@@ -35,14 +35,16 @@ def SMA(values, n):
     return pd.Series(values).rolling(n).mean()
 
 class MyStrategy(Strategy):
-    n1 = 33
-    n2 = 35
+    n1 = 9
+    n2 = 105
+    adx_threshold = 19
     def init(self):
         self.sma1 = self.I(talib.SMA, self.data.Close, timeperiod=self.n1)
         self.sma2 = self.I(talib.SMA, self.data.Close, timeperiod=self.n2)
+        self.adx = self.I(talib.ADX, self.data.High, self.data.Low, self.data.Close, timeperiod=14)
 
     def next(self):
-        if crossover(self.sma1, self.sma2) and not self.position.is_long:
+        if crossover(self.sma1, self.sma2) and not self.position.is_long and self.adx[-1] > self.adx_threshold:
             self.position.close()
             self.buy()
         elif crossover(self.sma2, self.sma1) and self.position.is_long:
@@ -54,23 +56,24 @@ if __name__ == "__main__":
     backtesting.Pool = multiprocessing.Pool
     
     symbol = "BTC-USD"
-    interval = "1d"
+    interval = "4h"  # 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
     start = "2023-01-01"
     end = "2025-08-28"
-    period= "max" # 4h-1h"730d" , 30m-5m "60d",1m "7d" 
+    period= "730d"#1d"max" 4h-1h"730d" , 30m-5m "60d",1m "7d" 
     
     data = get_data(symbol, interval, period, update=False)
     data = data.loc[start:end]
     bt = FractionalBacktest(data, MyStrategy, cash=20000, commission=.002, finalize_trades=True, fractional_unit=1e-08)
     stats = bt.run()
     print(stats)
-    bt.plot()
-    """ stats, heatmap = bt.optimize(
+    """ bt.plot()
+    stats, heatmap = bt.optimize(
         n1=range(5, 50,1),
         n2=range(20, 200, 5),
+        adx_threshold=range(10, 50, 1),
         maximize = "Return [%]",
         return_heatmap=True,
-    )
+    ) 
     print("Mejores parámetros encontrados:")
     print(stats["_strategy"])
     print(stats["_trades"])
