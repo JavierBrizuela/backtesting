@@ -7,6 +7,7 @@ import talib
 import multiprocessing
 import backtesting
 import os
+import matplotlib.pyplot as plt
 
 def get_data(symbol, interval, period="max", update=False):
     if not os.path.exists("tickers/" + symbol + "_" + interval + ".csv") or update:
@@ -33,6 +34,12 @@ def get_data(symbol, interval, period="max", update=False):
 def SMA(values, n):
    
     return pd.Series(values).rolling(n).mean()
+
+def VolumeProfile(data, bins=50):
+    # Calcular el perfil de volumen
+    price_bins = np.linspace(data['Low'].min(), data['High'].max(), bins)
+    hist, edges = np.histogram(data['Close'], bins=price_bins, weights=data['Volume'])
+    return hist, edges
 
 class MyStrategy(Strategy):
     n1 = 9
@@ -63,10 +70,26 @@ if __name__ == "__main__":
     
     data = get_data(symbol, interval, period, update=False)
     data = data.loc[start:end]
-    bt = FractionalBacktest(data, MyStrategy, cash=20000, commission=.002, finalize_trades=True, fractional_unit=1e-08)
+    hist, edges = VolumeProfile(data, bins=50)
+   # Graficar precios y perfil de volumen en subplots
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,6), gridspec_kw={"width_ratios":[3,1]})
+
+    # Cierre BTC
+    ax1.plot(data.index, data["Close"], color="black")
+    ax1.set_title("BTC-USD")
+
+    # Perfil de volumen
+    ax2.barh(edges[:-1], hist, height=np.diff(edges), alpha=0.6, color="blue")
+    ax2.set_title("Perfil de Volumen")
+    ax2.set_xlabel("Volumen")
+    ax2.set_ylabel("Precio")
+
+    plt.tight_layout()
+    plt.show()
+    """ bt = FractionalBacktest(data, MyStrategy, cash=20000, commission=.002, finalize_trades=True, fractional_unit=1e-08)
     stats = bt.run()
     print(stats)
-    """ bt.plot()
+    bt.plot()
     stats, heatmap = bt.optimize(
         n1=range(5, 50,1),
         n2=range(20, 200, 5),

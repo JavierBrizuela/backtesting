@@ -9,6 +9,8 @@ yfinance = "*"
 pandas = "*"
 numpy = "*"
 ta-lib = "*"
+matplotlib = "*"
+binance-sdk-spot = "*"
 
 [dev-packages]
 
