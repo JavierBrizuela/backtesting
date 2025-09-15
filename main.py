@@ -41,20 +41,56 @@ def VolumeProfile(data, bins=50):
     hist, edges = np.histogram(data['Close'], bins=price_bins, weights=data['Volume'])
     return hist, edges
 
+def squeeze_momentum(df, length=20, mult=2.0, lengthKC=20, multKC=1.5):
+    high = df['High']
+    low = df['Low']
+    close = df['Close']
+    # Calcular Bollinger Bands
+    upperBB, basis, lowerBB = talib.BBANDS(close, timeperiod=length, nbdevup=mult, nbdevdn=mult, matype=0)
+    # Calcular Keltner Channels
+    atr = talib.ATR(high, low, close, timeperiod=lengthKC)
+    ma = talib.SMA(close, timeperiod=lengthKC)
+    upperKC = ma + atr * multKC
+    lowerKC = ma - atr * multKC
+    # Determinar si el mercado está en "squeeze"
+    squeeze_on = (lowerBB > lowerKC) & (upperBB < upperKC)
+    squeeze_off = (lowerBB < lowerKC) & (upperBB > upperKC)
+    no_squeeze = ~(squeeze_on | squeeze_off)
+    # Calcular el Momentum
+    highest_high = pd.Series(high).rolling(lengthKC).max()
+    lowest_low = pd.Series(low).rolling(lengthKC).min()
+    avg1 = (highest_high + lowest_low) / 2
+    avg2 = pd.Series(close).rolling(lengthKC).mean()
+    input_series = pd.Series(close) - (avg1 + avg2) / 2
+    # Función para calcular la regresión lineal
+    def linreg(series, length, offset=0):
+        x = np.arange(length)
+        def f(y):
+            if np.isnan(y).any():
+                return np.nan
+            coeffs = np.polyfit(x, y, 1)
+            return coeffs[1] + coeffs[0] * (length - 1 - offset)
+        return series.rolling(length).apply(f, raw=True)
+
+    val = linreg(input_series, lengthKC, 0)
+
+    return val.values
+    
 class MyStrategy(Strategy):
-    n1 = 9
-    n2 = 105
+    n1 = 10
+    n2 = 55
     adx_threshold = 19
     def init(self):
-        self.sma1 = self.I(talib.SMA, self.data.Close, timeperiod=self.n1)
-        self.sma2 = self.I(talib.SMA, self.data.Close, timeperiod=self.n2)
+        self.ema1 = self.I(talib.EMA, self.data.Close, timeperiod=self.n1)
+        self.ema2 = self.I(talib.EMA, self.data.Close, timeperiod=self.n2)
         self.adx = self.I(talib.ADX, self.data.High, self.data.Low, self.data.Close, timeperiod=14)
-
+        self.sqz = self.I(squeeze_momentum, self.data)
+        self.bbands = self.I(talib.BBANDS, self.data.Close, timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
     def next(self):
-        if crossover(self.sma1, self.sma2) and not self.position.is_long and self.adx[-1] > self.adx_threshold:
+        if crossover(self.ema1, self.ema2) and not self.position.is_long and self.adx[-1] > self.adx_threshold:
             self.position.close()
             self.buy()
-        elif crossover(self.sma2, self.sma1) and self.position.is_long:
+        elif crossover(self.ema2, self.ema1) and self.position.is_long:
             self.position.close()
             
 if __name__ == "__main__":
@@ -70,8 +106,8 @@ if __name__ == "__main__":
     
     data = get_data(symbol, interval, period, update=False)
     data = data.loc[start:end]
-    hist, edges = VolumeProfile(data, bins=50)
-   # Graficar precios y perfil de volumen en subplots
+    hist, edges = VolumeProfile(data, bins=100)
+    """ # Graficar precios y perfil de volumen en subplots
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,6), gridspec_kw={"width_ratios":[3,1]})
 
     # Cierre BTC
@@ -85,12 +121,12 @@ if __name__ == "__main__":
     ax2.set_ylabel("Precio")
 
     plt.tight_layout()
-    plt.show()
-    """ bt = FractionalBacktest(data, MyStrategy, cash=20000, commission=.002, finalize_trades=True, fractional_unit=1e-08)
+    plt.show() """
+    bt = FractionalBacktest(data, MyStrategy, cash=20000, commission=.002, finalize_trades=True, fractional_unit=1e-08)
     stats = bt.run()
     print(stats)
     bt.plot()
-    stats, heatmap = bt.optimize(
+    """stats, heatmap = bt.optimize(
         n1=range(5, 50,1),
         n2=range(20, 200, 5),
         adx_threshold=range(10, 50, 1),
