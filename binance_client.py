@@ -1,10 +1,11 @@
+from datetime import datetime
 from pprint import pprint
 from binance_sdk_spot.spot import Spot
 from binance_common.constants import SPOT_REST_API_PROD_URL, SPOT_REST_API_TESTNET_URL
 from binance_common.configuration import ConfigurationRestAPI
 import os
 import logging
-
+import pandas as pd
 from decorators import log_api_call
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -31,6 +32,47 @@ class BinanceClient:
             if balance.asset == symbol:
                 return balance
         return None
+
+    @log_api_call
+    def get_ticker_ohlcv(self, symbol, interval, start_time=None, end_time=None, limit=1000):
+        
+        if start_time:
+            start_date = pd.to_datetime(start_time)
+            start_time = int(start_date.timestamp() * 1000)
+        
+            if not end_time:
+                end_time = int(datetime.now().timestamp() * 1000)
+            else:
+                end_date = pd.to_datetime(end_time)
+                end_time = int(end_date.timestamp() * 1000)
+                
+        if end_time and start_time and end_time < start_time:
+            raise ValueError("end_time must be greater than or equal to start_time")
+        
+        all_data = []
+        
+        while start_time and end_time and start_time < end_time:
+            # Cuando se solicitan mas de 1000 velas, se deben hacer multiples llamadas
+            data = self.client.rest_api.klines(symbol=symbol, interval=interval, start_time=start_time, end_time=end_time, limit=limit).data()
+            start_time = data[-1][0] + 1 if data else end_time
+            all_data.extend(data)
+
+        df = pd.DataFrame(all_data, columns=[
+            'open_time', 'Open', 'High', 'Low', 'Close', 'Volume',
+            'close_time', 'quote_asset_volume', 'number_of_trades',
+            'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
+            ])
+        df['open_time'] = pd.to_datetime(df['open_time'], unit='ms')
+        df['close_time'] = pd.to_datetime(df['close_time'], unit='ms')
+        cols_float = ['Open', 'High', 'Low', 'Close', 'Volume',
+              'quote_asset_volume', 'taker_buy_base_asset_volume',
+              'taker_buy_quote_asset_volume']
+
+        cols_int = ['number_of_trades', 'ignore']
+
+        df[cols_float] = df[cols_float].astype(float)
+        df[cols_int] = df[cols_int].astype(int)
+        return df
 
     @log_api_call
     def market_order(self, symbol, side, quantity=None, quote_order_qty=None):

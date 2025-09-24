@@ -8,6 +8,8 @@ import multiprocessing
 import backtesting
 import os
 import matplotlib.pyplot as plt
+from binance_client import BinanceClient
+from financial_analytics import FinancialAnalytics
 
 def get_data(symbol, interval, period="max", update=False):
     if not os.path.exists("tickers/" + symbol + "_" + interval + ".csv") or update:
@@ -80,6 +82,7 @@ class MyStrategy(Strategy):
     n1 = 10
     n2 = 55
     adx_threshold = 19
+    sl = 0.05  # 5% stop loss
     def init(self):
         self.ema1 = self.I(talib.EMA, self.data.Close, timeperiod=self.n1)
         self.ema2 = self.I(talib.EMA, self.data.Close, timeperiod=self.n2)
@@ -87,12 +90,14 @@ class MyStrategy(Strategy):
         self.sqz = self.I(squeeze_momentum, self.data)
         self.bbands = self.I(talib.BBANDS, self.data.Close, timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
     def next(self):
-        if crossover(self.ema1, self.ema2) and not self.position.is_long and self.adx[-1] > self.adx_threshold:
-            self.position.close()
+        price = self.data.Close[-1]
+        # Stop Loss: 2% debajo del precio de entrada
+        sl = price * 0.98
+        # Take Profit: 4% arriba del precio de entrada
+        tp = price * 1.04
+        if price <= self.ema2 and not self.position.is_long:
             self.buy()
-        elif crossover(self.ema2, self.ema1) and self.position.is_long:
-            self.position.close()
-            
+        
 if __name__ == "__main__":
     
     # Habilitar multiproceso
@@ -101,12 +106,22 @@ if __name__ == "__main__":
     symbol = "BTC-USD"
     interval = "4h"  # 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
     start = "2023-01-01"
-    end = "2025-08-28"
+    end = "2025-09-20"
     period= "730d"#1d"max" 4h-1h"730d" , 30m-5m "60d",1m "7d" 
+    client = BinanceClient(test_net=False)
+
+    data = client.get_ticker_ohlcv(symbol="BTCUSDT", interval="4h", start_time=start, end_time=end, limit=1000)
     
-    data = get_data(symbol, interval, period, update=False)
-    data = data.loc[start:end]
-    hist, edges = VolumeProfile(data, bins=100)
+    print(data.info())
+    financial = FinancialAnalytics(data)
+    data = financial.log_returns()
+    print(data.head())
+    data_monte_carlo = financial.monte_carlo_simulation()
+    print(data_monte_carlo.head())
+    financial.plot_returns()
+    #data = get_data(symbol, interval, period, update=False)
+    #data = data.loc[start:end]
+    #hist, edges = VolumeProfile(data, bins=100)
     """ # Graficar precios y perfil de volumen en subplots
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,6), gridspec_kw={"width_ratios":[3,1]})
 
@@ -121,19 +136,17 @@ if __name__ == "__main__":
     ax2.set_ylabel("Precio")
 
     plt.tight_layout()
-    plt.show() """
+    plt.show() 
     bt = FractionalBacktest(data, MyStrategy, cash=20000, commission=.002, finalize_trades=True, fractional_unit=1e-08)
     stats = bt.run()
     print(stats)
     bt.plot()
-    """stats, heatmap = bt.optimize(
-        n1=range(5, 50,1),
-        n2=range(20, 200, 5),
-        adx_threshold=range(10, 50, 1),
+    stats, heatmap = bt.optimize(
+        sl = np.arange(0.01, 0.10, 0.01),
         maximize = "Return [%]",
         return_heatmap=True,
-    ) 
+    )
+    plot_heatmaps(heatmap)
     print("Mejores parámetros encontrados:")
     print(stats["_strategy"])
-    print(stats["_trades"])
-    plot_heatmaps(heatmap) """
+    print(stats["_trades"])  """
