@@ -5,11 +5,13 @@ from binance_common.constants import SPOT_REST_API_PROD_URL, SPOT_REST_API_TESTN
 from binance_common.configuration import ConfigurationRestAPI
 import os
 import logging
+import json
+from pydantic import BaseModel
+import websocket
 import pandas as pd
 from decorators import log_api_call
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
 
 class BinanceClient:
     def __init__(self, test_net=False):
@@ -20,6 +22,10 @@ class BinanceClient:
         
         logging.info(f"Initializing BinanceClient with base_path: {base_path}")
         self.client = Spot(config_rest_api=__config)
+    
+    @log_api_call
+    def get_order_book(self, symbol, limit=500):
+        return self.client.rest_api.depth(symbol=symbol, limit=limit).data()
 
     @log_api_call
     def get_account_info(self):

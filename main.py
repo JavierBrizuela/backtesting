@@ -103,22 +103,36 @@ if __name__ == "__main__":
     # Habilitar multiproceso
     backtesting.Pool = multiprocessing.Pool
     
-    symbol = "BTC-USD"
+    symbol = "BTCUSDT"
     interval = "4h"  # 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
     start = "2023-01-01"
     end = "2025-09-20"
     period= "730d"#1d"max" 4h-1h"730d" , 30m-5m "60d",1m "7d" 
     client = BinanceClient(test_net=False)
 
-    data = client.get_ticker_ohlcv(symbol="BTCUSDT", interval="4h", start_time=start, end_time=end, limit=1000)
+    #data = client.get_ticker_ohlcv(symbol="BTCUSDT", interval="4h", start_time=start, end_time=end, limit=1000)
+    order_book = client.get_order_book(symbol=symbol, limit=500)
     
-    print(data.info())
-    financial = FinancialAnalytics(data)
-    data = financial.log_returns()
-    print(data.head())
-    data_monte_carlo = financial.monte_carlo_simulation()
-    print(data_monte_carlo.head())
-    financial.plot_returns()
+    #financial = FinancialAnalytics(data)
+    #data = financial.log_returns()
+    order_book = order_book.model_dump()
+
+    #data_monte_carlo = financial.monte_carlo_simulation()
+    #print(data_monte_carlo.head())
+    #financial.plot_returns()
+    bids_prices = [float(bid[0]) for bid in order_book['bids']]
+    bids_quantities = [float(bid[1]) for bid in order_book['bids']]
+    asks_prices = [float(ask[0]) for ask in order_book['asks']]
+    asks_quantities = [float(ask[1]) for ask in order_book['asks']]
+    plt.figure(figsize=(10, 6))
+    plt.plot(bids_quantities, bids_prices, label='Bids')
+    plt.plot(asks_quantities, asks_prices, label='Asks')
+    plt.title("Order Book")
+    plt.xlabel("Quantity")
+    plt.ylabel("Price")
+    plt.legend()
+    plt.show()
+
     #data = get_data(symbol, interval, period, update=False)
     #data = data.loc[start:end]
     #hist, edges = VolumeProfile(data, bins=100)
