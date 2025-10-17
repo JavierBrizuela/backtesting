@@ -46,10 +46,15 @@ class BinanceClient:
     def get_aggregate_trades(self, symbol, fromId=None, start_time=None, end_time=None, limit=None):
         if start_time:
             start_time, end_time = self.time_to_timestamp(start_time, end_time)
-            
-        agg_trades = self.client.rest_api.agg_trades(symbol=symbol, from_id=fromId, start_time=start_time, end_time=end_time, limit=limit).data()
-        
-        return agg_trades
+        last_trade_time = None
+        agg_trades = []
+        while last_trade_time < end_time:
+            response = self.client.rest_api.agg_trades(symbol=symbol, from_id=fromId, start_time=start_time, end_time=end_time, limit=limit).data()
+            last_trade =response[-1].model_dump()
+            fromId = last_trade['a'] + 1  # next trade id
+            last_trade_time = pd.to_datetime(last_trade['T'] , unit='ms')
+            agg_trades.extend(response)
+        return agg_trades, last_trade_time
 
     @log_api_call
     def get_account_info(self):
