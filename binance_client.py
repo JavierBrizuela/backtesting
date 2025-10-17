@@ -23,9 +23,33 @@ class BinanceClient:
         logging.info(f"Initializing BinanceClient with base_path: {base_path}")
         self.client = Spot(config_rest_api=__config)
     
+    def time_to_timestamp(self, start_time, end_time):
+        if start_time:
+            start_date = pd.to_datetime(start_time)
+            start_time = int(start_date.timestamp() * 1000)
+        
+            if not end_time:
+                end_time = int(datetime.now().timestamp() * 1000)
+            else:
+                end_date = pd.to_datetime(end_time)
+                end_time = int(end_date.timestamp() * 1000)
+                
+        if end_time and start_time and end_time < start_time:
+            raise ValueError("end_time must be greater than or equal to start_time")
+        return start_time, end_time
+    
     @log_api_call
     def get_order_book(self, symbol, limit=500):
         return self.client.rest_api.depth(symbol=symbol, limit=limit).data()
+    
+    @log_api_call
+    def get_aggregate_trades(self, symbol, fromId=None, start_time=None, end_time=None, limit=None):
+        if start_time:
+            start_time, end_time = self.time_to_timestamp(start_time, end_time)
+            
+        agg_trades = self.client.rest_api.agg_trades(symbol=symbol, from_id=fromId, start_time=start_time, end_time=end_time, limit=limit).data()
+        
+        return agg_trades
 
     @log_api_call
     def get_account_info(self):
@@ -43,17 +67,7 @@ class BinanceClient:
     def get_ticker_ohlcv(self, symbol, interval, start_time=None, end_time=None, limit=1000):
         
         if start_time:
-            start_date = pd.to_datetime(start_time)
-            start_time = int(start_date.timestamp() * 1000)
-        
-            if not end_time:
-                end_time = int(datetime.now().timestamp() * 1000)
-            else:
-                end_date = pd.to_datetime(end_time)
-                end_time = int(end_date.timestamp() * 1000)
-                
-        if end_time and start_time and end_time < start_time:
-            raise ValueError("end_time must be greater than or equal to start_time")
+            start_time, end_time = self.time_to_timestamp(start_time, end_time)
         
         all_data = []
         
@@ -87,3 +101,4 @@ class BinanceClient:
     @log_api_call
     def limit_order(self, symbol, side, price, quantity=None, quote_order_qty=None, time_in_force="GTC"):
         return self.client.rest_api.new_order(symbol=symbol, side=side, type="LIMIT", quantity=quantity, price=price, quote_order_qty=quote_order_qty, time_in_force=time_in_force).data()
+

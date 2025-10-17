@@ -111,19 +111,20 @@ if __name__ == "__main__":
     client = BinanceClient(test_net=False)
 
     #data = client.get_ticker_ohlcv(symbol="BTCUSDT", interval="4h", start_time=start, end_time=end, limit=1000)
-    order_book = client.get_order_book(symbol=symbol, limit=500)
     
     #financial = FinancialAnalytics(data)
     #data = financial.log_returns()
-    order_book = order_book.model_dump()
 
     #data_monte_carlo = financial.monte_carlo_simulation()
     #print(data_monte_carlo.head())
     #financial.plot_returns()
+    order_book = client.get_order_book(symbol=symbol, limit=500)
+    order_book = order_book.model_dump()
     bids_prices = [float(bid[0]) for bid in order_book['bids']]
     bids_quantities = [float(bid[1]) for bid in order_book['bids']]
     asks_prices = [float(ask[0]) for ask in order_book['asks']]
     asks_quantities = [float(ask[1]) for ask in order_book['asks']]
+    
     plt.figure(figsize=(10, 6))
     plt.plot(bids_quantities, bids_prices, label='Bids')
     plt.plot(asks_quantities, asks_prices, label='Asks')
