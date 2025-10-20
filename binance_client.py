@@ -25,13 +25,11 @@ class BinanceClient:
     
     def time_to_timestamp(self, start_time, end_time):
         if start_time:
-            start_time = pd.to_datetime(start_time)
             start_time = int(start_time.timestamp() * 1000)
 
             if not end_time:
                 end_time = int(datetime.now().timestamp() * 1000)
             else:
-                end_time = pd.to_datetime(end_time)
                 end_time = int(end_time.timestamp() * 1000)
                 
         if end_time and start_time and end_time < start_time:
@@ -49,12 +47,17 @@ class BinanceClient:
         last_trade_time = 0
         agg_trades = []
         print(f"last_trade_time: {last_trade_time}, end_time: {end_time}")
+    
         params = {
             'symbol': symbol,
             'start_time': start_time,
             'end_time': end_time,
             'limit': limit
         }
+        if fromId:
+            params['from_id'] = fromId
+            del params['start_time']
+            del params['end_time']
         request_count = 0
         
         while True:

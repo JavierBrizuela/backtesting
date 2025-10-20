@@ -1,3 +1,4 @@
 .env
 tickers/
 data/
+__pycache__/
