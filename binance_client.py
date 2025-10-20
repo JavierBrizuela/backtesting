@@ -3,7 +3,7 @@ from pprint import pprint
 from binance_sdk_spot.spot import Spot
 from binance_common.constants import SPOT_REST_API_PROD_URL, SPOT_REST_API_TESTNET_URL
 from binance_common.configuration import ConfigurationRestAPI
-import os
+import os, time
 import logging
 import json
 from pydantic import BaseModel
@@ -25,14 +25,14 @@ class BinanceClient:
     
     def time_to_timestamp(self, start_time, end_time):
         if start_time:
-            start_date = pd.to_datetime(start_time)
-            start_time = int(start_date.timestamp() * 1000)
-        
+            start_time = pd.to_datetime(start_time)
+            start_time = int(start_time.timestamp() * 1000)
+
             if not end_time:
                 end_time = int(datetime.now().timestamp() * 1000)
             else:
-                end_date = pd.to_datetime(end_time)
-                end_time = int(end_date.timestamp() * 1000)
+                end_time = pd.to_datetime(end_time)
+                end_time = int(end_time.timestamp() * 1000)
                 
         if end_time and start_time and end_time < start_time:
             raise ValueError("end_time must be greater than or equal to start_time")
@@ -43,19 +43,69 @@ class BinanceClient:
         return self.client.rest_api.depth(symbol=symbol, limit=limit).data()
     
     @log_api_call
-    def get_aggregate_trades(self, symbol, fromId=None, start_time=None, end_time=None, limit=None):
+    def get_aggregate_trades(self, symbol, fromId=None, start_time=None, end_time=None, limit=1000):
         if start_time:
             start_time, end_time = self.time_to_timestamp(start_time, end_time)
-        last_trade_time = None
+        last_trade_time = 0
         agg_trades = []
-        while last_trade_time < end_time:
-            response = self.client.rest_api.agg_trades(symbol=symbol, from_id=fromId, start_time=start_time, end_time=end_time, limit=limit).data()
-            last_trade =response[-1].model_dump()
-            fromId = last_trade['a'] + 1  # next trade id
-            last_trade_time = pd.to_datetime(last_trade['T'] , unit='ms')
-            agg_trades.extend(response)
-        return agg_trades, last_trade_time
-
+        print(f"last_trade_time: {last_trade_time}, end_time: {end_time}")
+        params = {
+            'symbol': symbol,
+            'start_time': start_time,
+            'end_time': end_time,
+            'limit': limit
+        }
+        request_count = 0
+        
+        while True:
+            try:
+                response = self.client.rest_api.agg_trades(**params)
+                status_code = response.status
+                rate_limit = response.rate_limits
+                response = response.data()
+                print(f"status_code: {status_code}, rate_limit: {rate_limit}")
+                if not response:
+                    print("No more trades to fetch.")
+                    break
+                
+                if len(response) < limit:
+                    print("Fetched all available trades.")
+                    agg_trades.extend(response)
+                    break
+                
+                last_trade = response[-1].model_dump()
+                last_trade_time = last_trade['T']
+        
+                params ={
+                    'symbol': symbol,
+                    'limit': limit,
+                    'from_id': last_trade['a'] + 1  # next trade id
+                }
+                request_count += 1
+                print(f"params: {params}")
+                
+                if last_trade_time >= end_time:
+                    filtered = [trade for trade in response if trade['T'] <= end_time]
+                    agg_trades.extend(filtered)
+                    print("Reached end_time, stopping fetch.")
+                    break
+                else:
+                    agg_trades.extend(response)
+                    print(f"Fetched {len(response)} trades, total so far: {len(agg_trades)}")
+                
+                if request_count % 10 == 0:
+                    print(f"Pausa más larga después de {request_count} peticiones...")
+                    time.sleep(2)
+                else:
+                    time.sleep(0.2)
+            except KeyboardInterrupt:
+                print("Proceso interrumpido por el usuario.")
+                break
+            except Exception as e:
+                logging.error(f"Error fetching aggregate trades: {e}")
+                break
+        return agg_trades
+    
     @log_api_call
     def get_account_info(self):
         return self.client.rest_api.get_account(omit_zero_balances=True).data()
