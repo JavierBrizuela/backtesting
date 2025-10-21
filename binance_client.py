@@ -24,17 +24,18 @@ class BinanceClient:
         self.client = Spot(config_rest_api=__config)
     
     def time_to_timestamp(self, start_time, end_time):
+        
         if start_time:
-            start_time = int(start_time.timestamp() * 1000)
+            start_timestamp = int(start_time.timestamp() * 1000)
 
-            if not end_time:
-                end_time = int(datetime.now().timestamp() * 1000)
-            else:
-                end_time = int(end_time.timestamp() * 1000)
+        if not end_time:
+            end_timestamp = int(datetime.now().timestamp() * 1000)
+        else:
+            end_timestamp = int(end_time.timestamp() * 1000)
                 
         if end_time and start_time and end_time < start_time:
             raise ValueError("end_time must be greater than or equal to start_time")
-        return start_time, end_time
+        return start_timestamp, end_timestamp
     
     @log_api_call
     def get_order_book(self, symbol, limit=500):
@@ -42,26 +43,29 @@ class BinanceClient:
     
     @log_api_call
     def get_aggregate_trades(self, symbol, fromId=None, start_time=None, end_time=None, limit=1000):
-        if start_time:
-            start_time, end_time = self.time_to_timestamp(start_time, end_time)
-        last_trade_time = 0
+        print(type(start_time))
+        start_timestamp = int(start_time.timestamp() * 1000) if start_time else None
+        end_timestamp = int(end_time.timestamp() * 1000) if end_time else None
+        last_trade_timestamp = 0
         agg_trades = []
-        print(f"last_trade_time: {last_trade_time}, end_time: {end_time}")
+        print(f"last_trade_time: {last_trade_timestamp}, start_timestamp: {start_timestamp}, end_timestamp: {end_timestamp}")
     
         params = {
             'symbol': symbol,
-            'start_time': start_time,
-            'end_time': end_time,
+            'start_time': start_timestamp,
+            'end_time': end_timestamp,
             'limit': limit
         }
         if fromId:
             params['from_id'] = fromId
             del params['start_time']
             del params['end_time']
+        
         request_count = 0
         
         while True:
             try:
+                print(f"params before request: {params}")
                 response = self.client.rest_api.agg_trades(**params)
                 status_code = response.status
                 rate_limit = response.rate_limits
@@ -77,8 +81,7 @@ class BinanceClient:
                     break
                 
                 last_trade = response[-1].model_dump()
-                last_trade_time = last_trade['T']
-        
+                last_trade_timestamp = last_trade['T']
                 params ={
                     'symbol': symbol,
                     'limit': limit,
@@ -86,9 +89,9 @@ class BinanceClient:
                 }
                 request_count += 1
                 print(f"params: {params}")
-                
-                if last_trade_time >= end_time:
-                    filtered = [trade for trade in response if trade['T'] <= end_time]
+                print(f"last_trade_time: {last_trade_timestamp}, end_time: {end_timestamp}")
+                if last_trade_timestamp >= end_timestamp:
+                    filtered = [trade for trade in response if trade['T'] <= end_timestamp]
                     agg_trades.extend(filtered)
                     print("Reached end_time, stopping fetch.")
                     break
