@@ -43,13 +43,12 @@ class BinanceClient:
     
     @log_api_call
     def get_aggregate_trades(self, symbol, fromId=None, start_time=None, end_time=None, limit=1000):
-        print(type(start_time))
         start_timestamp = int(start_time.timestamp() * 1000) if start_time else None
         end_timestamp = int(end_time.timestamp() * 1000) if end_time else None
         last_trade_timestamp = 0
         agg_trades = []
+        
         print(f"last_trade_time: {last_trade_timestamp}, start_timestamp: {start_timestamp}, end_timestamp: {end_timestamp}")
-    
         params = {
             'symbol': symbol,
             'start_time': start_timestamp,
@@ -57,7 +56,7 @@ class BinanceClient:
             'limit': limit
         }
         if fromId:
-            params['from_id'] = fromId
+            params['from_id'] = int(fromId)
             del params['start_time']
             del params['end_time']
         
@@ -65,13 +64,13 @@ class BinanceClient:
         
         while True:
             try:
-                print(f"params before request: {params}")
                 response = self.client.rest_api.agg_trades(**params)
                 status_code = response.status
                 rate_limit = response.rate_limits
                 response = response.data()
                 print(f"status_code: {status_code}, rate_limit: {rate_limit}")
-                if not response:
+                
+                if len(response) == 0:
                     print("No more trades to fetch.")
                     break
                 
@@ -88,7 +87,6 @@ class BinanceClient:
                     'from_id': last_trade['a'] + 1  # next trade id
                 }
                 request_count += 1
-                print(f"params: {params}")
                 print(f"last_trade_time: {last_trade_timestamp}, end_time: {end_timestamp}")
                 if last_trade_timestamp >= end_timestamp:
                     filtered = [trade for trade in response if trade['T'] <= end_timestamp]

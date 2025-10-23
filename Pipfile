@@ -11,6 +11,7 @@ numpy = "*"
 ta-lib = "*"
 matplotlib = "*"
 binance-sdk-spot = "*"
+pyarrow = "*"
 
 [dev-packages]
 
