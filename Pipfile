@@ -12,6 +12,7 @@ ta-lib = "*"
 matplotlib = "*"
 binance-sdk-spot = "*"
 pyarrow = "*"
+duckdb = "*"
 
 [dev-packages]
 

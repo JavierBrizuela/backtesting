@@ -18,7 +18,13 @@ class BinanceClient:
         __api_key = os.getenv("API_KEY") if not test_net else os.getenv("TESTNET_API_KEY")
         __api_secret = os.getenv("SECRET_KEY") if not test_net else os.getenv("TESTNET_SECRET_KEY")
         base_path=SPOT_REST_API_PROD_URL if not test_net else SPOT_REST_API_TESTNET_URL
-        __config = ConfigurationRestAPI(api_key=__api_key, api_secret=__api_secret, base_path=base_path)
+        __config = ConfigurationRestAPI(
+            api_key=__api_key, 
+            api_secret=__api_secret, 
+            base_path=base_path,
+            timeout=5000, 
+            retries=5,
+            backoff=1500)
         
         logging.info(f"Initializing BinanceClient with base_path: {base_path}")
         self.client = Spot(config_rest_api=__config)
@@ -86,7 +92,7 @@ class BinanceClient:
                     'limit': limit,
                     'from_id': last_trade['a'] + 1  # next trade id
                 }
-                request_count += 1
+                
                 print(f"last_trade_time: {last_trade_timestamp}, end_time: {end_timestamp}")
                 if last_trade_timestamp >= end_timestamp:
                     filtered = [trade for trade in response if trade['T'] <= end_timestamp]
@@ -97,11 +103,7 @@ class BinanceClient:
                     agg_trades.extend(response)
                     print(f"Fetched {len(response)} trades, total so far: {len(agg_trades)}")
                 
-                if request_count % 10 == 0:
-                    print(f"Pausa más larga después de {request_count} peticiones...")
-                    time.sleep(2)
-                else:
-                    time.sleep(0.2)
+                time.sleep(0.1)
             except KeyboardInterrupt:
                 print("Proceso interrumpido por el usuario.")
                 break

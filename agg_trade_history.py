@@ -1,6 +1,7 @@
 from binance_client import BinanceClient
 import numpy as np
 import pandas as pd
+import duckdb
 import os
 
 symbol = "BTCUSDT"
@@ -11,7 +12,29 @@ folder = f'data/{symbol}/tradebook/'
 os.makedirs(folder, exist_ok=True)
 file_path = os.path.join(folder, f'agg_trade_history_{date}.parquet')
 client = BinanceClient(test_net=False)
+db_path = os.path.join(folder, f'{symbol}_trade_history.db')
+table = 'agg_trade_history'
 
+def save_trades_to_db(trades, db_path, table):
+    df = pd.DataFrame(trade.model_dump() for trade in trades)
+    if df.empty:
+        print("⚠️ No hay datos para guardar en la base de datos.")
+    else:
+        df.columns = ['agg_trade_id', 'price', 'quantity', 'first_trade_id', 'last_trade_id', 'timestamp', 'is_buyer_maker', 'is_best_match', 'additional_properties']
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')# Formato YYYY-MM-DD hh:mm:ss.fff
+        df.set_index('timestamp', inplace=True)
+        df.drop(columns=['additional_properties'], inplace=True)
+        
+        con = duckdb.connect(database=db_path)
+        con.execute(f'''
+            CREATE TABLE IF NOT EXISTS {table} AS 
+            SELECT * FROM df LIMIT 0
+        ''')
+        con.execute(f'''
+            INSERT INTO {table} SELECT * FROM df
+        ''')
+        con.close()
+        
 def save_trades_to_csv(trades, file_path):
     
     df = pd.DataFrame(trade.model_dump() for trade in trades)
