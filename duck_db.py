@@ -1,6 +1,9 @@
 import duckdb
 
 con = duckdb.connect(database='data/BTCUSDT/tradebook/trade_history.db')
-result = con.execute("SELECT * FROM agg_trade_history").fetchdf()
+result = con.execute("""
+                    DESCRIBE TABLE candles_4_hours 
+                    
+                     """).fetchdf()
 
-print( result.tail() )
+print( result )
