@@ -88,6 +88,24 @@ def create_candlesticks_table(db_path, table, interval, candle_table=None):
     ''')
     con.close()
     
+def create_volume_profile_table(db_path, table, interval, volume_profile_table=None, resolution=100):
+    if volume_profile_table is None:
+        volume_profile_table = f'volume_profile_{interval.replace(" ", "_")}'
+    con = duckdb.connect(database=db_path)
+    con.execute(f'''
+        CREATE TABLE IF NOT EXISTS {volume_profile_table} AS 
+        SELECT 
+            time_bucket('{interval}', timestamp) AS open_time,
+            FLOOR(price/{resolution})*{resolution} AS price_bin,
+            COUNT(*) AS trade_count,
+            SUM(CASE WHEN is_buyer_maker THEN quantity ELSE 0 END) AS sell_volume,
+            SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE 0 END) AS buy_volume
+        FROM {table} 
+        GROUP BY open_time, price_bin
+        ORDER BY open_time ASC
+    ''')
+    con.close()
+    
 def get_agg_trades_from_api(symbol, start_time, end_time):
     if os.path.exists(db_path):
         con = duckdb.connect(database=db_path)
@@ -116,13 +134,14 @@ def get_agg_trades_from_api(symbol, start_time, end_time):
         save_agg_trades_to_db(df, db_path, table)
         print(f"Database created and {len(response)} trades saved.")
 year = 2025
-month = 9
-interval = '4 hours'
+month = 10
 
-df = get_agg_trades_monthly(symbol, year, month)
+""" df = get_agg_trades_monthly(symbol, year, month)
 
 if df is not None:
     save_agg_trades_to_db(df, db_path, table)
-    print(f"{len(df)} trades from {month} - {year} saved to the database.")
+    print(f"{len(df)} trades from {month} - {year} saved to the database.") 
+"""
 
-#create_candlesticks_table(db_path, table, interval)
+create_candlesticks_table(db_path, table, interval='4 hours')
+create_volume_profile_table(db_path, table, interval='4 hours', resolution=100)
