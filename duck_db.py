@@ -2,6 +2,7 @@ import duckdb
 from bokeh.plotting import figure, show
 from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.layouts import column
+import pandas as pd
 
 con = duckdb.connect(database='data/BTCUSDT/tradebook/trade_history.db')
 df_ohlc = con.execute("""SELECT * FROM candles_4_hours""").fetchdf()
@@ -13,15 +14,16 @@ df_ohlc['color'] = ['green' if close >= open_ else 'red' for close, open_ in zip
 df_vol_profile['delta'] = df_vol_profile['buy_volume'] - df_vol_profile['sell_volume']
 df_vol_profile['buy_vol_norm'] = df_vol_profile['buy_volume'] / df_vol_profile['buy_volume'].max()
 df_vol_profile['sell_vol_norm'] = df_vol_profile['sell_volume'] / df_vol_profile['sell_volume'].max()
-df_vol_profile['buy_vol_bar'] = df_vol_profile['open_time'] + df_vol_profile['buy_vol_norm'] * width_ms
-source_ohlc = ColumnDataSource(df_ohlc)
-df_vol_profile['sell_vol_bar'] = df_vol_profile['open_time'] + df_vol_profile['sell_vol_norm'] * width_ms
+df_vol_profile['buy_vol_bar'] = df_vol_profile['open_time'] + pd.to_timedelta( df_vol_profile['buy_vol_norm'] * width_ms, unit='ms')
+df_vol_profile['sell_vol_bar'] = df_vol_profile['open_time'] + pd.to_timedelta(df_vol_profile['sell_vol_norm'] * width_ms, unit='ms')
+print(df_vol_profile.head())
 
+source_ohlc = ColumnDataSource(df_ohlc)
 source_vol_profile = ColumnDataSource(df_vol_profile)
 plt_candlestick = figure(x_axis_type='datetime', title='BTCUSDT 4 Hours Candlesticks', width=1000, height=600)
 plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='low', line_color='color', source=source_ohlc)
 plt_candlestick.vbar(x='open_time', width=3.6e+6*4*0.8, top='open', bottom='close', fill_color='color', line_color=None, source=source_ohlc)
-plt_candlestick.hbar(y='price_bin', left='open_time', right=df_vol_profile['open_time'] + df_vol_profile['buy_vol_norm'] * width_ms, height=60, color='black', source=source_vol_profile)
+plt_candlestick.hbar(y='price_bin', left='open_time', right='buy_vol_bar', height=60, color='black', source=source_vol_profile)
 hover = HoverTool(
     tooltips=[
         ("Time", "@open_time{%F %T}"),
