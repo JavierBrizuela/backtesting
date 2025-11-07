@@ -1,6 +1,6 @@
 import duckdb
 from bokeh.plotting import figure, show
-from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.models import ColumnDataSource, HoverTool, NumeralTickFormatter
 from bokeh.layouts import column
 import pandas as pd
 
@@ -16,15 +16,16 @@ df_vol_profile['buy_vol_norm'] = df_vol_profile['buy_volume'] / df_vol_profile['
 df_vol_profile['sell_vol_norm'] = df_vol_profile['sell_volume'] / df_vol_profile['sell_volume'].max()
 df_vol_profile['buy_vol_bar'] = df_vol_profile['open_time'] + pd.to_timedelta( df_vol_profile['buy_vol_norm'] * width_ms, unit='ms')
 df_vol_profile['sell_vol_bar'] = df_vol_profile['open_time'] + pd.to_timedelta(df_vol_profile['sell_vol_norm'] * width_ms, unit='ms')
-print(df_vol_profile.head())
-
+# Candlestick Plot with Volume Profile
 source_ohlc = ColumnDataSource(df_ohlc)
 source_vol_profile = ColumnDataSource(df_vol_profile)
-plt_candlestick = figure(x_axis_type='datetime', title='BTCUSDT 4 Hours Candlesticks', width=1000, height=600)
-plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='low', line_color='color', source=source_ohlc)
-plt_candlestick.vbar(x='open_time', width=3.6e+6*4*0.8, top='open', bottom='close', fill_color='color', line_color=None, source=source_ohlc)
+plt_candlestick = figure(x_axis_type='datetime', width=1200, height=560)
+candles = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='low', line_color='color', source=source_ohlc)
+plt_candlestick.vbar(x='open_time', width=3.6e+6*4*0.8, top='open', bottom='close', fill_color='color', line_color=None, source=source_ohlc, legend_label='BTCUSDT 4 Hours Candlesticks')
 plt_candlestick.hbar(y='price_bin', left='open_time', right='buy_vol_bar', height=60, color='black', source=source_vol_profile)
+plt_candlestick.hbar(y='price_bin', left='sell_vol_bar', right='open_time', height=60, color='white', source=source_vol_profile, alpha=0.5)
 hover = HoverTool(
+    renderers=[candles],
     tooltips=[
         ("Time", "@open_time{%F %T}"),
         ("Open", "@open{0.2f}"),
@@ -40,10 +41,12 @@ hover = HoverTool(
     mode='vline'
 )
 plt_candlestick.add_tools(hover)
+plt_candlestick.xaxis.visible = False
+plt_candlestick.yaxis.formatter = NumeralTickFormatter(format="0,0.00")
 
 # Volume Plot
-plt_volume = figure(x_axis_type='datetime', title='BTCUSDT 4 Hours Volume', width=1000, height=200, x_range=plt_candlestick.x_range)
-plt_volume.vbar(x=df_ohlc['open_time'], width=3.6e+6*4*0.8, top=df_ohlc['volume'], bottom=0, fill_color=df_ohlc['color'], line_color=None)
+plt_volume = figure(x_axis_type='datetime', width=1200, height=180, x_range=plt_candlestick.x_range)
+plt_volume.vbar(x=df_ohlc['open_time'], width=3.6e+6*4*0.8, top=df_ohlc['volume'], bottom=0, fill_color=df_ohlc['color'], line_color=None, legend_label='BTCUSDT 4 Hours Volume' )
 
 # Volume Delta Stack Plot
 df_candle_vol = (
@@ -52,10 +55,10 @@ df_candle_vol = (
     .sum()
     .sort_values('open_time')
 )
-stackers = ['buy_volume', 'sell_volume']
+stackers = ['sell_volume', 'buy_volume']
 source_vol_stack = ColumnDataSource(df_candle_vol)
-plt_vol_stack = figure(x_axis_type='datetime', title='BTCUSDT 4 Hours Delta', width=1000, height=200, x_range=plt_candlestick.x_range)
-plt_vol_stack.vbar_stack(stackers, x='open_time',width=width_ms, fill_color = ['green', 'red'], line_color=None, source=source_vol_stack, legend_label=['Buy Volume', 'Sell Volume'])
+plt_vol_stack = figure(x_axis_type='datetime', width=1200, height=120, x_range=plt_candlestick.x_range)
+plt_vol_stack.vbar_stack(stackers, x='open_time',width=width_ms, fill_color = ['red', 'green'], line_color=None, source=source_vol_stack, legend_label=['Sell Volume', 'Buy Volume'])
 plt_vol_stack.add_tools(HoverTool(
     tooltips=[
         ("Time", "@open_time{%F %T}"),
