@@ -15,15 +15,26 @@ df_vol_profile['delta'] = df_vol_profile['buy_volume'] - df_vol_profile['sell_vo
 df_vol_profile['buy_vol_norm'] = df_vol_profile['buy_volume'] / df_vol_profile['buy_volume'].max()
 df_vol_profile['sell_vol_norm'] = df_vol_profile['sell_volume'] / df_vol_profile['sell_volume'].max()
 df_vol_profile['buy_vol_bar'] = df_vol_profile['open_time'] + pd.to_timedelta( df_vol_profile['buy_vol_norm'] * width_ms, unit='ms')
-df_vol_profile['sell_vol_bar'] = df_vol_profile['open_time'] + pd.to_timedelta(df_vol_profile['sell_vol_norm'] * width_ms, unit='ms')
+df_vol_profile['sell_vol_bar'] = df_vol_profile['open_time'] - pd.to_timedelta(df_vol_profile['sell_vol_norm'] * width_ms, unit='ms')
 # Candlestick Plot with Volume Profile
 source_ohlc = ColumnDataSource(df_ohlc)
 source_vol_profile = ColumnDataSource(df_vol_profile)
 plt_candlestick = figure(x_axis_type='datetime', width=1200, height=560)
-candles = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='low', line_color='color', source=source_ohlc)
-plt_candlestick.vbar(x='open_time', width=3.6e+6*4*0.8, top='open', bottom='close', fill_color='color', line_color=None, source=source_ohlc, legend_label='BTCUSDT 4 Hours Candlesticks')
-plt_candlestick.hbar(y='price_bin', left='open_time', right='buy_vol_bar', height=60, color='black', source=source_vol_profile)
-plt_candlestick.hbar(y='price_bin', left='sell_vol_bar', right='open_time', height=60, color='white', source=source_vol_profile, alpha=0.5)
+candles = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='low', line_color='color', source=source_ohlc, alpha=0.4)
+plt_candlestick.vbar(x='open_time', width=3.6e+6*4*0.8, top='open', bottom='close', fill_color='color', line_color=None, source=source_ohlc, legend_label='BTCUSDT 4 Hours Candlesticks', alpha=0.4)
+
+plt_candlestick.hbar(y='price_bin', left='open_time', right='buy_vol_bar', height=90, color='green', source=source_vol_profile)
+plt_candlestick.hbar(y='price_bin', left='sell_vol_bar', right='open_time', height=90, color='red', source=source_vol_profile)
+# calculate POC
+df_vol_profile['total_volume'] = df_vol_profile['buy_volume'] + df_vol_profile['sell_volume']
+df_poc = (
+    df_vol_profile
+    .loc[df_vol_profile.groupby('open_time')['total_volume'].idxmax()]
+    [['open_time', 'price_bin', 'sell_vol_bar', 'buy_vol_bar', 'total_volume']]
+    .reset_index(drop=True)
+    .sort_values('open_time')
+)
+plt_candlestick.hbar(y='price_bin', left='sell_vol_bar', right='buy_vol_bar', height=100, color=None, line_color='black', source=ColumnDataSource(df_poc), legend_label='Point of Control (POC)')   
 hover = HoverTool(
     renderers=[candles],
     tooltips=[
