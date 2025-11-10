@@ -10,26 +10,26 @@ class OrderFlowAnalizer:
         query = f"""
         SELECT
             time_bucket(INTERVAL '{interval}', timestamp) AS open_time,
-            FIRST(price) AS open,
+            FIRST(price ORDER BY timestamp ASC) AS open,
             MAX(price) AS high,
             MIN(price) AS low,
-            LAST(price) AS close,
+            FIRST(price ORDER BY timestamp DESC) AS close,
             SUM(CASE WHEN is_buyer_maker THEN quantity ELSE 0 END) AS sell_volume,
             SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE 0 END) AS buy_volume,
             SUM(quantity) AS volume,
             SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE -quantity END) AS delta,
-            LAST(last_trade_id) - FIRST(first_trade_id) + 1 AS trade_count,
+            MAX(last_trade_id) - MIN(first_trade_id) + 1 AS trade_count,
             CASE 
                 -- Vela verde con delta negativo = Distribución institucional
-                -- WHEN LAST(price) >= FIRST(price) AND delta < 0 THEN 'orange'
+                -- WHEN close >= open AND delta < 0 THEN 'orange'
                 
                 -- Vela roja con delta positivo = Acumulación institucional  
-                -- WHEN LAST(price) < FIRST(price) AND delta > 0 THEN 'cyan'
+                -- WHEN close < open AND delta > 0 THEN 'cyan'
                 
-                -- Vela verde normal
-                WHEN LAST(price) >= FIRST(price) THEN 'green'
+                -- Vela verde alcista
+                WHEN close >= open THEN 'green'
                 
-                -- Vela roja normal
+                -- Vela roja bajista
                 ELSE 'red'
             END AS color_smart_money
         FROM agg_trade_history
@@ -45,7 +45,7 @@ class OrderFlowAnalizer:
         SELECT
             time_bucket('{interval}', timestamp) AS open_time,
             FLOOR(price/{resolution})*{resolution} AS price_bin,
-            LAST(last_trade_id) - FIRST(first_trade_id) + 1 AS trade_count,
+            MAX(last_trade_id) - MIN(first_trade_id) + 1 AS trade_count,
             SUM(CASE WHEN is_buyer_maker THEN quantity ELSE 0 END) AS sell_volume,
             SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE 0 END) AS buy_volume,
             SUM(quantity) AS total_volume,
