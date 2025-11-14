@@ -17,7 +17,7 @@ class AggTradeDB:
                 quantity DOUBLE,
                 first_trade_id BIGINT,
                 last_trade_id BIGINT,
-                timestamp TIMESTAMP,
+                timestamp BIGINT,
                 is_buyer_maker BOOLEAN,
                 is_best_match BOOLEAN
             )

@@ -18,6 +18,7 @@ class AggTradesBinanceDownloader:
                 df.columns = ['agg_trade_id', 'price', 'quantity', 'first_trade_id', 'last_trade_id', 'timestamp', 'is_buyer_maker', 'is_best_match']
                 if time_zone != 0:
                     df['timestamp'] = df['timestamp'] + time_zone * 60 * 60 * 1000000
+                print(f'Descargados {len(df)} registros para {symbol} - {year}-{month:02d}')
                 return df
         else:
             print(f"Failed to download {symbol}-aggTrades-{year}-{month:02d}.zip")
@@ -33,6 +34,7 @@ class AggTradesBinanceDownloader:
                 df.columns = ['agg_trade_id', 'price', 'quantity', 'first_trade_id', 'last_trade_id', 'timestamp', 'is_buyer_maker', 'is_best_match']
                 if time_zone != 0:
                     df['timestamp'] = df['timestamp'] + time_zone * 60 * 60 * 1000000
+                print(f'Descargados {len(df)} registros para {symbol} - {year}-{month:02d}-{day:02d}')
                 return df
         else:
             print(f"Failed to download {symbol}-aggTrades-{year}-{month:02d}-{day:02d}.zip")

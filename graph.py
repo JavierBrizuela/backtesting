@@ -18,7 +18,7 @@ db_connector = OrderFlowAnalizer(db_path)
 df_ohlc = db_connector.get_ohlc(start, end, interval)
 df_profile = db_connector.get_vol_profile(start, end, interval, resolution)
 db_connector.close_connection()
-
+print(df_ohlc.head())
 width_ms = (df_ohlc['open_time'].iloc[1] - df_ohlc['open_time'].iloc[0]).total_seconds() * 1000
 offset_ms = width_ms * 0.5
 df_profile['bar_right'] = df_profile['open_time'] + pd.to_timedelta(df_profile['volume_normalized'] * width_ms, unit='ms')
@@ -48,7 +48,6 @@ hover = HoverTool(
 plt_candlestick.add_tools(hover)
 #plt_candlestick.xaxis.visible = False 
 plt_candlestick.yaxis.formatter = NumeralTickFormatter(format="0,0.00")
-""" 
 # Crear un colormap personalizado
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
     "red_white_green", ["#ff0000", "#ffffff", "#00ff00"]
@@ -73,5 +72,5 @@ hover_heatmap = HoverTool(
         ("Delta", "@delta{+0,0.00}"),
         ("Delta Normalized", "@delta_normalized{0.00}")
     ], formatters={'@open_time': 'datetime'})
-plt_candlestick.add_tools(hover_heatmap) """
+plt_candlestick.add_tools(hover_heatmap)
 show(plt_candlestick)

@@ -9,7 +9,7 @@ class OrderFlowAnalizer:
     def get_ohlc(self, start, end, interval):
         query = f"""
         SELECT
-            time_bucket(INTERVAL '{interval}', timestamp) AS open_time,
+            time_bucket(INTERVAL '{interval}', timestamp ) AS open_time,
             FIRST(price ORDER BY timestamp ASC) AS open,
             MAX(price) AS high,
             MIN(price) AS low,

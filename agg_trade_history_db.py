@@ -24,7 +24,10 @@ def get_agg_trades_monthly(symbol, year, month):
             csv_name = zip_file.namelist()[0]
             df = pd.read_csv(zip_file.open(csv_name))
             df.columns = ['agg_trade_id', 'price', 'quantity', 'first_trade_id', 'last_trade_id', 'timestamp', 'is_buyer_maker', 'is_best_match']
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='us')# Formato YYYY-MM-DD hh:mm:ss.fff
+            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='us') # Formato YYYY-MM-DD hh:mm:ss.fff
+            print(df.head())
+            df['timestamp'] = df['timestamp'] + pd.Timedelta(hours=-3) # Ajuste de zona horaria si es necesario
+            print(df.head())
             return df
     else:
         print(f"Failed to download {symbol}-aggTrades-{year}-{month:02d}.zip")
@@ -39,10 +42,11 @@ def agg_trades_from_response_to_df(trades):
     else:
         df.columns = ['agg_trade_id', 'price', 'quantity', 'first_trade_id', 'last_trade_id', 'timestamp', 'is_buyer_maker', 'is_best_match', 'additional_properties']
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')# Formato YYYY-MM-DD hh:mm:ss.fff
+        df['timestamp'] = df['timestamp'] + pd.Timedelta(hours=-3) # Ajuste de zona horaria si es necesario
         df.drop(columns=['additional_properties'], inplace=True)
         return df
 
-def save_agg_trades_to_db(df, db_path, table):
+def save_agg_trades_to_db(df, db_path, table, timezone_offset_hours=0):
     if df.empty:
         print("⚠️ No hay datos en el dataframe para crear la tabla.")
         return None
@@ -134,14 +138,14 @@ def get_agg_trades_from_api(symbol, start_time, end_time):
         save_agg_trades_to_db(df, db_path, table)
         print(f"Database created and {len(response)} trades saved.")
 year = 2025
-month = 10
+month = 9
 
-""" df = get_agg_trades_monthly(symbol, year, month)
+df = get_agg_trades_monthly(symbol, year, month)
 
 if df is not None:
     save_agg_trades_to_db(df, db_path, table)
     print(f"{len(df)} trades from {month} - {year} saved to the database.") 
-"""
 
-create_candlesticks_table(db_path, table, interval='4 hours')
-create_volume_profile_table(db_path, table, interval='4 hours', resolution=100)
+
+""" create_candlesticks_table(db_path, table, interval='4 hours')
+create_volume_profile_table(db_path, table, interval='4 hours', resolution=100) """
