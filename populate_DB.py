@@ -1,10 +1,21 @@
 from agg_trades_binance import AggTradesBinanceDownloader
 from agg_trades_db import AggTradeDB
 import pandas as pd
-import os
+
 db_path = 'data/BTCUSDT/tradebook/agg_trades.db'
 table = 'agg_trades'
 simbol = 'BTCUSDT'
+
+def agg_trades_monthly(start_year, start_month, end_year, end_month, simbol):
+    for year in range(start_year, end_year + 1):
+        for month in range(start_month, end_month):
+            df = agg_trades_df.download_agg_trades_montly(simbol, year, month, -3)
+            agg_trades_DB.save_df_to_db(df, table)
+
+def agg_trades_daily(year, month, start_day, end_day, simbol): 
+    for day in range(start_day, end_day):
+        df = agg_trades_df.download_agg_trades_daily(simbol, year, month, day, -3)
+        agg_trades_DB.save_df_to_db(df, table)
 
 agg_trades_df = AggTradesBinanceDownloader()
 agg_trades_DB = AggTradeDB(db_path)
@@ -22,18 +33,21 @@ if table in tables['name'].values:
     start_year = last_date.year
     start_month = last_date.month
     start_day = last_date.day
+    if start_year < end_year or (start_year == end_year and start_month < end_month):
+        print(f"Actualizando datos mensuales desde {start_year}-{start_month} hasta {end_year}-{end_month-1}")
+        agg_trades_monthly(start_year, start_month, end_year, end_month, simbol)
+        start_day = 1  # Reiniciar el día para la descarga diaria
+    if start_year == end_year and start_month == end_month and start_day < end_day:
+        print(f"Actualizando datos diarios desde {start_year}-{start_month}-{start_day} hasta {end_year}-{end_month}-{end_day-1}")
+        agg_trades_daily(end_year, end_month, start_day, end_day, simbol)
 else:  
-    print(f"La base de datos no existe. Se creara y descargarán todos los datos disponibles. hasta la fecha: {today}")
+    print(f"La base de datos no existe. Se creara y descargarán todos los datos disponibles. hasta la fecha: {end_year}-{end_month}-{end_day-1}")
     start_year = 2025
     start_month = 1
     start_day = 1
+    agg_trades_monthly(start_year, start_month, end_year, end_month, simbol)
+    agg_trades_daily(end_year, end_month, 1, end_day, simbol)
 
-for m in range(1, end_month):
-    df = agg_trades_df.download_agg_trades_montly(simbol, end_year, m, -3)
-    agg_trades_DB.save_df_to_db(df, table)
-for d in range(1, end_day):
-    df = agg_trades_df.download_agg_trades_daily(simbol, end_year, end_month, d, -3)
-    agg_trades_DB.save_df_to_db(df, table)
 
 agg_trades_DB.close_connection()
     

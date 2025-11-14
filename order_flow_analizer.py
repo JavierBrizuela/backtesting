@@ -6,10 +6,10 @@ class OrderFlowAnalizer:
         self.db_path = db_path
         self.con = duckdb.connect(database=self.db_path)
 
-    def get_ohlc(self, start, end, interval):
+    def get_ohlc(self, start, end, interval, table):
         query = f"""
         SELECT
-            time_bucket(INTERVAL '{interval}', timestamp ) AS open_time,
+            time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000) ) AS open_time,
             FIRST(price ORDER BY timestamp ASC) AS open,
             MAX(price) AS high,
             MIN(price) AS low,
@@ -32,7 +32,7 @@ class OrderFlowAnalizer:
                 -- Vela roja bajista
                 ELSE 'red'
             END AS color_smart_money
-        FROM agg_trade_history
+        FROM {table}
         WHERE open_time >= '{start}' AND open_time <= '{end}'
         GROUP BY open_time
         ORDER BY open_time ASC
@@ -40,10 +40,10 @@ class OrderFlowAnalizer:
         df_ohlc = self.con.execute(query).fetchdf()
         return df_ohlc
 
-    def get_vol_profile(self, start, end, interval, resolution):
+    def get_vol_profile(self, start, end, interval, table, resolution):
         query = f"""
         SELECT
-            time_bucket('{interval}', timestamp) AS open_time,
+            time_bucket('{interval}', to_timestamp(timestamp / 1000000)) AS open_time,
             FLOOR(price/{resolution})*{resolution} AS price_bin,
             MAX(last_trade_id) - MIN(first_trade_id) + 1 AS trade_count,
             SUM(CASE WHEN is_buyer_maker THEN quantity ELSE 0 END) AS sell_volume,
@@ -52,7 +52,7 @@ class OrderFlowAnalizer:
             SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE -quantity END) AS delta,
             delta::FLOAT / NULLIF(SUM(quantity), 0) AS delta_normalized,
             total_volume::FLOAT / MAX(total_volume) OVER () AS volume_normalized
-        FROM agg_trade_history
+        FROM {table}
         WHERE open_time >= '{start}' AND open_time <= '{end}'
         GROUP BY open_time, price_bin
         ORDER BY open_time ASC, price_bin ASC

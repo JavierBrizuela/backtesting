@@ -11,18 +11,19 @@ from bokeh.palettes import RdYlGn11, linear_palette
 interval = '4 hours'
 resolution = 50
 start = '2025-09-01'
-end = '2025-09-15'
-db_path = 'data/BTCUSDT/tradebook/trade_history.db'
+end = '2025-10-31'
+db_path = 'data/BTCUSDT/tradebook/agg_trades.db'
+table = 'agg_trades'
 
 db_connector = OrderFlowAnalizer(db_path)
-df_ohlc = db_connector.get_ohlc(start, end, interval)
-df_profile = db_connector.get_vol_profile(start, end, interval, resolution)
+df_ohlc = db_connector.get_ohlc(start, end, interval, table)
+df_profile = db_connector.get_vol_profile(start, end, interval, table, resolution)
 db_connector.close_connection()
 print(df_ohlc.head())
 width_ms = (df_ohlc['open_time'].iloc[1] - df_ohlc['open_time'].iloc[0]).total_seconds() * 1000
 offset_ms = width_ms * 0.5
-df_profile['bar_right'] = df_profile['open_time'] + pd.to_timedelta(df_profile['volume_normalized'] * width_ms, unit='ms')
 df_profile['bar_left'] = df_profile['open_time'] - pd.to_timedelta(offset_ms, unit='ms')
+df_profile['bar_right'] = df_profile['bar_left'] + pd.to_timedelta(df_profile['volume_normalized'] * width_ms, unit='ms')
 source_ohlc = ColumnDataSource(df_ohlc)
 source_vol_profile = ColumnDataSource(df_profile)
 
@@ -50,15 +51,18 @@ plt_candlestick.add_tools(hover)
 plt_candlestick.yaxis.formatter = NumeralTickFormatter(format="0,0.00")
 # Crear un colormap personalizado
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
-    "red_white_green", ["#ff0000", "#ffffff", "#00ff00"]
+    "red_white_green", ["#b50000", "#ffffff", "#007000"]
 )
 
 # Convertirlo a una lista de 256 hexadecimales para Bokeh
 palette_256 = [matplotlib.colors.rgb2hex(cmap(i)) for i in np.linspace(0, 1, 256)]
+# Configurar maximos y minimos para el LinearColorMapper
+delta_min = df_profile['delta_normalized'].min()
+delta_max = df_profile['delta_normalized'].max()
 color_mapper = LinearColorMapper(
         palette=palette_256,
-        low=-1,
-        high=1
+        low=delta_min,
+        high=delta_max
     )
 heatmap = plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution*0.9, line_color='black', line_alpha=0.3, color={'field': 'delta_normalized', 'transform': color_mapper}, source=source_vol_profile, alpha=0.4)
 hover_heatmap = HoverTool(
@@ -67,10 +71,13 @@ hover_heatmap = HoverTool(
         ("Tiempo", "@open_time{%F %T}"),
         ("Precio", "@price_bin{0,0.00}"),
         ("Volumen", "@total_volume{0,0.00}"),
+        ("Volumen Normalizado", "@volume_normalized{0.00}"),
         ("Buy Volume", "@buy_volume{0,0.00}"),
         ("Sell Volume", "@sell_volume{0,0.00}"),
         ("Delta", "@delta{+0,0.00}"),
         ("Delta Normalized", "@delta_normalized{0.00}")
     ], formatters={'@open_time': 'datetime'})
+df_poc = df_profile.loc[df_profile.groupby('open_time')['total_volume'].idxmax()][['open_time', 'price_bin', 'bar_left', 'bar_right', 'total_volume']].reset_index(drop=True).sort_values('open_time')
+plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution, color=None, line_color='black', source=ColumnDataSource(df_poc))
 plt_candlestick.add_tools(hover_heatmap)
 show(plt_candlestick)
