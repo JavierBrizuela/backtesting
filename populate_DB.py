@@ -14,17 +14,18 @@ def agg_trades_monthly(start_year, start_month, end_year, end_month, simbol):
 
 def agg_trades_daily(year, month, start_day, end_day, simbol): 
     for day in range(start_day, end_day):
-        df = agg_trades_df.download_agg_trades_daily(simbol, year, month, day, -3)
+        df = agg_trades_df.download_agg_trades_daily(simbol, year, month, day, time_zone)
         agg_trades_DB.save_df_to_db(df, table)
 
-agg_trades_df = AggTradesBinanceDownloader()
-agg_trades_DB = AggTradeDB(db_path)
-tables = agg_trades_DB.con.execute("SHOW TABLES;").fetchdf()
-
+time_zone = -3  # GMT-3
 today = pd.Timestamp.now()
 end_year = today.year
 end_month = today.month
 end_day = today.day
+
+agg_trades_df = AggTradesBinanceDownloader()
+agg_trades_DB = AggTradeDB(db_path)
+tables = agg_trades_DB.con.execute("SHOW TABLES;").fetchdf()
 
 if table in tables['name'].values:
     timestamp = agg_trades_DB.con.execute(f"SELECT MAX(timestamp) FROM {table}").fetch_df().iloc[0,0]
@@ -32,7 +33,7 @@ if table in tables['name'].values:
     print(f"Último timestamp en la base de datos: {last_date}")
     start_year = last_date.year
     start_month = last_date.month
-    start_day = last_date.day
+    start_day = last_date.day + 1 # Comenzar desde el día siguiente
     if start_year < end_year or (start_year == end_year and start_month < end_month):
         print(f"Actualizando datos mensuales desde {start_year}-{start_month} hasta {end_year}-{end_month-1}")
         agg_trades_monthly(start_year, start_month, end_year, end_month, simbol)
@@ -47,7 +48,10 @@ else:
     start_day = 1
     agg_trades_monthly(start_year, start_month, end_year, end_month, simbol)
     agg_trades_daily(end_year, end_month, 1, end_day, simbol)
-
+interval = '1 minutes'
+start = f'{start_year}-{start_month}-{start_day}'
+end = f'{end_year}-{end_month}-{end_day}'
+agg_trades_DB.ohlc_table(interval, start, end)
 
 agg_trades_DB.close_connection()
     
