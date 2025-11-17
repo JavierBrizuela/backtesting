@@ -29,7 +29,7 @@ class AggTradeDB:
         count_after = self.con.execute(f"SELECT COUNT(*) AS count FROM {table}").fetchone()[0]
         print(f"Registros antes: {count_before}, después: {count_after}, añadidos: {count_after - count_before}")
         
-    def ohlc_table(self, interval, start, end):
+    def create_ohlc_table(self, interval):
         interval_name = interval.replace(" ", "_")
         query = f"""
         CREATE TABLE IF NOT EXISTS ohlc_{interval_name} AS
@@ -47,15 +47,38 @@ class AggTradeDB:
             CASE 
                 WHEN close >= open THEN 'green'
                 ELSE 'red'
-            END AS color_smart_money
+            END AS color
         FROM agg_trades
-        WHERE to_timestamp(timestamp / 1000000) >= '{start}'::TIMESTAMP
-        AND to_timestamp(timestamp / 1000000) <= '{end}'::TIMESTAMP
         GROUP BY time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000) )
         ORDER BY open_time ASC
         """
         self.con.execute(query)
         print(f"✓ Tabla ohlc_{interval_name} creada exitosamente")
+        
+    def update_ohlc_table(self, interval):
+        interval_name = interval.replace(" ", "_")
+        query = f"""
+        INSERT OR REPLACE INTO ohlc_{interval_name}
+        SELECT
+            time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000) ) AS open_time,
+            FIRST(price ORDER BY timestamp ASC) AS open,
+            MAX(price) AS high,
+            MIN(price) AS low,
+            FIRST(price ORDER BY timestamp DESC) AS close,
+            SUM(CASE WHEN is_buyer_maker THEN quantity ELSE 0 END) AS sell_volume,
+            SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE 0 END) AS buy_volume,
+            SUM(quantity) AS volume,
+            SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE -quantity END) AS delta,
+            MAX(last_trade_id) - MIN(first_trade_id) + 1 AS trade_count,
+            CASE 
+                WHEN close >= open THEN 'green'
+                ELSE 'red'
+            END AS color
+        WHERE to_timestamp(timestamp / 1000000) >= (SELECT MAX(open_time) FROM ohlc_{interval_name})
+        GROUP BY time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000) )
+         """
+        self.con.execute(query)
+        print(f"✓ Tabla ohlc_{interval_name} actualizada exitosamente")
         
     def close_connection(self):
         self.con.close()

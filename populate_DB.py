@@ -2,14 +2,15 @@ from agg_trades_binance import AggTradesBinanceDownloader
 from agg_trades_db import AggTradeDB
 import pandas as pd
 
-db_path = 'data/BTCUSDT/tradebook/agg_trades.db'
 table = 'agg_trades'
 simbol = 'BTCUSDT'
+db_path = f'data/{simbol}/tradebook/agg_trades.db'
+time_zone = -3  # GMT-3 Argentina
 
 def agg_trades_monthly(start_year, start_month, end_year, end_month, simbol):
     for year in range(start_year, end_year + 1):
         for month in range(start_month, end_month):
-            df = agg_trades_df.download_agg_trades_montly(simbol, year, month, -3)
+            df = agg_trades_df.download_agg_trades_montly(simbol, year, month, time_zone)
             agg_trades_DB.save_df_to_db(df, table)
 
 def agg_trades_daily(year, month, start_day, end_day, simbol): 
@@ -17,7 +18,6 @@ def agg_trades_daily(year, month, start_day, end_day, simbol):
         df = agg_trades_df.download_agg_trades_daily(simbol, year, month, day, time_zone)
         agg_trades_DB.save_df_to_db(df, table)
 
-time_zone = -3  # GMT-3
 today = pd.Timestamp.now()
 end_year = today.year
 end_month = today.month
@@ -25,7 +25,7 @@ end_day = today.day
 
 agg_trades_df = AggTradesBinanceDownloader()
 agg_trades_DB = AggTradeDB(db_path)
-tables = agg_trades_DB.con.execute("SHOW TABLES;").fetchdf()
+""" tables = agg_trades_DB.con.execute("SHOW TABLES;").fetchdf()
 
 if table in tables['name'].values:
     timestamp = agg_trades_DB.con.execute(f"SELECT MAX(timestamp) FROM {table}").fetch_df().iloc[0,0]
@@ -47,11 +47,10 @@ else:
     start_month = 1
     start_day = 1
     agg_trades_monthly(start_year, start_month, end_year, end_month, simbol)
-    agg_trades_daily(end_year, end_month, 1, end_day, simbol)
+    agg_trades_daily(end_year, end_month, 1, end_day, simbol) """
 interval = '1 minutes'
-start = f'{start_year}-{start_month}-{start_day}'
-end = f'{end_year}-{end_month}-{end_day}'
-agg_trades_DB.ohlc_table(interval, start, end)
-
+agg_trades_DB.create_ohlc_table(interval)
+df = agg_trades_DB.con.execute(f"SELECT * FROM ohlc_{interval.replace(' ', '_')}").fetchdf()
+print(df)
 agg_trades_DB.close_connection()
     
