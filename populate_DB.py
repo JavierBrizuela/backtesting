@@ -5,17 +5,16 @@ import pandas as pd
 table = 'agg_trades'
 simbol = 'BTCUSDT'
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
-time_zone = -3  # GMT-3 Argentina
 
 def agg_trades_monthly(start_year, start_month, end_year, end_month, simbol):
     for year in range(start_year, end_year + 1):
         for month in range(start_month, end_month):
-            df = agg_trades_df.download_agg_trades_montly(simbol, year, month, time_zone)
+            df = agg_trades_df.download_agg_trades_montly(simbol, year, month)
             agg_trades_DB.save_df_to_db(df, table)
 
 def agg_trades_daily(year, month, start_day, end_day, simbol): 
     for day in range(start_day, end_day):
-        df = agg_trades_df.download_agg_trades_daily(simbol, year, month, day, time_zone)
+        df = agg_trades_df.download_agg_trades_daily(simbol, year, month, day)
         agg_trades_DB.save_df_to_db(df, table)
 
 today = pd.Timestamp.now()
@@ -49,6 +48,7 @@ else:
     agg_trades_monthly(start_year, start_month, end_year, end_month, simbol)
     agg_trades_daily(end_year, end_month, 1, end_day, simbol) """
 interval = '1 minutes'
+agg_trades_DB.con.execute(f"DROP TABLE IF EXISTS ohlc_{interval.replace(' ', '_')}")
 agg_trades_DB.create_ohlc_table(interval)
 df = agg_trades_DB.con.execute(f"SELECT * FROM ohlc_{interval.replace(' ', '_')}").fetchdf()
 print(df)

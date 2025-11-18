@@ -2,9 +2,11 @@ import duckdb
 import pandas as pd
 
 class AggTradeDB:
-    def __init__(self, db_path):
+    def __init__(self, db_path, UTC=False):
         self.db_path = db_path
         self.con = duckdb.connect(database=self.db_path)
+        if UTC:
+            self.con.execute("SET TimeZone='UTC'")
     
     def save_df_to_db(self, df, table):
         if df.empty:
