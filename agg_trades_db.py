@@ -1,5 +1,4 @@
 import duckdb
-import pandas as pd
 
 class AggTradeDB:
     def __init__(self, db_path, UTC=False):
@@ -33,8 +32,23 @@ class AggTradeDB:
         
     def create_ohlc_table(self, interval):
         interval_name = interval.replace(" ", "_")
+        self.con.execute(f"""
+            CREATE TABLE IF NOT EXISTS ohlc_{interval_name} (
+                open_time TIMESTAMP PRIMARY KEY,
+                open DOUBLE,
+                high DOUBLE,
+                low DOUBLE,
+                close DOUBLE,
+                sell_volume DOUBLE,
+                buy_volume DOUBLE,
+                volume DOUBLE,
+                delta DOUBLE,
+                trade_count BIGINT,
+                color VARCHAR
+            )
+        """)
         query = f"""
-        CREATE TABLE IF NOT EXISTS ohlc_{interval_name} AS
+        INSERT INTO ohlc_{interval_name}
         SELECT
             time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000) ) AS open_time,
             FIRST(price ORDER BY timestamp ASC) AS open,
@@ -76,6 +90,7 @@ class AggTradeDB:
                 WHEN close >= open THEN 'green'
                 ELSE 'red'
             END AS color
+        FROM agg_trades
         WHERE to_timestamp(timestamp / 1000000) >= (SELECT MAX(open_time) FROM ohlc_{interval_name})
         GROUP BY time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000) )
          """

@@ -9,7 +9,7 @@ import json
 from pydantic import BaseModel
 import websocket
 import pandas as pd
-from decorators import log_api_call
+from practica.decorators import log_api_call
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 

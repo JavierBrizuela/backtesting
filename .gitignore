@@ -2,3 +2,4 @@
 tickers/
 data/
 __pycache__/
+bokeh_output/

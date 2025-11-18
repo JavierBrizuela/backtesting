@@ -1,4 +1,4 @@
-from bokeh.plotting import figure, show
+from bokeh.plotting import figure, show, output_file
 from bokeh.models import ColumnDataSource, HoverTool, NumeralTickFormatter
 from bokeh.layouts import column
 import pandas as pd
@@ -7,6 +7,7 @@ import numpy as np
 from order_flow_analizer import OrderFlowAnalizer
 from bokeh.models import LinearColorMapper
 from bokeh.palettes import RdYlGn11, linear_palette
+import os
 
 interval = '1 hours'
 resolution = 50
@@ -15,6 +16,9 @@ end = '2025-10-01'
 simbol = 'BTCUSDT'
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
 table = 'agg_trades'
+path = 'bokeh_output'
+os.makedirs(path, exist_ok=True)
+output_file = os.path.join(path, f'volume_profile.html')
 
 db_connector = OrderFlowAnalizer(db_path)
 df_ohlc = db_connector.get_ohlc(start, end, interval, table)
@@ -88,4 +92,5 @@ df_volume = df_ohlc.loc[df_ohlc['volume'] > df_ohlc['volume_ma'] * 1.5, ['open_t
 source_volume = ColumnDataSource(df_volume)
 plt_volume.vbar_stack(stackers=['buy_volume', 'sell_volume'], x='open_time', width=width_ms, color=['red', 'green'], source=source_ohlc)
 plt_volume.vbar(x='open_time', width=width_ms, top='volume', bottom=0, fill_color=None, line_color='black', source=source_volume)
+output_file(output_file)
 show(column(plt_candlestick, plt_volume))

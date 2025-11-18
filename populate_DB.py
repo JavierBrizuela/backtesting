@@ -2,9 +2,10 @@ from agg_trades_binance import AggTradesBinanceDownloader
 from agg_trades_db import AggTradeDB
 import pandas as pd
 
-table = 'agg_trades'
 simbol = 'BTCUSDT'
+interval = '1 minutes'
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
+table = 'agg_trades'
 
 def agg_trades_monthly(start_year, start_month, end_year, end_month, simbol):
     for year in range(start_year, end_year + 1):
@@ -24,7 +25,7 @@ end_day = today.day
 
 agg_trades_df = AggTradesBinanceDownloader()
 agg_trades_DB = AggTradeDB(db_path)
-""" tables = agg_trades_DB.con.execute("SHOW TABLES;").fetchdf()
+tables = agg_trades_DB.con.execute("SHOW TABLES;").fetchdf()
 
 if table in tables['name'].values:
     timestamp = agg_trades_DB.con.execute(f"SELECT MAX(timestamp) FROM {table}").fetch_df().iloc[0,0]
@@ -40,17 +41,20 @@ if table in tables['name'].values:
     if start_year == end_year and start_month == end_month and start_day < end_day:
         print(f"Actualizando datos diarios desde {start_year}-{start_month}-{start_day} hasta {end_year}-{end_month}-{end_day-1}")
         agg_trades_daily(end_year, end_month, start_day, end_day, simbol)
+    agg_trades_DB.update_ohlc_table(interval)
+    print(f"Actualizando tabla OHLC para el intervalo {interval}")
 else:  
     print(f"La base de datos no existe. Se creara y descargarán todos los datos disponibles. hasta la fecha: {end_year}-{end_month}-{end_day-1}")
     start_year = 2025
     start_month = 1
     start_day = 1
     agg_trades_monthly(start_year, start_month, end_year, end_month, simbol)
-    agg_trades_daily(end_year, end_month, 1, end_day, simbol) """
-interval = '1 minutes'
-agg_trades_DB.con.execute(f"DROP TABLE IF EXISTS ohlc_{interval.replace(' ', '_')}")
-agg_trades_DB.create_ohlc_table(interval)
-df = agg_trades_DB.con.execute(f"SELECT * FROM ohlc_{interval.replace(' ', '_')}").fetchdf()
+    agg_trades_daily(end_year, end_month, 1, end_day, simbol)
+    agg_trades_DB.create_ohlc_table(interval)
+    print(f'Tabla OHLC creada para el intervalo {interval}')
+    
+#agg_trades_DB.con.execute(f"DROP TABLE IF EXISTS ohlc_{interval.replace(' ', '_')}")
+df = agg_trades_DB.con.execute(f"SELECT * FROM ohlc_{interval.replace(' ', '_')} ").fetchdf()
 print(df)
 agg_trades_DB.close_connection()
     
