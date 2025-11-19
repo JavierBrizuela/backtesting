@@ -96,6 +96,36 @@ class AggTradeDB:
          """
         self.con.execute(query)
         print(f"✓ Tabla ohlc_{interval_name} actualizada exitosamente")
+    
+    def create_volume_profile_table(self, resolution, interval):
+        self.con.execute("""
+            CREATE TABLE IF NOT EXISTS volume_profile (
+                start_time TIMESTAMP PRIMARY KEY,
+                price_bin DOUBLE,
+                trade_count BIGINT,
+                sell_volume DOUBLE,
+                buy_volume DOUBLE,
+                total_volume DOUBLE,
+                delta DOUBLE
+            )
+            """)
+        query = f"""
+        INSERT INTO volume_profile
+        SELECT
+            time_bucket(INTERVAL '{interval}' , to_timestamp(timestamp/1000000)) AS open_time,
+            FLOOR(price/{resolution})*{resolution} AS price_bin,
+            MAX(last_trade_id) - MIN(first_trade_id) + 1 AS trade_count,
+            SUM(CASE WHEN is_buyer_maker THEN quantity ELSE 0 END) AS sell_volume,
+            SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE 0 END) AS buy_volume,
+            SUM(quantity) AS total_volume,
+            SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE -quantity END) AS delta,
+        FROM agg_trades
+        GROUP BY open_time, price_bin
+        ORDER BY open_time ASC, price_bin ASC
+        """
+        self.con.execute(query)
         
+    def update_volume_profile_table(self, resolution, interval):
+        pass    
     def close_connection(self):
         self.con.close()
