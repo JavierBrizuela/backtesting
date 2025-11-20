@@ -100,13 +100,14 @@ class AggTradeDB:
     def create_volume_profile_table(self, resolution, interval):
         self.con.execute("""
             CREATE TABLE IF NOT EXISTS volume_profile (
-                start_time TIMESTAMP PRIMARY KEY,
+                start_time TIMESTAMP,
                 price_bin DOUBLE,
                 trade_count BIGINT,
                 sell_volume DOUBLE,
                 buy_volume DOUBLE,
                 total_volume DOUBLE,
-                delta DOUBLE
+                delta DOUBLE,
+                PRIMARY KEY (start_time, price_bin)
             )
             """)
         query = f"""

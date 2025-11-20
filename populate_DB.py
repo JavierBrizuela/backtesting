@@ -4,6 +4,7 @@ import pandas as pd
 
 simbol = 'BTCUSDT'
 interval = '1 minutes'
+resolution = 10
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
 table = 'agg_trades'
 
@@ -54,7 +55,8 @@ else:
     print(f'Tabla OHLC creada para el intervalo {interval}')
     
 #agg_trades_DB.con.execute(f"DROP TABLE IF EXISTS ohlc_{interval.replace(' ', '_')}")
-df = agg_trades_DB.con.execute(f"SELECT * FROM ohlc_{interval.replace(' ', '_')} ").fetchdf()
+agg_trades_DB.create_volume_profile_table(resolution, interval)
+df = agg_trades_DB.con.execute(f"SELECT * FROM volume_profile").fetchdf()
 print(df)
 agg_trades_DB.close_connection()
     
