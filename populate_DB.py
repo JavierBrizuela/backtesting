@@ -42,8 +42,8 @@ if table in tables['name'].values:
     if start_year == end_year and start_month == end_month and start_day < end_day:
         print(f"Actualizando datos diarios desde {start_year}-{start_month}-{start_day} hasta {end_year}-{end_month}-{end_day-1}")
         agg_trades_daily(end_year, end_month, start_day, end_day, simbol)
-    agg_trades_DB.update_ohlc_table(interval)
-    print(f"Actualizando tabla OHLC para el intervalo {interval}")
+    agg_trades_DB.create_ohlc_table(interval)
+    agg_trades_DB.create_volume_profile_table(resolution, interval)
 else:  
     print(f"La base de datos no existe. Se creara y descargarán todos los datos disponibles. hasta la fecha: {end_year}-{end_month}-{end_day-1}")
     start_year = 2025
@@ -52,10 +52,9 @@ else:
     agg_trades_monthly(start_year, start_month, end_year, end_month, simbol)
     agg_trades_daily(end_year, end_month, 1, end_day, simbol)
     agg_trades_DB.create_ohlc_table(interval)
-    print(f'Tabla OHLC creada para el intervalo {interval}')
+    agg_trades_DB.create_volume_profile_table(resolution, interval)
     
 #agg_trades_DB.con.execute(f"DROP TABLE IF EXISTS ohlc_{interval.replace(' ', '_')}")
-agg_trades_DB.create_volume_profile_table(resolution, interval)
 df = agg_trades_DB.con.execute(f"SELECT * FROM volume_profile").fetchdf()
 print(df)
 agg_trades_DB.close_connection()
