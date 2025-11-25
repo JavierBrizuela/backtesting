@@ -9,7 +9,7 @@ from bokeh.models import LinearColorMapper
 from bokeh.palettes import RdYlGn11, linear_palette
 import os
 
-interval = '15 minutes'
+interval = '4 hours'
 resolution = 10
 start = '2025-11-19'
 end = '2025-11-23'
@@ -23,7 +23,8 @@ output_file(file_path)
 # Consultas a la base de datos
 db_connector = AggTradeDB(db_path)
 df_ohlc = db_connector.get_ohlc(interval, start, end)
-df_profile = db_connector.get_volume_profile(interval, start, end, resolution)
+df_vol_profile = db_connector.get_volume_profile(interval, start, end, resolution)
+df_profile = db_connector.get_profile(start, end, resolution)
 db_connector.close_connection()
 # Calculos de variables
 width_ms = (df_ohlc['open_time'].iloc[1] - df_ohlc['open_time'].iloc[0]).total_seconds() * 1000
@@ -38,18 +39,18 @@ cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
 # Convertirlo a una lista de 256 hexadecimales para Bokeh
 palette_256 = [matplotlib.colors.rgb2hex(cmap(i)) for i in np.linspace(0, 1, 256)]
 # Configurar maximos y minimos para el LinearColorMapper
-delta_min = df_profile[delta_normalized].min()
-delta_max = df_profile[delta_normalized].max()
+delta_min = df_vol_profile[delta_normalized].min()
+delta_max = df_vol_profile[delta_normalized].max()
 color_mapper = LinearColorMapper(
         palette=palette_256,
         low=delta_min,
         high=delta_max
     )
-df_profile['bar_left'] = df_profile['open_time'] - pd.to_timedelta(offset_ms, unit='ms')
-df_profile['bar_right'] = df_profile['bar_left'] + pd.to_timedelta(df_profile[volume_normalized] * width_ms, unit='ms')
+df_vol_profile['bar_left'] = df_vol_profile['open_time'] - pd.to_timedelta(offset_ms, unit='ms')
+df_vol_profile['bar_right'] = df_vol_profile['bar_left'] + pd.to_timedelta(df_vol_profile[volume_normalized] * width_ms, unit='ms')
 
 source_ohlc = ColumnDataSource(df_ohlc)
-source_vol_profile = ColumnDataSource(df_profile)
+source_vol_profile = ColumnDataSource(df_vol_profile)
 # Grafica Cuerpo y mecha de la vela
 plt_candlestick = figure(x_axis_type='datetime', width=1600, height=600)
 candles = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='low', line_color='color', source=source_ohlc, alpha=0.2)
@@ -57,7 +58,7 @@ plt_candlestick.vbar(x='open_time', width=width_ms, top='open', bottom='close', 
 # Grafica perfil de volumen por precio y tiempo
 heatmap = plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution*0.9, line_color='black', line_alpha=0.3, color={'field': delta_normalized, 'transform': color_mapper}, source=source_vol_profile, alpha=0.4)
 # Grafica POC de cada vela
-df_poc = df_profile.loc[df_profile.groupby('open_time')['total_volume'].idxmax()][['open_time', 'price_bin', 'bar_left', 'bar_right', 'total_volume']].reset_index(drop=True).sort_values('open_time')
+df_poc = df_vol_profile.loc[df_vol_profile.groupby('open_time')['total_volume'].idxmax()][['open_time', 'price_bin', 'bar_left', 'bar_right', 'total_volume']].reset_index(drop=True).sort_values('open_time')
 plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution, color=None, line_color='black', source=ColumnDataSource(df_poc))
 # Hover para las mechas de las velas
 hover = HoverTool(
@@ -101,5 +102,11 @@ df_volume = df_ohlc.loc[df_ohlc['volume'] > df_ohlc['volume_ma'] * 1.5, ['open_t
 source_volume = ColumnDataSource(df_volume)
 plt_volume.vbar_stack(stackers=['buy_volume', 'sell_volume'], x='open_time', width=width_ms, color=['red', 'green'], source=source_ohlc)
 plt_volume.vbar(x='open_time', width=width_ms, top='volume', bottom=0, fill_color=None, line_color='black', source=source_volume)
-
+# Graficar perfil de volumen
+start_time = pd.to_datetime(end) + pd.to_timedelta(width_ms, unit='ms')
+df_profile['total_volume_normalized'] = start_time - pd.to_timedelta(df_profile['total_volume_normalized'] * width_ms * 4 , unit="ms")
+source_profile = ColumnDataSource(df_profile)
+plt_candlestick.hbar(y='price_bin', left='total_volume_normalized', right=start_time, height= resolution , fill_color='blue', source=source_profile)
+print(df_profile)
+print(pd.to_datetime(start))
 show(column(plt_candlestick, plt_volume))

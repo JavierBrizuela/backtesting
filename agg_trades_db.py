@@ -253,6 +253,35 @@ class AggTradeDB:
             """
         df = self.con.execute(query).fetchdf()
         return df
+    def get_profile(self, start_date=None, end_date=None, resolution='auto'):
+        # Filtros de fecha
+        where_clauses = []
+        if start_date:
+            where_clauses.append(f"open_time >= '{start_date}'")
+        if end_date:
+            where_clauses.append(f"open_time <= '{end_date}'")
+        where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+        query = f"""
+            WITH resume AS(
+                SELECT
+                    FLOOR(price_bin / {resolution}) * {resolution} AS price_bin,
+                    SUM(total_volume) AS total_volume
+                FROM volume_profile
+                {where_sql}
+                GROUP BY FLOOR(price_bin / {resolution}) * {resolution}
+            ),
+            normalized AS (
+                SELECT
+                    price_bin,
+                    total_volume,
+                    total_volume::FLOAT / NULLIF(MAX(total_volume) OVER(), 0) AS total_volume_normalized
+                FROM resume
+            )
+            SELECT * FROM normalized
+            ORDER BY price_bin ASC
+        """
+        df = self.con.execute(query).fetchdf()
+        return df
     
     def close_connection(self):
         self.con.close()
