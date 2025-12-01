@@ -1,4 +1,5 @@
 import duckdb
+import pandas as pd
 
 class AggTradeDB:
     def __init__(self, db_path, UTC=False):
@@ -15,10 +16,17 @@ class AggTradeDB:
         ''').fetchone()
         return res[0] > 0
     
+    def str_to_timestamp(self, date_str):
+        return int(pd.Timestamp(date_str).value // 1000)
+    
     def save_df_to_db(self, df, table):
         if df.empty:
             print("⚠️ No hay datos en el dataframe para crear la tabla.")
             return None
+        
+        # Ordenar por timestamp antes de insertar
+        df = df.sort_values("timestamp")
+        
         self.con.execute(f'''
             CREATE TABLE IF NOT EXISTS {table} (
                 agg_trade_id BIGINT PRIMARY KEY,
@@ -253,6 +261,7 @@ class AggTradeDB:
             """
         df = self.con.execute(query).fetchdf()
         return df
+    
     def get_profile(self, start_date=None, end_date=None, resolution='auto'):
         # Filtros de fecha
         where_clauses = []
@@ -280,6 +289,31 @@ class AggTradeDB:
             SELECT * FROM normalized
             ORDER BY price_bin ASC
         """
+        df = self.con.execute(query).fetchdf()
+        return df
+    
+    def get_institutional_trades(self, start_date=None, end_date=None, interval='1 minute'):
+        # Filtros de fecha
+        where_clauses = []
+        if start_date:
+            where_clauses.append(f"timestamp >= {self.str_to_timestamp(start_date)}")
+        if end_date:
+            where_clauses.append(f"timestamp <= {self.str_to_timestamp(end_date)}")
+        where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+        query = f"""
+            SELECT
+                CAST(time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000)) AS TIMESTAMP) AS interval_time,
+                quantity,
+                AVG(price) AS avg_price,
+                is_buyer_maker,
+                COUNT(*) AS trade_count
+            FROM agg_trades
+            {where_sql}
+            GROUP BY time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000)), quantity, is_buyer_maker
+            HAVING trade_count > 5
+            ORDER BY trade_count DESC
+        """
+        
         df = self.con.execute(query).fetchdf()
         return df
     

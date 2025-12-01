@@ -10,8 +10,10 @@ from bokeh.palettes import RdYlGn11, linear_palette
 import os
 
 interval = '4 hours'
-resolution = 10
-start = '2025-11-19'
+interval_trades = '10 minutes'
+size_position = 1
+resolution = 100
+start = '2025-10-01'
 end = '2025-11-23'
 simbol = 'BTCUSDT'
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
@@ -25,6 +27,7 @@ db_connector = AggTradeDB(db_path)
 df_ohlc = db_connector.get_ohlc(interval, start, end)
 df_vol_profile = db_connector.get_volume_profile(interval, start, end, resolution)
 df_profile = db_connector.get_profile(start, end, resolution)
+df_trades = db_connector.get_institutional_trades(start, end, interval_trades)
 db_connector.close_connection()
 # Calculos de variables
 width_ms = (df_ohlc['open_time'].iloc[1] - df_ohlc['open_time'].iloc[0]).total_seconds() * 1000
@@ -60,6 +63,15 @@ heatmap = plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right'
 # Grafica POC de cada vela
 df_poc = df_vol_profile.loc[df_vol_profile.groupby('open_time')['total_volume'].idxmax()][['open_time', 'price_bin', 'bar_left', 'bar_right', 'total_volume']].reset_index(drop=True).sort_values('open_time')
 plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution, color=None, line_color='black', source=ColumnDataSource(df_poc))
+# Grafica trades institucionales
+df_filtered = df_trades[df_trades['quantity'] >= size_position][['quantity', 'is_buyer_maker', 'trade_count', 'interval_time', 'avg_price']]
+df_filtered['color'] = df_filtered['is_buyer_maker'].map({
+    True: 'red',    # Seller taker
+    False: 'green'  # Buyer taker
+})
+df_filtered['quantity_scaled'] = df_filtered['quantity'] * 4
+source_trades = ColumnDataSource(df_filtered)
+plt_candlestick.scatter(x='interval_time', y='avg_price', size='quantity_scaled', fill_color='color', line_color=None, line_width=2, source=source_trades, legend_label='Institucional Sell Trades', alpha=0.6)
 # Hover para las mechas de las velas
 hover = HoverTool(
     renderers=[candles],
@@ -94,6 +106,15 @@ hover_heatmap = HoverTool(
         ("Delta Normalized", "@delta_normalized{0.00}")
     ], formatters={'@open_time': 'datetime'})
 plt_candlestick.add_tools(hover_heatmap)
+# HOver para trades institucionales
+hover_trades = HoverTool(
+    tooltips=[
+        ("Quantity", "@quantity{0.00}"),
+        ("Trade Count", "@trade_count{0}"),
+        ("Interval Time", "@interval_time{%F %T}"),
+        ("Avg Price", "@avg_price{0,0.00}")
+    ], formatters={'@interval_time': 'datetime'})
+plt_candlestick.add_tools(hover_trades)
 # Graficar volumen 
 window=20
 plt_volume = figure(x_axis_type='datetime', width=1600, height=200, x_range=plt_candlestick.x_range)
@@ -107,6 +128,9 @@ start_time = pd.to_datetime(end) + pd.to_timedelta(width_ms, unit='ms')
 df_profile['total_volume_normalized'] = start_time - pd.to_timedelta(df_profile['total_volume_normalized'] * width_ms * 4 , unit="ms")
 source_profile = ColumnDataSource(df_profile)
 plt_candlestick.hbar(y='price_bin', left='total_volume_normalized', right=start_time, height= resolution , fill_color='blue', source=source_profile)
-print(df_profile)
-print(pd.to_datetime(start))
+df_filtered['total'] = df_filtered['quantity'] * df_filtered['trade_count'] * df_filtered['avg_price']
+df_res = df_filtered.groupby(['quantity', 'is_buyer_maker']).agg(total_USD=('total', 'sum'),
+                                                                 ocurrencias=('trade_count', 'count')
+                                                                 ).reset_index().sort_values('ocurrencias', ascending=False)
+print(df_res.head(20))
 show(column(plt_candlestick, plt_volume))
