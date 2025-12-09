@@ -1,5 +1,5 @@
 from bokeh.plotting import figure, show, output_file
-from bokeh.models import ColumnDataSource, HoverTool, NumeralTickFormatter, WheelZoomTool
+from bokeh.models import ColumnDataSource, HoverTool, NumeralTickFormatter, WheelZoomTool, CrosshairTool
 from bokeh.layouts import column
 import pandas as pd
 import matplotlib
@@ -14,7 +14,7 @@ interval_trades = '5 minutes'
 size_position = 1
 resolution = 25
 start = '2025-10-23'
-end = '2025-10-24'
+end = '2025-10-28'
 simbol = 'BTCUSDT'
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
 table = 'agg_trades'
@@ -22,6 +22,10 @@ path = 'bokeh_output'
 os.makedirs(path, exist_ok=True)
 file_path = os.path.join(path, 'volume_profile.html')
 output_file(file_path)
+CHART_WIDTH = 1900
+CHART_HEIGHT = 600
+VOLUME_HEIGHT = 250
+
 # Consultas a la base de datos
 db_connector = AggTradeDB(db_path)
 df_ohlc = db_connector.get_ohlc(interval, start, end)
@@ -29,6 +33,7 @@ df_vol_profile = db_connector.get_volume_profile(interval, start, end, resolutio
 df_profile = db_connector.get_profile(start, end, resolution)
 df_trades = db_connector.get_institutional_trades(start, end, interval_trades)
 db_connector.close_connection()
+
 # Calculos de variables
 width_ms = (df_ohlc['open_time'].iloc[1] - df_ohlc['open_time'].iloc[0]).total_seconds() * 1000
 offset_ms = width_ms * 0.5
@@ -54,8 +59,9 @@ df_vol_profile['bar_right'] = df_vol_profile['bar_left'] + pd.to_timedelta(df_vo
 
 source_ohlc = ColumnDataSource(df_ohlc)
 source_vol_profile = ColumnDataSource(df_vol_profile)
+
 # Grafica Cuerpo y mecha de la vela
-plt_candlestick = figure(x_axis_type='datetime', width=1600, height=600, sizing_mode='stretch_width')
+plt_candlestick = figure(x_axis_type='datetime', height=CHART_HEIGHT, width=CHART_WIDTH)
 candles = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='low', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
 plt_candlestick.vbar(x='open_time', width=width_ms, top='open', bottom='close', fill_color=None, line_color='color', line_width=2, source=source_ohlc, legend_label=f'{simbol}-{interval} Candlesticks', alpha=0.2)
 
@@ -119,7 +125,8 @@ hover_heatmap = HoverTool(
         ("Delta Normalized", "@delta_normalized{0.00}")
     ], formatters={'@open_time': 'datetime'})
 plt_candlestick.add_tools(hover_heatmap)
-# HOver para trades institucionales
+
+# Hover para trades institucionales
 hover_trades = HoverTool(
     tooltips=[
         ("Quantity", "@quantity{0.00}"),
@@ -127,15 +134,21 @@ hover_trades = HoverTool(
         ("Interval Time", "@interval_time{%F %T}"),
         ("Avg Price", "@avg_price{0,0.00}")
     ], formatters={'@interval_time': 'datetime'})
-plt_candlestick.add_tools(hover_trades)
+#plt_candlestick.add_tools(hover_trades)
+
 # Graficar volumen compra ventas apilados
 window=20
-plt_volume = figure(x_axis_type='datetime', width=1600, height=200, x_range=plt_candlestick.x_range)
+plt_volume = figure(x_axis_type='datetime', height=VOLUME_HEIGHT, width=CHART_WIDTH, x_range=plt_candlestick.x_range)
 df_ohlc['volume_ma'] = df_ohlc[ 'volume'].rolling(window=window).mean()
-df_volume = df_ohlc.loc[df_ohlc['volume'] > df_ohlc['volume_ma'] * 1.5, ['open_time', 'volume']]
-source_volume = ColumnDataSource(df_volume)
-plt_volume.vbar(x='open_time', width=width_ms, top='volume', bottom=0, fill_color=None, line_color='black', line_width=2, source=source_volume)
-plt_volume.vbar_stack(stackers=['sell_volume', 'buy_volume'], x='open_time', width=width_ms * 0.9, color=['red', 'green'], line_color=None, source=source_ohlc)
+df_ohlc['volume_high'] = df_ohlc['volume'].where(df_ohlc['volume'] > df_ohlc['volume_ma'] * 1.5)
+df_ohlc['delta_cum'] = df_ohlc['delta'].cumsum()
+df_ohlc['delta_ma'] = df_ohlc['delta'].rolling(window=window).sum()
+source_volume = ColumnDataSource(df_ohlc)
+plt_volume.vbar(x='open_time', width=width_ms, top='volume_high', bottom=0, fill_color=None, line_color='black', line_width=2, source=source_volume)
+plt_volume.vbar_stack(stackers=['sell_volume', 'buy_volume'], x='open_time', width=width_ms * 0.9, color=['red', 'green'], line_color=None, source=source_volume)
+plt_volume.line(x='open_time', y='volume_ma', line_color='blue', line_width=2, legend_label=f'Volume MA {window}', source=source_volume)
+plt_volume.line(x='open_time', y='delta_ma', line_color='orange', line_width=2, legend_label=f'Delta MA {window}', source=source_volume)
+plt_volume.line(x='open_time', y='delta_cum', line_color='purple', line_width=2, legend_label='Cumulative Delta', source=source_volume)
 # Hover para volumen
 hover_volume = HoverTool(
     tooltips=[
@@ -155,5 +168,15 @@ df_filtered['total'] = df_filtered['quantity'] * df_filtered['trade_count'] * df
 df_res = df_filtered.groupby(['quantity', 'is_buyer_maker']).agg(total_USD=('total', 'sum'),
                                                                  ocurrencias=('trade_count', 'count')
                                                                  ).reset_index().sort_values('ocurrencias', ascending=False)
-print(df_res.head(20))
+# 
+crosshair = CrosshairTool(
+    dimensions='both',
+    line_color='gray',
+    line_alpha=0.8,
+    line_width=2
+)
+plt_candlestick.add_tools(crosshair)
+plt_volume.add_tools(crosshair)
+#plt_candlestick.scatter()
+print(df_ohlc)
 show(column(plt_candlestick, plt_volume))
