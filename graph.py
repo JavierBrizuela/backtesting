@@ -8,12 +8,13 @@ from agg_trades_db import AggTradeDB
 from bokeh.models import LinearColorMapper
 from bokeh.palettes import RdYlGn11, linear_palette
 import os
+from candlestick_analytics import hammer_candle
 
 interval = '5 minutes'
 interval_trades = '5 minutes'
 size_position = 1
 resolution = 25
-start = '2025-10-23'
+start = '2025-10-22'
 end = '2025-10-28'
 simbol = 'BTCUSDT'
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
@@ -159,6 +160,10 @@ hover_volume = HoverTool(
     ], formatters={'@open_time': 'datetime'})
 plt_volume.add_tools(hover_volume)
 plt_volume.yaxis.formatter = NumeralTickFormatter(format="0,0.00")
+# Grafica velas que cumplas los requisitos
+df_ohlc['hammer_candle'] = df_ohlc.apply(lambda row: hammer_candle(row['open'], row['high'], row['low'], row['close']), axis=1)
+df_fil = df_ohlc[(df_ohlc['hammer_candle']==True) & (df_ohlc['volume_high'] == True)]
+plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='black', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_fil), legend_label='Hammer Candles', alpha=0.8)
 # Graficar perfil de volumen
 start_time = pd.to_datetime(end) + pd.to_timedelta(width_ms, unit='ms')
 df_profile['total_volume_normalized'] = start_time - pd.to_timedelta(df_profile['total_volume_normalized'] * width_ms * 4 , unit="ms")
@@ -178,5 +183,5 @@ crosshair = CrosshairTool(
 plt_candlestick.add_tools(crosshair)
 plt_volume.add_tools(crosshair)
 #plt_candlestick.scatter()
-print(df_ohlc)
+print(df_fil.head())
 show(column(plt_candlestick, plt_volume))
