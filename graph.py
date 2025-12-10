@@ -141,15 +141,17 @@ hover_trades = HoverTool(
 window=20
 plt_volume = figure(x_axis_type='datetime', height=VOLUME_HEIGHT, width=CHART_WIDTH, x_range=plt_candlestick.x_range)
 df_ohlc['volume_ma'] = df_ohlc[ 'volume'].rolling(window=window).mean()
-df_ohlc['volume_high'] = df_ohlc['volume'].where(df_ohlc['volume'] > df_ohlc['volume_ma'] * 1.5)
+df_ohlc['volume_high'] = df_ohlc['volume'] > df_ohlc['volume_ma'] * 1.5
 df_ohlc['delta_cum'] = df_ohlc['delta'].cumsum()
 df_ohlc['delta_ma'] = df_ohlc['delta'].rolling(window=window).sum()
+
+df_ohlc['delta_normalized'] = ((df_ohlc['buy_volume'] / df_ohlc['volume'])-0.5) * df_ohlc['volume'].max()
 source_volume = ColumnDataSource(df_ohlc)
-plt_volume.vbar(x='open_time', width=width_ms, top='volume_high', bottom=0, fill_color=None, line_color='black', line_width=2, source=source_volume)
+plt_volume.vbar(x='open_time', width=width_ms, top='volume', bottom=0, fill_color=None, line_color='black', line_width=2, source=ColumnDataSource(df_ohlc[df_ohlc['volume_high']]), legend_label='Total Volume')
 plt_volume.vbar_stack(stackers=['sell_volume', 'buy_volume'], x='open_time', width=width_ms * 0.9, color=['red', 'green'], line_color=None, source=source_volume)
 plt_volume.line(x='open_time', y='volume_ma', line_color='blue', line_width=2, legend_label=f'Volume MA {window}', source=source_volume)
 plt_volume.line(x='open_time', y='delta_ma', line_color='orange', line_width=2, legend_label=f'Delta MA {window}', source=source_volume)
-plt_volume.line(x='open_time', y='delta_cum', line_color='purple', line_width=2, legend_label='Cumulative Delta', source=source_volume)
+plt_volume.line(x='open_time', y='delta_normalized', line_color='purple', line_width=2, legend_label='Delta Normalized', source=source_volume)
 # Hover para volumen
 hover_volume = HoverTool(
     tooltips=[
@@ -183,5 +185,5 @@ crosshair = CrosshairTool(
 plt_candlestick.add_tools(crosshair)
 plt_volume.add_tools(crosshair)
 #plt_candlestick.scatter()
-print(df_fil.head())
+#print(df_ohlc.head(40))
 show(column(plt_candlestick, plt_volume))
