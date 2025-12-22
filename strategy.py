@@ -18,7 +18,7 @@ path = 'bokeh_output'
 # Consultas a la base de datos
 db_connector = AggTradeDB(db_path)
 df_ohlc = db_connector.get_ohlc(interval, start, end)
-#df_vol_profile = db_connector.get_volume_profile(interval, start, end, resolution)
+df_vol_profile = db_connector.get_volume_profile(interval, start, end, resolution)
 db_connector.close_connection()
 df_ohlc.set_index('open_time', inplace=True)
 df_ohlc.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
@@ -27,13 +27,15 @@ df_ohlc.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': '
 #df_ohlc['delta_ma'] = df_ohlc['delta'].rolling(window=window[2]).sum()
 def SMA(data, n):
     return pd.Series(data).rolling(n).mean()
-
+print(df_vol_profile)
+df_poc = df_vol_profile.groupby('open_time')['total_volume'].idxmax()
+df_ohlc['poc'] = df_vol_profile.loc[df_poc, 'price_bin'].values
+print(df_ohlc[['Open', 'High', 'Low', 'Close', 'Volume', 'poc']])
 class signal_strategy(Strategy):
     vol_window = 15
     delta_window = 20
-    vol_min_threshold = 2.9
+    vol_min_threshold = 2
     def init(self):
-        print(self.data)
         self.vol_ma = self.I(SMA, self.data.Volume, self.vol_window)
         self.delta_ma = self.I(SMA, self.data.delta, self.delta_window)
     def next(self):

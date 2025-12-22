@@ -10,7 +10,7 @@ from bokeh.palettes import RdYlGn11, linear_palette
 import os
 from candlestick_analytics import hammer_candle
 
-interval = '5 minutes'
+interval = '15 minutes'
 interval_trades = '5 minutes'
 size_position = 1
 resolution = 25
@@ -158,14 +158,19 @@ hover_volume = HoverTool(
         ("Time", "@open_time{%F %T}"),
         ("Buy Volume", "@buy_volume{0,0.00}"),
         ("Sell Volume", "@sell_volume{0,0.00}"),
-        ("Total Volume", "@volume{0,0.00}")
+        ("Total Volume", "@volume{0,0.00}"),
+        ("Volume MA", "@volume_ma{0,0.00}"),
+        ("Delta MA", "@delta_ma{+0,0.00}"),
+        ("Delta Normalized", "@delta_normalized{0.00}")
     ], formatters={'@open_time': 'datetime'})
 plt_volume.add_tools(hover_volume)
 plt_volume.yaxis.formatter = NumeralTickFormatter(format="0,0.00")
 # Grafica velas que cumplas los requisitos
 df_ohlc['hammer_candle'] = df_ohlc.apply(lambda row: hammer_candle(row['open'], row['high'], row['low'], row['close']), axis=1)
-df_fil = df_ohlc[(df_ohlc['hammer_candle']==True) & (df_ohlc['volume_high'] == True)]
-plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='black', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_fil), legend_label='Hammer Candles', alpha=0.8)
+df_poc = df_vol_profile.groupby('open_time')['total_volume'].idxmax()
+df_ohlc['poc'] = df_vol_profile.loc[df_poc, 'price_bin'].values
+df_fil = df_ohlc[(df_ohlc['poc'] > (df_ohlc['high'] - (df_ohlc['high'] - df_ohlc['low']) / 3)) & (df_ohlc['volume_high'] == True)]
+plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='red', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_fil), legend_label='Hammer Candles', alpha=0.8)
 # Graficar perfil de volumen
 start_time = pd.to_datetime(end) + pd.to_timedelta(width_ms, unit='ms')
 df_profile['total_volume_normalized'] = start_time - pd.to_timedelta(df_profile['total_volume_normalized'] * width_ms * 4 , unit="ms")
