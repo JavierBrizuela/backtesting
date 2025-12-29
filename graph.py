@@ -10,7 +10,7 @@ from bokeh.palettes import RdYlGn11, linear_palette
 import os
 from candlestick_analytics import hammer_candle
 
-interval = '15 minutes'
+interval = '5 minutes'
 interval_trades = '5 minutes'
 size_position = 1
 resolution = 25
@@ -38,8 +38,8 @@ db_connector.close_connection()
 # Calculos de variables
 width_ms = (df_ohlc['open_time'].iloc[1] - df_ohlc['open_time'].iloc[0]).total_seconds() * 1000
 offset_ms = width_ms * 0.5
-volume_normalized = 'volume_global_normalized'
-delta_normalized = 'delta_global_normalized'
+volume_normalized = 'volume_local_normalized'
+delta_normalized = 'delta_local_normalized'
 # Crear un colormap personalizado
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
     "red_white_green", ["#b50000", "#ffffff", "#007000"]
@@ -58,13 +58,26 @@ color_mapper = LinearColorMapper(
 df_vol_profile['bar_left'] = df_vol_profile['open_time'] - pd.to_timedelta(offset_ms, unit='ms')
 df_vol_profile['bar_right'] = df_vol_profile['bar_left'] + pd.to_timedelta(df_vol_profile[volume_normalized] * width_ms, unit='ms')
 
-source_ohlc = ColumnDataSource(df_ohlc)
 source_vol_profile = ColumnDataSource(df_vol_profile)
+# Calcula las mechas basándote en el color
+df_ohlc['upper_wick_end'] = np.where(
+    df_ohlc['color'] == 'red', 
+    df_ohlc['open'], 
+    df_ohlc['close']
+)
+
+df_ohlc['lower_wick_end'] = np.where(
+    df_ohlc['color'] == 'red', 
+    df_ohlc['close'], 
+    df_ohlc['open']
+)
+source_ohlc = ColumnDataSource(df_ohlc)
 
 # Grafica Cuerpo y mecha de la vela
 plt_candlestick = figure(x_axis_type='datetime', height=CHART_HEIGHT, width=CHART_WIDTH)
-candles = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='low', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
-plt_candlestick.vbar(x='open_time', width=width_ms, top='open', bottom='close', fill_color=None, line_color='color', line_width=2, source=source_ohlc, legend_label=f'{simbol}-{interval} Candlesticks', alpha=0.2)
+upper_wick = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='upper_wick_end', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
+lower_wick = plt_candlestick.segment(x0='open_time', x1='open_time', y0='low', y1='lower_wick_end', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
+body = plt_candlestick.vbar(x='open_time', width=width_ms, top='open', bottom='close', fill_color='color', line_color='color', line_width=2, source=source_ohlc, legend_label=f'{simbol}-{interval} Candlesticks', alpha=0.2)
 
 # Grafica perfil de volumen por precio y tiempo
 heatmap = plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution*0.9, line_color='black', line_alpha=0.3, color={'field': delta_normalized, 'transform': color_mapper}, source=source_vol_profile, alpha=0.4)
@@ -83,9 +96,9 @@ df_filtered['quantity_scaled'] = df_filtered['quantity'] * 4
 source_trades = ColumnDataSource(df_filtered)
 plt_candlestick.scatter(x='interval_time', y='avg_price', size='quantity_scaled', fill_color='color', line_color=None, line_width=2, source=source_trades, legend_label='Institucional Sell Trades', alpha=0.6)
 
-# Hover para las mechas de las velas
+# Hover para las velas
 hover = HoverTool(
-    renderers=[candles],
+    renderers=[body],
     tooltips=[
         ("Time", "@open_time{%F %T}"),
         ("Open", "@open{0.2f}"),
@@ -141,17 +154,17 @@ hover_trades = HoverTool(
 window=20
 plt_volume = figure(x_axis_type='datetime', height=VOLUME_HEIGHT, width=CHART_WIDTH, x_range=plt_candlestick.x_range)
 df_ohlc['volume_ma'] = df_ohlc[ 'volume'].rolling(window=window).mean()
-df_ohlc['volume_high'] = df_ohlc['volume'] > df_ohlc['volume_ma'] * 1.5
+df_ohlc['volume_high'] = df_ohlc['volume'] > df_ohlc['volume_ma'] * 2
 df_ohlc['delta_cum'] = df_ohlc['delta'].cumsum()
 df_ohlc['delta_ma'] = df_ohlc['delta'].rolling(window=window).sum()
-
-df_ohlc['delta_normalized'] = ((df_ohlc['buy_volume'] / df_ohlc['volume'])-0.5) * df_ohlc['volume'].max()
+df_ohlc['delta_normalized'] = df_ohlc['buy_volume'] / df_ohlc['volume']
+df_ohlc['delta_normalized_scaled'] = (df_ohlc['delta_normalized']-0.5) * df_ohlc['volume'].max()
 source_volume = ColumnDataSource(df_ohlc)
 plt_volume.vbar(x='open_time', width=width_ms, top='volume', bottom=0, fill_color=None, line_color='black', line_width=2, source=ColumnDataSource(df_ohlc[df_ohlc['volume_high']]), legend_label='Total Volume')
 plt_volume.vbar_stack(stackers=['sell_volume', 'buy_volume'], x='open_time', width=width_ms * 0.9, color=['red', 'green'], line_color=None, source=source_volume)
 plt_volume.line(x='open_time', y='volume_ma', line_color='blue', line_width=2, legend_label=f'Volume MA {window}', source=source_volume)
 plt_volume.line(x='open_time', y='delta_ma', line_color='orange', line_width=2, legend_label=f'Delta MA {window}', source=source_volume)
-plt_volume.line(x='open_time', y='delta_normalized', line_color='purple', line_width=2, legend_label='Delta Normalized', source=source_volume)
+plt_volume.line(x='open_time', y='delta_normalized_scaled', line_color='purple', line_width=2, legend_label='Delta Normalized', source=source_volume)
 # Hover para volumen
 hover_volume = HoverTool(
     tooltips=[
@@ -159,6 +172,7 @@ hover_volume = HoverTool(
         ("Buy Volume", "@buy_volume{0,0.00}"),
         ("Sell Volume", "@sell_volume{0,0.00}"),
         ("Total Volume", "@volume{0,0.00}"),
+        ("Delta", "@delta{+0,0.00}"),
         ("Volume MA", "@volume_ma{0,0.00}"),
         ("Delta MA", "@delta_ma{+0,0.00}"),
         ("Delta Normalized", "@delta_normalized{0.00}")
@@ -169,8 +183,18 @@ plt_volume.yaxis.formatter = NumeralTickFormatter(format="0,0.00")
 df_ohlc['hammer_candle'] = df_ohlc.apply(lambda row: hammer_candle(row['open'], row['high'], row['low'], row['close']), axis=1)
 df_poc = df_vol_profile.groupby('open_time')['total_volume'].idxmax()
 df_ohlc['poc'] = df_vol_profile.loc[df_poc, 'price_bin'].values
-df_fil = df_ohlc[(df_ohlc['poc'] > (df_ohlc['high'] - (df_ohlc['high'] - df_ohlc['low']) / 3)) & (df_ohlc['volume_high'] == True)]
-plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='red', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_fil), legend_label='Hammer Candles', alpha=0.8)
+df_buyl = df_ohlc[(df_ohlc['poc'] <= df_ohlc['close'] ) & 
+                 (df_ohlc['volume_high'] == True) & 
+                 (df_ohlc['delta_normalized'] < 0.5) & 
+                 (df_ohlc['color'] == 'red') &
+                 (df_ohlc['delta_ma'] < 0)]
+plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='green', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_buyl), legend_label='absorption', alpha=0.8)
+df_sell = df_ohlc[(df_ohlc['poc'] >= df_ohlc['close'] ) & 
+                 (df_ohlc['volume_high'] == True) & 
+                 (df_ohlc['delta_normalized'] > 0.5) & 
+                 (df_ohlc['color'] == 'green') &
+                 (df_ohlc['delta_ma'] > 0)]
+plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='red', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_sell), legend_label='absorption', alpha=0.8)
 # Graficar perfil de volumen
 start_time = pd.to_datetime(end) + pd.to_timedelta(width_ms, unit='ms')
 df_profile['total_volume_normalized'] = start_time - pd.to_timedelta(df_profile['total_volume_normalized'] * width_ms * 4 , unit="ms")
