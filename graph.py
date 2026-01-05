@@ -10,15 +10,24 @@ from bokeh.palettes import RdYlGn11, linear_palette
 import os
 from candlestick_analytics import hammer_candle
 
-interval = '5 minutes'
-interval_trades = '5 minutes'
-size_position = 1
-resolution = 25
-start = '2025-10-22'
-end = '2025-10-28'
+# Parámetros de configuración simbolo, intervalo, fechas, base de datos
+interval = '15 minutes'
+start = '2025-12-22'
+end = '2026-01-03'
 simbol = 'BTCUSDT'
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
 table = 'agg_trades'
+
+# Parámetros de análisis de trades institucionales
+interval_trades = '5 minutes'
+size_position = 1
+
+# Parámetros de perfil de volumen
+resolution = 25
+volume_normalized = 'volume_local_normalized' # 'volume_global_normalized'
+delta_normalized = 'delta_local_normalized' # 'delta_global_normalized'
+
+# Parámetros de la gráfica
 path = 'bokeh_output'
 os.makedirs(path, exist_ok=True)
 file_path = os.path.join(path, 'volume_profile.html')
@@ -35,11 +44,9 @@ df_profile = db_connector.get_profile(start, end, resolution)
 df_trades = db_connector.get_institutional_trades(start, end, interval_trades)
 db_connector.close_connection()
 
-# Calculos de variables
+# Calculos de amcho de vela y offset
 width_ms = (df_ohlc['open_time'].iloc[1] - df_ohlc['open_time'].iloc[0]).total_seconds() * 1000
 offset_ms = width_ms * 0.5
-volume_normalized = 'volume_local_normalized'
-delta_normalized = 'delta_local_normalized'
 # Crear un colormap personalizado
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
     "red_white_green", ["#b50000", "#ffffff", "#007000"]
@@ -195,11 +202,47 @@ df_sell = df_ohlc[(df_ohlc['poc'] >= df_ohlc['close'] ) &
                  (df_ohlc['color'] == 'green') &
                  (df_ohlc['delta_ma'] > 0)]
 plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='red', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_sell), legend_label='absorption', alpha=0.8)
+
+# Graficar imbalance oferta y demanda
+def streak_counter(series):
+    streaks = []
+    current_streak = 0
+    for value in series:
+        if value:
+            current_streak += 1
+        else:
+            current_streak = 0
+        streaks.append(current_streak)
+    return streaks
+
+def bin_filled(row, df_ohlc):
+    future = df_ohlc[df_ohlc['open_time'] > row['open_time']]
+    hits = future[future['low'] <= row['price_bin']]
+    if hits.empty:
+        return pd.to_datetime(end)
+    else:
+        return hits['open_time'].iloc[0]
+    
+IMB_RATIO = 3.0
+MIN_STREAK = 3
+df_imbalance = df_vol_profile.sort_values(['open_time', 'price_bin']).reset_index(drop=True)
+df_imbalance['sell_prev_bin'] = df_imbalance.groupby('open_time')['sell_volume'].shift(1)
+df_imbalance['imbalance_ratio'] = df_imbalance['buy_volume'] / df_imbalance['sell_prev_bin']
+df_imbalance = df_imbalance.merge( df_ohlc[['open_time', 'open', 'high', 'low', 'close']], on='open_time', how='left' )
+df_imbalance['buy_imbalance'] = (df_imbalance['imbalance_ratio'] >= IMB_RATIO) & (df_imbalance['price_bin'] < df_imbalance['close']) 
+df_imbalance['buy_streak'] = df_imbalance.groupby('open_time')['buy_imbalance'].transform(streak_counter)
+df_buy_imbalance = df_imbalance[df_imbalance['buy_streak'] >= MIN_STREAK].copy()
+df_buy_imbalance['imbalance_filled'] = df_buy_imbalance.apply(lambda row: bin_filled(row, df_ohlc), axis=1)
+plt_candlestick.hbar(y='price_bin', left='open_time', right= 'imbalance_filled', height=resolution*0.9, fill_color='green', line_color=None, source=ColumnDataSource(df_buy_imbalance), alpha=0.8)    
+df_sell_imbalance = df_imbalance[df_imbalance['imbalance_ratio'] <= (1/IMB_RATIO)]
+#plt_candlestick.hbar(y='price_bin', left='open_time', right= pd.to_datetime(end), height=resolution*0.9, fill_color='red', line_color=None, source=ColumnDataSource(df_sell_imbalance), alpha=0.8)    
+print(df_buy_imbalance)
 # Graficar perfil de volumen
 start_time = pd.to_datetime(end) + pd.to_timedelta(width_ms, unit='ms')
 df_profile['total_volume_normalized'] = start_time - pd.to_timedelta(df_profile['total_volume_normalized'] * width_ms * 4 , unit="ms")
 source_profile = ColumnDataSource(df_profile)
-plt_candlestick.hbar(y='price_bin', left='total_volume_normalized', right=start_time, height= resolution , fill_color='blue', source=source_profile)
+plt_candlestick.hbar(y='price_bin', left='total_volume_normalized', right=start_time, height= resolution , fill_color='blue', source=source_profile, alpha=0.6)
+
 df_filtered['total'] = df_filtered['quantity'] * df_filtered['trade_count'] * df_filtered['avg_price']
 df_res = df_filtered.groupby(['quantity', 'is_buyer_maker']).agg(total_USD=('total', 'sum'),
                                                                  ocurrencias=('trade_count', 'count')
