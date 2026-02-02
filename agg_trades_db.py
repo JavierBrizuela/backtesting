@@ -16,6 +16,25 @@ class AggTradeDB:
         ''').fetchone()
         return res[0] > 0
     
+    def create_ohlc_table(self, interval):
+        response = self.con.execute(f"""
+                CREATE TABLE ohlc_{interval} (
+                    open_time TIMESTAMP PRIMARY KEY,
+                    open DOUBLE,
+                    high DOUBLE,
+                    low DOUBLE,
+                    close DOUBLE,
+                    sell_volume DOUBLE,
+                    buy_volume DOUBLE,
+                    volume DOUBLE,
+                    delta DOUBLE,
+                    trade_count BIGINT,
+                    color VARCHAR
+                )
+            """).fetchone()
+        if response[0] == 'SUCCESS':
+            print(f"✓ Tabla ohlc_{interval} creada exitosamente")
+        
     def str_to_timestamp(self, date_str):
         return int(pd.Timestamp(date_str).value // 1000)
     
@@ -46,26 +65,11 @@ class AggTradeDB:
         count_after = self.con.execute(f"SELECT COUNT(*) AS count FROM {table}").fetchone()[0]
         print(f"Registros antes: {count_before}, después: {count_after}, añadidos: {count_after - count_before}")
         
-    def create_ohlc_table(self, interval):
+    def create_ohlc_table_from_aggtrades(self, interval):
         interval_name = interval.replace(" ", "_")
         table_exists = self.table_exists(f"ohlc_{interval_name}")
         if not table_exists:
-            self.con.execute(f"""
-                CREATE TABLE ohlc_{interval_name} (
-                    open_time TIMESTAMP PRIMARY KEY,
-                    open DOUBLE,
-                    high DOUBLE,
-                    low DOUBLE,
-                    close DOUBLE,
-                    sell_volume DOUBLE,
-                    buy_volume DOUBLE,
-                    volume DOUBLE,
-                    delta DOUBLE,
-                    trade_count BIGINT,
-                    color VARCHAR
-                )
-            """)
-            print(f"✓ Tabla ohlc_{interval_name} creada exitosamente")
+            self.create_ohlc_table(interval_name)
             where_clause = ""
         else:
             where_clause = f"WHERE to_timestamp(timestamp / 1000000) > (SELECT MAX(open_time) FROM ohlc_{interval_name})"
@@ -132,6 +136,97 @@ class AggTradeDB:
         """
         self.con.execute(query)
     
+    def create_market_context_table(self, interval):
+        interval_name = interval.replace(" ", "_")
+        table_exists = self.table_exists(f"market_context_{interval_name}")
+        if not table_exists:
+            self.con.execute(f"""
+                             CREATE TABLE market_context_{interval_name} (
+                                open_time TIMESTAMP PRIMARY KEY,
+                                efficiency DOUBLE,
+                                overlap_ratio DOUBLE,
+                                delta_efficiency DOUBLE,
+                                regime TEXT DEFAULT NULL,           -- 'RANGE' | 'TREND' | 'TRANSITION'
+                                price_location TEXT DEFAULT NULL   -- 'VAL' | 'VAH' | 'MID' | 'EXTREME'
+                             )
+                                """)
+            print(f"✓ Tabla market_context_{interval_name} creada exitosamente")
+            where_clause = ""
+        else:
+            where_clause = f"WHERE open_time > (SELECT MAX(open_time) FROM market_context_{interval_name})"
+            print(f"✓ Tabla market_context_{interval_name} se actualiza con nuevos datos")
+        query = f"""
+        WITH ohlc AS (
+            SELECT
+                time_bucket(INTERVAL '{interval}', open_time) AS open_time,
+                FIRST(open ORDER BY open_time ASC) AS open,
+                MAX(high) AS high,
+                MIN(low) AS low,
+                FIRST(close ORDER BY open_time DESC) AS close,
+                SUM(sell_volume) AS sell_volume,
+                SUM(buy_volume) AS buy_volume,
+                SUM(volume) AS volume,
+                SUM(delta) AS delta,
+                SUM(trade_count) AS trade_count
+            FROM ohlc_1_minutes
+            {where_clause}
+            GROUP BY time_bucket(INTERVAL '{interval}', open_time)
+        ),
+        metrics AS (
+            SELECT
+            *,
+            ABS(close - open) / NULLIF(volume, 0) AS efficiency,
+            CASE
+                WHEN LEAST(GREATEST(open, close),
+                    GREATEST(LAG(open) OVER w, LAG(close) OVER w))
+                >
+                    GREATEST(LEAST(open, close), 
+                    LEAST(LAG(open) OVER w, LAG(close) OVER w))
+                THEN 1 ELSE 0
+            END AS overlap_flag
+            FROM ohlc
+            WINDOW w AS (ORDER BY open_time)
+        )
+        INSERT OR IGNORE INTO market_context_{interval_name}
+        SELECT
+            open_time,
+            efficiency,
+            -- overlap ratio (20 velas)
+            AVG(overlap_flag) OVER (
+            ORDER BY open_time
+            ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING
+            ) AS overlap_ratio,
+            -- delta efficiency (20 velas)
+            ABS(
+                SUM(delta) OVER (
+                    ORDER BY open_time
+                    ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING
+                )
+            ) /
+            NULLIF(
+                ABS(
+                    FIRST_VALUE(open) OVER (
+                        ORDER BY open_time
+                        ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING
+                    )
+                    -
+                    LAST_VALUE(close) OVER (
+                        ORDER BY open_time
+                        ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING
+                    )
+                ),
+                0
+            ) AS delta_efficiency,
+            NULL AS regime, -- 'RANGE' | 'TREND' | 'TRANSITION'
+            NULL AS price_location -- 'VAL' | 'VAH' | 'MID' | 'EXTREME'
+        FROM metrics
+        ORDER BY open_time;
+        """
+        response = self.con.execute(query).fetchone()
+        print(response[0])
+        if response[0] == 'SUCCESS':
+            print(f"✓ Tabla market_context_{interval_name} actualizada exitosamente")
+        
     def get_ohlc(self, interval, start_date=None, end_date=None):
         
          # Filtros de fecha
@@ -157,28 +252,28 @@ class AggTradeDB:
         FROM ohlc_1_minutes
         {where_sql}
         GROUP BY time_bucket(INTERVAL '{interval}', open_time)
-    )
-    SELECT
-        open_time,
-        open,
-        high,
-        low,
-        close,
-        sell_volume,
-        buy_volume,
-        volume,
-        delta,
-        trade_count,
-        CASE 
-            WHEN close >= open THEN 'green'
-            ELSE 'red'
-        END AS color
-    FROM resampled
-    ORDER BY open_time ASC
-    """
+        )
+        SELECT
+            open_time,
+            open,
+            high,
+            low,
+            close,
+            sell_volume,
+            buy_volume,
+            volume,
+            delta,
+            trade_count,
+            CASE 
+                WHEN close >= open THEN 'green'
+                ELSE 'red'
+            END AS color
+        FROM resampled
+        ORDER BY open_time ASC
+        """
         df = self.con.execute(query).fetchdf()
         return df
-    
+
     def get_volume_profile(self, interval='4 hours', start_date=None, end_date=None, 
                            resolution='auto'):
         """

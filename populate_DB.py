@@ -7,13 +7,14 @@ interval = '1 minutes'
 resolution = 10
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
 table = 'agg_trades'
+context_interval='15 minutes'
 
 def agg_trades_monthly(start_year, start_month, end_year, end_month, end_day, simbol):
     current_year = start_year
     current_month = start_month
     while (current_year < end_year) or (current_year == end_year and current_month < end_month):
-        #df = agg_trades_df.download_agg_trades_montly(simbol, current_year, current_month)
-        #agg_trades_DB.save_df_to_db(df, table)
+        df = agg_trades_df.download_agg_trades_montly(simbol, current_year, current_month)
+        agg_trades_DB.save_df_to_db(df, table)
         print(f"Descargando datos de {current_year}-{current_month}")
         current_month += 1
         if current_month > 12:
@@ -23,8 +24,8 @@ def agg_trades_monthly(start_year, start_month, end_year, end_month, end_day, si
    
 def agg_trades_daily(year, month, start_day, end_day, simbol): 
     for day in range(start_day, end_day):
-        #df = agg_trades_df.download_agg_trades_daily(simbol, year, month, day)
-        #agg_trades_DB.save_df_to_db(df, table)
+        df = agg_trades_df.download_agg_trades_daily(simbol, year, month, day)
+        agg_trades_DB.save_df_to_db(df, table)
         print(f"Descargando datos de {year}-{month}-{day}")
 
 today = pd.Timestamp.now()
@@ -44,7 +45,7 @@ if table in tables['name'].values:
     start_month = last_date.month
     start_day = last_date.day + 1 # Comenzar desde el día siguiente
     if (start_year < end_year) or (start_year == end_year and start_month < end_month):
-        print(f"Actualizando datos mensuales desde {start_year}-{start_month} hasta {end_year}-{end_month-1}")
+        print(f"Actualizando datos mensuales desde {start_year}-{start_month} hasta {end_year}-{end_month}")
         agg_trades_monthly(start_year, start_month, end_year, end_month, end_day, simbol)
 
     if (start_year == end_year and start_month == end_month and start_day < end_day):
@@ -58,9 +59,9 @@ else:
     start_day = 1
     agg_trades_monthly(start_year, start_month, end_year, end_month, end_day, simbol)
     
-#agg_trades_DB.create_ohlc_table(interval)
-#agg_trades_DB.create_volume_profile_table(resolution, interval)
-    
+agg_trades_DB.create_ohlc_table_from_aggtrades(interval)
+agg_trades_DB.create_volume_profile_table(resolution, interval)
+agg_trades_DB.create_market_context_table(context_interval)
 #agg_trades_DB.con.execute(f"DROP TABLE IF EXISTS ohlc_{interval.replace(' ', '_')}")
 df = agg_trades_DB.con.execute(f"SELECT * FROM volume_profile").fetchdf().tail(20)
 print(df)
