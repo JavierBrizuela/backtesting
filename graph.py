@@ -11,7 +11,7 @@ import os
 from candlestick_analytics import hammer_candle
 
 # Parámetros de configuración simbolo, intervalo, fechas, base de datos
-interval = '5 minutes'
+interval = '15 minutes'
 start = '2025-12-20'
 end = '2026-01-28'
 simbol = 'BTCUSDT'
@@ -192,19 +192,25 @@ plt_volume.add_tools(hover_volume)
 plt_volume.yaxis.formatter = NumeralTickFormatter(format="0,0.00")
 
 # Grafica de contexto de mercado
-df_market_context['overlap_ratio_escaled'] = df_market_context['overlap_ratio'] * df_market_context['efficiency'].max()
-df_market_context['efficiency_ma'] = df_market_context['efficiency'].rolling(window=window).mean()
-df_market_context['delta_efficiency_escaled'] = df_market_context['delta_efficiency'] * (df_market_context['efficiency'].max() / df_market_context['delta_efficiency'].abs().max())
-plt_context = figure(x_axis_type='datetime', height=150, width=CHART_WIDTH, x_range=plt_candlestick.x_range, title='Market Context')
+df_market_context['efficiency_normalized'] = df_market_context['efficiency'] / df_market_context['efficiency'].max()
+df_market_context['efficiency_ma'] = df_market_context['efficiency_normalized'].rolling(window=window).mean()
+df_market_context['delta_efficiency_normalized'] = df_market_context['delta_efficiency'] / max(df_market_context['delta_efficiency'].abs().max(), df_market_context['delta_efficiency'].abs().min())
+plt_context = figure(x_axis_type='datetime', height=250, width=CHART_WIDTH, x_range=plt_candlestick.x_range, title='Market Context')
 source_market_context = ColumnDataSource(df_market_context)
-hline_hight = Span(location=0.65 * df_market_context['efficiency'].max(), dimension='width', line_color='black', line_width=2, line_dash='dashed')
-hline_low = Span(location=0.45 * df_market_context['efficiency'].max(), dimension='width', line_color='black', line_width=2, line_dash='dashed')
+hline_hight = Span(location=0.6 , dimension='width', line_color='black', line_width=2, line_dash='dashed')
+hline_low = Span(location=0.3 , dimension='width', line_color='black', line_width=2, line_dash='dashed')
+hline_r_square = Span(location=0.7 , dimension='width', line_color='blue', line_width=2, line_dash='dashed')
 plt_context.add_layout(hline_hight)
 plt_context.add_layout(hline_low)
-plt_context.line(x='open_time', y='overlap_ratio_escaled', line_color='black', line_width=2, source=source_market_context, legend_label='Overlap Ratio')
-plt_context.line(x='open_time', y='efficiency', line_color='red', line_width=2, source=source_market_context, legend_label='Efficiency Ratio', alpha=0.7)
-plt_context.line(x='open_time', y='efficiency_ma', line_color='blue', line_width=2, source=source_market_context, legend_label=f'Efficiency MA {window}', alpha=0.7)
-plt_context.line(x='open_time', y='delta_efficiency_escaled', line_color='green', line_width=2, source=source_market_context, legend_label='delta efficiency', alpha=0.7)
+plt_context.add_layout(hline_r_square)
+plt_context.line(x='open_time', y='efficiency_normalized', line_color='red', line_width=2, source=source_market_context, legend_label='Efficiency', alpha=0.5)
+plt_context.line(x='open_time', y='efficiency_ma', line_color='red', line_width=2, source=source_market_context, legend_label=f'Efficiency MA {window}')
+plt_context.line(x='open_time', y='efficiency_ratio', line_color='black', line_width=2, source=source_market_context, legend_label='efficiency ratio Kaufman')
+plt_context.line(x='open_time', y='r_squared', line_color='blue', line_width=1, source=source_market_context, legend_label='R²')
+plt_context.line(x='open_time', y='delta_efficiency_normalized', line_color='green', line_width=2, source=source_market_context, legend_label='delta efficiency normalized', alpha=0.7)
+#plt_context.line(x='open_time', y='coefficient_variation', line_color='orange', line_width=1, source=source_market_context, legend_label='Coefficient of Variation')
+#plt_context.line(x='open_time', y='atr_normalized', line_color='purple', line_width=1, source=source_market_context, legend_label='ATR Normalized')
+
 #Hover para contexto de mercado
 hover_context = HoverTool(
     tooltips=[
@@ -212,6 +218,10 @@ hover_context = HoverTool(
         ("Overlap Ratio", "@overlap_ratio{0.00}"),
         ("Efficiency", "@efficiency{0.00}"),
         ("Efficiency MA", "@efficiency_ma{0.00}"),
+        ("Efficiency Ratio Kaufman", "@efficiency_ratio{0.00}"),
+        ("R²", "@r_squared{0.00}"),
+        ("Coefficient of Variation", "@coefficient_variation{0.00}"),
+        ("ATR Normalized", "@atr_normalized{0.00}"),
         ("Delta Efficiency", "@delta_efficiency{+0,0.00}")
     ], formatters={'@open_time': 'datetime'})
 plt_context.add_tools(hover_context)

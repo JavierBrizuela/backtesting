@@ -144,7 +144,10 @@ class AggTradeDB:
                              CREATE TABLE market_context_{interval_name} (
                                 open_time TIMESTAMP PRIMARY KEY,
                                 efficiency DOUBLE,
-                                overlap_ratio DOUBLE,
+                                efficiency_ratio DOUBLE,
+                                r_squared DOUBLE,
+                                coefficient_variation DOUBLE,
+                                atr_normalized DOUBLE,
                                 delta_efficiency DOUBLE,
                                 regime TEXT DEFAULT NULL,           -- 'RANGE' | 'TREND' | 'TRANSITION'
                                 price_location TEXT DEFAULT NULL   -- 'VAL' | 'VAH' | 'MID' | 'EXTREME'
@@ -172,54 +175,59 @@ class AggTradeDB:
             {where_clause}
             GROUP BY time_bucket(INTERVAL '{interval}', open_time)
         ),
-        metrics AS (
+        base_data AS (
             SELECT
             *,
-            ABS(close - open) / NULLIF(volume, 0) AS efficiency,
-            CASE
-                WHEN LEAST(GREATEST(open, close),
-                    GREATEST(LAG(open) OVER w, LAG(close) OVER w))
-                >
-                    GREATEST(LEAST(open, close), 
-                    LEAST(LAG(open) OVER w, LAG(close) OVER w))
-                THEN 1 ELSE 0
-            END AS overlap_flag
+            LAG(close) OVER (ORDER BY open_time) AS prev_close,
+            ROW_NUMBER() OVER (ORDER BY open_time) AS row_number
             FROM ohlc
-            WINDOW w AS (ORDER BY open_time)
         )
         INSERT OR IGNORE INTO market_context_{interval_name}
         SELECT
             open_time,
-            efficiency,
-            -- overlap ratio (20 velas)
-            AVG(overlap_flag) OVER (
-            ORDER BY open_time
-            ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING
-            ) AS overlap_ratio,
-            -- delta efficiency (20 velas)
-            ABS(
-                SUM(delta) OVER (
-                    ORDER BY open_time
-                    ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING
+            ABS(close - open) / NULLIF(volume, 0) AS efficiency,
+            -- efficiency ratio (Kaufman)
+                ABS(close - FIRST_VALUE(close) OVER w20) / NULLIF(
+                    SUM(ABS(close - prev_close)) OVER w20, 
+                    0
+                ) AS efficiency_ratio,
+            -- 2. R² (Coeficiente de determinación)
+            POW(
+                CORR(row_number, close) OVER w20, 2
+            ) AS r_squared,
+            -- 3. Coeficiente de Variación
+            -- Desviación estándar normalizada por el precio promedio
+            STDDEV(close) OVER w20 / NULLIF(
+                AVG(close) OVER w20, 
+                0
+            ) AS coefficient_variation,
+            
+            -- 4. ATR Normalizado
+            -- Rango verdadero promedio normalizado por precio
+            AVG(
+                GREATEST(
+                    high - low,
+                    ABS(high - prev_close),
+                    ABS(low - prev_close)
                 )
-            ) /
+            ) OVER w20 / NULLIF(AVG(close) OVER w20, 0) AS atr_normalized,
+            
+            -- delta efficiency (20 velas)
+            SUM(delta) OVER w20
+            /
             NULLIF(
                 ABS(
-                    FIRST_VALUE(open) OVER (
-                        ORDER BY open_time
-                        ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING
-                    )
+                    FIRST_VALUE(open) OVER w20
                     -
-                    LAST_VALUE(close) OVER (
-                        ORDER BY open_time
-                        ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING
-                    )
+                    LAST_VALUE(close) OVER w20
                 ),
                 0
             ) AS delta_efficiency,
             NULL AS regime, -- 'RANGE' | 'TREND' | 'TRANSITION'
             NULL AS price_location -- 'VAL' | 'VAH' | 'MID' | 'EXTREME'
-        FROM metrics
+        FROM base_data
+        WINDOW 
+            w20 AS (ORDER BY open_time ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING)
         ORDER BY open_time;
         """
         response = self.con.execute(query).fetchone()
