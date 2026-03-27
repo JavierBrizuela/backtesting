@@ -12,8 +12,8 @@ from candlestick_analytics import hammer_candle
 
 # Parámetros de configuración simbolo, intervalo, fechas, base de datos
 interval = '15 minutes'
-start = '2025-12-20'
-end = '2026-01-28'
+start = '2026-02-01'
+end = '2026-02-21'
 simbol = 'BTCUSDT'
 db_path = f'data/{simbol}/tradebook/agg_trades.db'
 table = 'agg_trades'
@@ -117,7 +117,11 @@ hover = HoverTool(
         ("Low", "@low{0.2f}"),
         ("Close", "@close{0.2f}"),
         ("Volume", "@volume{0.00}"),
-        ("Trade Count", "@trade_count")
+        ("Trade Count", "@trade_count"),
+        ("VWAP", "@vwap{0.2f}"),
+        ("POC", "@poc{0.2f}"),
+        ("Price/VWAP Diff", "@price_vwap_diff{0.00%}"),
+        ("VWAP Slope", "@vwap_slope{0.2f}"),
     ],
     formatters={
         '@open_time': 'datetime',
@@ -215,8 +219,7 @@ plt_context.line(x='open_time', y='delta_efficiency_normalized', line_color='gre
 hover_context = HoverTool(
     tooltips=[
         ("Time", "@open_time{%F %T}"),
-        ("Overlap Ratio", "@overlap_ratio{0.00}"),
-        ("Efficiency", "@efficiency{0.00}"),
+        ("Efficiency", "@efficiency_normalized{0.00}"),
         ("Efficiency MA", "@efficiency_ma{0.00}"),
         ("Efficiency Ratio Kaufman", "@efficiency_ratio{0.00}"),
         ("R²", "@r_squared{0.00}"),
@@ -227,13 +230,14 @@ hover_context = HoverTool(
 plt_context.add_tools(hover_context)
 # Grafica velas que cumplas los requisitos
 df_ohlc['hammer_candle'] = df_ohlc.apply(lambda row: hammer_candle(row['open'], row['high'], row['low'], row['close']), axis=1)
-df_poc = df_vol_profile.groupby('open_time')['total_volume'].idxmax()
-df_ohlc['poc'] = df_vol_profile.loc[df_poc, 'price_bin'].values
-df_buyl = df_ohlc[(df_ohlc['poc'] <= df_ohlc['close'] ) & 
+# POC ya viene de la DB en df_ohlc['poc'], no hace falta calcularlo
+df_ohlc = df_ohlc.merge(df_market_context[['open_time', 'efficiency_normalized', 'efficiency_ma']], on='open_time', how='left')
+df_buyl = df_ohlc[(df_ohlc['poc'] <= df_ohlc['close'] + abs(df_ohlc['close'] - df_ohlc['open']) * 0.2) & 
                  (df_ohlc['volume_high'] == True) & 
-                 (df_ohlc['delta_normalized'] < 0.5) & 
+                 (df_ohlc['delta_normalized'] < 0.46) & 
                  (df_ohlc['color'] == 'red') &
-                 (df_ohlc['delta_ma'] < 0)]
+                 (df_ohlc['efficiency_normalized'] < df_ohlc['efficiency_ma'])]
+print(df_buyl.head())
 plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='green', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_buyl), legend_label='absorption', alpha=0.8)
 df_sell = df_ohlc[(df_ohlc['poc'] >= df_ohlc['close'] ) & 
                  (df_ohlc['volume_high'] == True) & 
@@ -243,7 +247,7 @@ df_sell = df_ohlc[(df_ohlc['poc'] >= df_ohlc['close'] ) &
 plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='red', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_sell), legend_label='absorption', alpha=0.8)
 
 # Graficar imbalance oferta y demanda
-IMB_RATIO = 3.0
+""" IMB_RATIO = 3.0
 MIN_STREAK = 3
 
 def streak_counter(series):
@@ -282,7 +286,7 @@ df_imbalance['sell_streak'] = df_imbalance.groupby('open_time')['sell_imbalance'
 df_sell_imbalance = df_imbalance[df_imbalance['sell_streak'] >= MIN_STREAK].copy()
 df_sell_imbalance['imbalance_filled'] = df_sell_imbalance.apply(lambda row: bin_filled(row, df_ohlc), axis=1)
 plt_candlestick.hbar(y='price_bin', left='open_time', right= 'imbalance_filled', height=resolution*0.9, fill_color='red', line_color=None, source=ColumnDataSource(df_sell_imbalance), alpha=0.8)    
-
+ """
 # Graficar perfil de volumen
 start_time = pd.to_datetime(end) + pd.to_timedelta(width_ms, unit='ms')
 df_profile['total_volume_normalized'] = start_time - pd.to_timedelta(df_profile['total_volume_normalized'] * width_ms * 4 , unit="ms")
@@ -304,4 +308,4 @@ plt_candlestick.add_tools(crosshair)
 plt_volume.add_tools(crosshair)
 #plt_candlestick.scatter()
 #print(df_ohlc.head(40))
-show(column(plt_candlestick, plt_context)) # , plt_volume
+show(column(plt_candlestick, plt_context, plt_volume)) # , plt_volume

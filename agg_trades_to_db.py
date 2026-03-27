@@ -7,17 +7,18 @@ class AggTradeDB:
         self.con = duckdb.connect(database=self.db_path)
         if UTC:
             self.con.execute("SET TimeZone='UTC'")
-    
+
     def table_exists(self, table):
-        res = self.con.execute(f'''
+        res = self.con.execute('''
             SELECT COUNT(*) AS count
             FROM information_schema.tables
-            WHERE table_name = '{table}'
-        ''').fetchone()
+            WHERE table_name = ?
+        ''', [table]).fetchone()
         return res[0] > 0
-    
+
     def create_ohlc_table(self, interval):
-        response = self.con.execute(f"""
+        try:
+            self.con.execute(f"""
                 CREATE TABLE ohlc_{interval} (
                     open_time TIMESTAMP PRIMARY KEY,
                     open DOUBLE,
@@ -29,23 +30,68 @@ class AggTradeDB:
                     volume DOUBLE,
                     delta DOUBLE,
                     trade_count BIGINT,
-                    color VARCHAR
+                    color VARCHAR,
+                    vwap DOUBLE,
+                    poc DOUBLE,
+                    vwap_std DOUBLE,
+                    price_vwap_diff DOUBLE,
+                    vwap_slope DOUBLE
                 )
-            """).fetchone()
-        if response[0] == 'SUCCESS':
-            print(f"✓ Tabla ohlc_{interval} creada exitosamente")
-        
+            """)
+            print(f"[OK] Tabla ohlc_{interval} creada exitosamente")
+        except Exception as e:
+            print(f"[ERROR] Tabla ohlc_{interval}: {e}")
+            raise
+
     def str_to_timestamp(self, date_str):
         return int(pd.Timestamp(date_str).value // 1000)
-    
+
+    def import_csv_to_db(self, csv_path, table):
+        """
+        Importa un archivo CSV directamente a DuckDB sin pasar por la RAM de Python.
+        Extremadamente eficiente para millones de registros.
+        """
+        if not csv_path:
+            return None
+        
+        # Normalizar ruta para SQL (evitar problemas de contra-barras en Windows)
+        csv_path_sql = csv_path.replace("\\", "/")
+        
+        # Creamos la tabla si no existe
+        self.con.execute(f'''
+            CREATE TABLE IF NOT EXISTS {table} (
+                agg_trade_id BIGINT PRIMARY KEY,
+                price DOUBLE,
+                quantity DOUBLE,
+                first_trade_id BIGINT,
+                last_trade_id BIGINT,
+                timestamp BIGINT,
+                is_buyer_maker BOOLEAN,
+                is_best_match BOOLEAN
+            )
+        ''')
+        
+        print(f"[SQL] Importando datos desde CSV...")
+        count_before = self.con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+        
+        # La magia de DuckDB: Leer CSV masivo directamente
+        self.con.execute(f'''
+            INSERT OR IGNORE INTO {table} 
+            SELECT * FROM read_csv_auto('{csv_path_sql}', header=False)
+        ''')
+        
+        count_after = self.con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+        print(f"[OK] Importación terminada: {count_after - count_before} registros añadidos.")
+        print(f"[OK] Total registros en tabla '{table}': {count_after:,}")
+
     def save_df_to_db(self, df, table):
         if df.empty:
             print("⚠️ No hay datos en el dataframe para crear la tabla.")
             return None
-        
+
         # Ordenar por timestamp antes de insertar
         df = df.sort_values("timestamp")
-        
+
         self.con.execute(f'''
             CREATE TABLE IF NOT EXISTS {table} (
                 agg_trade_id BIGINT PRIMARY KEY,
@@ -64,7 +110,7 @@ class AggTradeDB:
         ''')
         count_after = self.con.execute(f"SELECT COUNT(*) AS count FROM {table}").fetchone()[0]
         print(f"Registros antes: {count_before}, después: {count_after}, añadidos: {count_after - count_before}")
-        
+
     def create_ohlc_table_from_aggtrades(self, interval):
         interval_name = interval.replace(" ", "_")
         table_exists = self.table_exists(f"ohlc_{interval_name}")
@@ -73,32 +119,87 @@ class AggTradeDB:
             where_clause = ""
         else:
             where_clause = f"WHERE to_timestamp(timestamp / 1000000) > (SELECT MAX(open_time) FROM ohlc_{interval_name})"
-            print(f"✓ Tabla ohlc_{interval_name} se actualiza con nuevos datos")
-            
+            print(f"[OK] Tabla ohlc_{interval_name} se actualiza con nuevos datos")
+
         query = f"""
+        WITH bucketed AS (
+            SELECT
+                time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000)) AS open_time,
+                price, quantity, is_buyer_maker, timestamp, first_trade_id, last_trade_id
+            FROM agg_trades
+            {where_clause}
+        ),
+        ohlc_agg AS (
+            SELECT
+                open_time,
+                FIRST(price ORDER BY timestamp ASC) AS open,
+                MAX(price) AS high,
+                MIN(price) AS low,
+                FIRST(price ORDER BY timestamp DESC) AS close,
+                SUM(CASE WHEN is_buyer_maker THEN quantity ELSE 0 END) AS sell_volume,
+                SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE 0 END) AS buy_volume,
+                SUM(quantity) AS volume,
+                SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE -quantity END) AS delta,
+                MAX(last_trade_id) - MIN(first_trade_id) + 1 AS trade_count
+            FROM bucketed
+            GROUP BY open_time
+        ),
+        vwap_calc AS (
+            SELECT
+                open_time,
+                SUM(price * quantity) / SUM(quantity) AS vwap,
+                STDDEV(price) AS vwap_std
+            FROM bucketed
+            GROUP BY open_time
+        ),
+        poc_calc AS (
+            SELECT open_time, price_bin AS poc FROM (
+                SELECT
+                    open_time,
+                    FLOOR(price) AS price_bin,
+                    SUM(quantity) AS vol_at_price,
+                    ROW_NUMBER() OVER (PARTITION BY open_time ORDER BY SUM(quantity) DESC) AS rn
+                FROM bucketed
+                GROUP BY open_time, FLOOR(price)
+            )
+            WHERE rn = 1
+        ),
+        vwap_with_slope AS (
+            SELECT
+                open_time,
+                vwap,
+                vwap_std,
+                vwap - LAG(vwap) OVER (ORDER BY open_time) AS vwap_slope
+            FROM vwap_calc
+        )
         INSERT OR IGNORE INTO ohlc_{interval_name}
         SELECT
-            CAST(time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000)) AS TIMESTAMP) AS open_time,
-            FIRST(price ORDER BY timestamp ASC) AS open,
-            MAX(price) AS high,
-            MIN(price) AS low,
-            FIRST(price ORDER BY timestamp DESC) AS close,
-            SUM(CASE WHEN is_buyer_maker THEN quantity ELSE 0 END) AS sell_volume,
-            SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE 0 END) AS buy_volume,
-            SUM(quantity) AS volume,
-            SUM(CASE WHEN NOT is_buyer_maker THEN quantity ELSE -quantity END) AS delta,
-            MAX(last_trade_id) - MIN(first_trade_id) + 1 AS trade_count,
-            CASE 
-                WHEN close >= open THEN 'green'
+            o.open_time,
+            o.open,
+            o.high,
+            o.low,
+            o.close,
+            o.sell_volume,
+            o.buy_volume,
+            o.volume,
+            o.delta,
+            o.trade_count,
+            CASE
+                WHEN o.close >= o.open THEN 'green'
                 ELSE 'red'
-            END AS color
-        FROM agg_trades
-        {where_clause}
-        GROUP BY time_bucket(INTERVAL '{interval}', to_timestamp(timestamp / 1000000) )
-        ORDER BY open_time ASC
+            END AS color,
+            vs.vwap,
+            p.poc,
+            vs.vwap_std,
+            (o.close - vs.vwap) / vs.vwap AS price_vwap_diff,
+            vs.vwap_slope
+        FROM ohlc_agg o
+        JOIN vwap_with_slope vs ON o.open_time = vs.open_time
+        JOIN poc_calc p ON o.open_time = p.open_time
+        ORDER BY o.open_time ASC
         """
         self.con.execute(query)
-    
+
     def create_volume_profile_table(self, resolution, interval):
         table_exists = self.table_exists("volume_profile")
         if not table_exists:
@@ -114,11 +215,11 @@ class AggTradeDB:
                     PRIMARY KEY (open_time, price_bin)
                 )
                 """)
-            print("✓ Tabla volume_profile creada exitosamente")
+            print("[OK] Tabla volume_profile creada exitosamente")
             where_clause = ""
         else:
             where_clause = f"WHERE to_timestamp(timestamp / 1000000) > (SELECT MAX(open_time) FROM volume_profile)"
-            print("✓ Tabla volume_profile se actualiza con nuevos datos")
+            print("[OK] Tabla volume_profile se actualiza con nuevos datos")
         query = f"""
         INSERT OR IGNORE INTO volume_profile
         SELECT
@@ -135,7 +236,7 @@ class AggTradeDB:
         ORDER BY open_time ASC, price_bin ASC
         """
         self.con.execute(query)
-    
+
     def create_market_context_table(self, interval):
         interval_name = interval.replace(" ", "_")
         table_exists = self.table_exists(f"market_context_{interval_name}")
@@ -153,11 +254,11 @@ class AggTradeDB:
                                 price_location TEXT DEFAULT NULL   -- 'VAL' | 'VAH' | 'MID' | 'EXTREME'
                              )
                                 """)
-            print(f"✓ Tabla market_context_{interval_name} creada exitosamente")
+            print(f"[OK] Tabla market_context_{interval_name} creada exitosamente")
             where_clause = ""
         else:
             where_clause = f"WHERE open_time > (SELECT MAX(open_time) FROM market_context_{interval_name})"
-            print(f"✓ Tabla market_context_{interval_name} se actualiza con nuevos datos")
+            print(f"[OK] Tabla market_context_{interval_name} se actualiza con nuevos datos")
         query = f"""
         WITH ohlc AS (
             SELECT
@@ -188,7 +289,7 @@ class AggTradeDB:
             ABS(close - open) / NULLIF(volume, 0) AS efficiency,
             -- efficiency ratio (Kaufman)
                 ABS(close - FIRST_VALUE(close) OVER w20) / NULLIF(
-                    SUM(ABS(close - prev_close)) OVER w20, 
+                    SUM(ABS(close - prev_close)) OVER w20,
                     0
                 ) AS efficiency_ratio,
             -- 2. R² (Coeficiente de determinación)
@@ -198,10 +299,10 @@ class AggTradeDB:
             -- 3. Coeficiente de Variación
             -- Desviación estándar normalizada por el precio promedio
             STDDEV(close) OVER w20 / NULLIF(
-                AVG(close) OVER w20, 
+                AVG(close) OVER w20,
                 0
             ) AS coefficient_variation,
-            
+
             -- 4. ATR Normalizado
             -- Rango verdadero promedio normalizado por precio
             AVG(
@@ -211,7 +312,7 @@ class AggTradeDB:
                     ABS(low - prev_close)
                 )
             ) OVER w20 / NULLIF(AVG(close) OVER w20, 0) AS atr_normalized,
-            
+
             -- delta efficiency (20 velas)
             SUM(delta) OVER w20
             /
@@ -226,17 +327,17 @@ class AggTradeDB:
             NULL AS regime, -- 'RANGE' | 'TREND' | 'TRANSITION'
             NULL AS price_location -- 'VAL' | 'VAH' | 'MID' | 'EXTREME'
         FROM base_data
-        WINDOW 
+        WINDOW
             w20 AS (ORDER BY open_time ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING)
         ORDER BY open_time;
         """
         response = self.con.execute(query).fetchone()
         print(response[0])
         if response[0] == 'SUCCESS':
-            print(f"✓ Tabla market_context_{interval_name} actualizada exitosamente")
-        
+            print(f"[OK] Tabla market_context_{interval_name} actualizada exitosamente")
+
     def get_ohlc(self, interval, start_date=None, end_date=None):
-        
+
          # Filtros de fecha
         where_clauses = []
         if start_date:
@@ -256,7 +357,12 @@ class AggTradeDB:
             SUM(buy_volume) AS buy_volume,
             SUM(volume) AS volume,
             SUM(delta) AS delta,
-            SUM(trade_count) AS trade_count
+            SUM(trade_count) AS trade_count,
+            AVG(vwap) AS vwap,
+            AVG(poc) AS poc,
+            AVG(vwap_std) AS vwap_std,
+            AVG(price_vwap_diff) AS price_vwap_diff,
+            SUM(vwap_slope) AS vwap_slope
         FROM ohlc_1_minutes
         {where_sql}
         GROUP BY time_bucket(INTERVAL '{interval}', open_time)
@@ -272,17 +378,22 @@ class AggTradeDB:
             volume,
             delta,
             trade_count,
-            CASE 
+            CASE
                 WHEN close >= open THEN 'green'
                 ELSE 'red'
-            END AS color
+            END AS color,
+            vwap,
+            poc,
+            vwap_std,
+            price_vwap_diff,
+            vwap_slope
         FROM resampled
         ORDER BY open_time ASC
         """
         df = self.con.execute(query).fetchdf()
         return df
 
-    def get_volume_profile(self, interval='4 hours', start_date=None, end_date=None, 
+    def get_volume_profile(self, interval='4 hours', start_date=None, end_date=None,
                            resolution='auto'):
         """
         Calcula volume profile desde tabla base de 1m
@@ -293,7 +404,7 @@ class AggTradeDB:
             start_date: Filtro fecha inicio
             end_date: Filtro fecha fin
             resolution: 'auto' o valor numérico (10, 25, 50, 100, 200, 500, 1000)
-        
+
         Returns:
             DataFrame con volume profile
         """
@@ -338,23 +449,23 @@ class AggTradeDB:
                     total_volume::FLOAT / NULLIF(
                         MAX(total_volume) OVER (PARTITION BY open_time), 0
                     ) AS volume_local_normalized,
-                    
-                    CASE 
-                        WHEN delta >= 0 THEN 
+
+                    CASE
+                        WHEN delta >= 0 THEN
                             delta::FLOAT / NULLIF(MAX(delta) OVER (PARTITION BY open_time), 0)
-                        ELSE 
+                        ELSE
                             delta::FLOAT / NULLIF(ABS(MIN(delta) OVER (PARTITION BY open_time)), 0)
                     END AS delta_local_normalized,
-                    
+
                     -- NORMALIZACIONES GLOBALES
                     total_volume::FLOAT / NULLIF(
                         MAX(total_volume) OVER (), 0
                     ) AS volume_global_normalized,
-                    
-                    CASE 
-                        WHEN delta >= 0 THEN 
+
+                    CASE
+                        WHEN delta >= 0 THEN
                             delta::FLOAT / NULLIF(MAX(delta) OVER (), 0)
-                        ELSE 
+                        ELSE
                             delta::FLOAT / NULLIF(ABS(MIN(delta) OVER ()), 0)
                     END AS delta_global_normalized
                 FROM resampled
@@ -364,7 +475,7 @@ class AggTradeDB:
             """
         df = self.con.execute(query).fetchdf()
         return df
-    
+
     def get_profile(self, start_date=None, end_date=None, resolution='auto'):
         # Filtros de fecha
         where_clauses = []
@@ -394,7 +505,7 @@ class AggTradeDB:
         """
         df = self.con.execute(query).fetchdf()
         return df
-    
+
     def get_institutional_trades(self, start_date=None, end_date=None, interval='1 minute'):
         # Filtros de fecha
         where_clauses = []
@@ -416,9 +527,9 @@ class AggTradeDB:
             HAVING trade_count > 5
             ORDER BY trade_count DESC
         """
-        
+
         df = self.con.execute(query).fetchdf()
         return df
-    
+
     def close_connection(self):
         self.con.close()
