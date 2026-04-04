@@ -1,0 +1,7430 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Strategy Scanner Summary</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a2e; color: #eee; }
+            h1 { color: #00ff88; }
+            h2 { color: #00ccff; margin-top: 30px; }
+            h3 { color: #ffaa00; margin-top: 20px; }
+            table { border-collapse: collapse; width: 100%; margin: 20px 0; background: #16213e; }
+            th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+            th { background: #0f3460; color: #fff; }
+            tr:nth-child(even) { background: #1a1a2e; }
+            tr:hover { background: #2a2a4e; }
+            .long { color: #00ff88; }
+            .short { color: #ff4444; }
+            .metric { background: #0f3460; padding: 15px; border-radius: 5px; display: inline-block; margin: 10px; }
+            .metric-value { font-size: 24px; font-weight: bold; color: #00ff88; }
+            .metric-label { font-size: 12px; color: #aaa; }
+            .win { color: #00ff88; }
+            .loss { color: #ff4444; }
+            .neutral { color: #ffaa00; }
+        </style>
+    </head>
+    <body>
+        <h1>Strategy Scanner Summary</h1>
+        <p>Periodo: 2026-02-01 a 2026-02-28 | Intervalo: 15 minutes</p>
+        <p>RR Ratio: 2.0:1 | Max Candiles: 20</p>
+    <div>
+        <div class="metric">
+            <div class="metric-value">14</div>
+            <div class="metric-label">Absorcion Long</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">10</div>
+            <div class="metric-label">Absorcion Short</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">630</div>
+            <div class="metric-label">Imbalance Total</div>
+        </div>
+    </div>
+        <h2>Backtest Metrics - Absorcion LONG</h2>
+        <div>
+            <div class="metric"><div class="metric-value">0.0%</div><div class="metric-label">Win Rate</div></div>
+            <div class="metric"><div class="metric-value">0.00</div><div class="metric-label">Profit Factor</div></div>
+            <div class="metric"><div class="metric-value">-512.60</div><div class="metric-label">Expectancy</div></div>
+            <div class="metric"><div class="metric-value">5538.34</div><div class="metric-label">Max Drawdown</div></div>
+            <div class="metric"><div class="metric-value">328.56</div><div class="metric-label">Avg MFE</div></div>
+            <div class="metric"><div class="metric-value">1433.77</div><div class="metric-label">Avg MAE</div></div>
+        </div>
+        <p>Exit Reasons: {'STOP_LOSS': 12, 'TIME_EXIT': 2}</p>
+        
+        <h2>Backtest Metrics - Absorcion SHORT</h2>
+        <div>
+            <div class="metric"><div class="metric-value">40.0%</div><div class="metric-label">Win Rate</div></div>
+            <div class="metric"><div class="metric-value">0.80</div><div class="metric-label">Profit Factor</div></div>
+            <div class="metric"><div class="metric-value">-65.00</div><div class="metric-label">Expectancy</div></div>
+            <div class="metric"><div class="metric-value">1727.02</div><div class="metric-label">Max Drawdown</div></div>
+            <div class="metric"><div class="metric-value">793.75</div><div class="metric-label">Avg MFE</div></div>
+            <div class="metric"><div class="metric-value">895.01</div><div class="metric-label">Avg MAE</div></div>
+        </div>
+        <p>Exit Reasons: {'STOP_LOSS': 6, 'TARGET': 3, 'TIME_EXIT': 1}</p>
+        <h2>Absorcion LONG (14 señales)</h2><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>timestamp</th>
+      <th>price_close</th>
+      <th>entry_trigger</th>
+      <th>stop_loss</th>
+      <th>target</th>
+      <th>exit_time</th>
+      <th>exit_price</th>
+      <th>exit_reason</th>
+      <th>pnl</th>
+      <th>max_profit</th>
+      <th>max_loss</th>
+      <th>mfe</th>
+      <th>mae</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-02-01 20:00</td>
+      <td>76639.72</td>
+      <td>77338.00</td>
+      <td>75700.00</td>
+      <td>80614.00</td>
+      <td>2026-02-02 00:15</td>
+      <td>75700.00</td>
+      <td>STOP_LOSS</td>
+      <td>-1638.00</td>
+      <td>+893.26</td>
+      <td>+2734.00</td>
+      <td>+893.26</td>
+      <td>+2734.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 14:00</td>
+      <td>73608.88</td>
+      <td>73851.06</td>
+      <td>72824.56</td>
+      <td>75904.06</td>
+      <td>2026-02-04 14:15</td>
+      <td>72824.56</td>
+      <td>STOP_LOSS</td>
+      <td>-1026.50</td>
+      <td>+292.94</td>
+      <td>+1963.06</td>
+      <td>+292.94</td>
+      <td>+1963.06</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 09:15</td>
+      <td>69640.86</td>
+      <td>69940.00</td>
+      <td>69163.00</td>
+      <td>71494.00</td>
+      <td>2026-02-05 12:00</td>
+      <td>69163.00</td>
+      <td>STOP_LOSS</td>
+      <td>-777.00</td>
+      <td>+932.04</td>
+      <td>+3478.00</td>
+      <td>+932.04</td>
+      <td>+3478.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:00</td>
+      <td>70104.44</td>
+      <td>70310.00</td>
+      <td>69852.03</td>
+      <td>71225.94</td>
+      <td>2026-02-07 03:30</td>
+      <td>69852.03</td>
+      <td>STOP_LOSS</td>
+      <td>-457.97</td>
+      <td>-10.00</td>
+      <td>+3010.00</td>
+      <td>-10.00</td>
+      <td>+3010.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:30</td>
+      <td>70063.41</td>
+      <td>70300.00</td>
+      <td>69811.90</td>
+      <td>71276.20</td>
+      <td>2026-02-07 03:45</td>
+      <td>69811.90</td>
+      <td>STOP_LOSS</td>
+      <td>-488.10</td>
+      <td>-228.48</td>
+      <td>+3000.00</td>
+      <td>-228.48</td>
+      <td>+3000.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 00:30</td>
+      <td>69378.34</td>
+      <td>69542.55</td>
+      <td>69208.61</td>
+      <td>70210.43</td>
+      <td>2026-02-10 03:15</td>
+      <td>69208.61</td>
+      <td>STOP_LOSS</td>
+      <td>-333.94</td>
+      <td>+363.95</td>
+      <td>+860.55</td>
+      <td>+363.95</td>
+      <td>+860.55</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 03:45</td>
+      <td>66820.32</td>
+      <td>66907.13</td>
+      <td>66557.99</td>
+      <td>67605.41</td>
+      <td>2026-02-11 07:45</td>
+      <td>66557.99</td>
+      <td>STOP_LOSS</td>
+      <td>-349.14</td>
+      <td>+347.47</td>
+      <td>+537.64</td>
+      <td>+347.47</td>
+      <td>+537.64</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 12:45</td>
+      <td>68692.12</td>
+      <td>68800.00</td>
+      <td>68379.90</td>
+      <td>69640.20</td>
+      <td>2026-02-13 17:45</td>
+      <td>68777.12</td>
+      <td>TIME_EXIT</td>
+      <td>-22.88</td>
+      <td>+682.97</td>
+      <td>+259.17</td>
+      <td>+682.97</td>
+      <td>+259.17</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 13:00</td>
+      <td>68987.81</td>
+      <td>69100.00</td>
+      <td>68658.00</td>
+      <td>69984.00</td>
+      <td>2026-02-15 14:45</td>
+      <td>68658.00</td>
+      <td>STOP_LOSS</td>
+      <td>-442.00</td>
+      <td>-3.57</td>
+      <td>+1100.00</td>
+      <td>-3.57</td>
+      <td>+1100.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 14:45</td>
+      <td>68641.07</td>
+      <td>68823.05</td>
+      <td>68203.60</td>
+      <td>70061.95</td>
+      <td>2026-02-15 16:00</td>
+      <td>68203.60</td>
+      <td>STOP_LOSS</td>
+      <td>-619.45</td>
+      <td>+255.44</td>
+      <td>+823.05</td>
+      <td>+255.44</td>
+      <td>+823.05</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 19:00</td>
+      <td>66891.98</td>
+      <td>66933.00</td>
+      <td>66688.30</td>
+      <td>67422.40</td>
+      <td>2026-02-19 19:30</td>
+      <td>66688.30</td>
+      <td>STOP_LOSS</td>
+      <td>-244.70</td>
+      <td>+553.62</td>
+      <td>+280.66</td>
+      <td>+553.62</td>
+      <td>+280.66</td>
+    </tr>
+    <tr>
+      <td>2026-02-21 13:15</td>
+      <td>68274.36</td>
+      <td>68356.77</td>
+      <td>68101.78</td>
+      <td>68866.75</td>
+      <td>2026-02-21 18:15</td>
+      <td>68345.55</td>
+      <td>TIME_EXIT</td>
+      <td>-11.22</td>
+      <td>+301.73</td>
+      <td>+218.77</td>
+      <td>+301.73</td>
+      <td>+218.77</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 11:00</td>
+      <td>67650.31</td>
+      <td>67671.28</td>
+      <td>67468.24</td>
+      <td>68077.36</td>
+      <td>2026-02-22 11:30</td>
+      <td>67468.24</td>
+      <td>STOP_LOSS</td>
+      <td>-203.04</td>
+      <td>+141.92</td>
+      <td>+481.28</td>
+      <td>+141.92</td>
+      <td>+481.28</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 11:45</td>
+      <td>67698.18</td>
+      <td>67826.62</td>
+      <td>67264.22</td>
+      <td>68951.42</td>
+      <td>2026-02-26 12:00</td>
+      <td>67264.22</td>
+      <td>STOP_LOSS</td>
+      <td>-562.40</td>
+      <td>+76.50</td>
+      <td>+1326.62</td>
+      <td>+76.50</td>
+      <td>+1326.62</td>
+    </tr>
+  </tbody>
+</table><h2>Absorcion SHORT (10 señales)</h2><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>timestamp</th>
+      <th>price_close</th>
+      <th>entry_trigger</th>
+      <th>stop_loss</th>
+      <th>target</th>
+      <th>exit_time</th>
+      <th>exit_price</th>
+      <th>exit_reason</th>
+      <th>pnl</th>
+      <th>max_profit</th>
+      <th>max_loss</th>
+      <th>mfe</th>
+      <th>mae</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-02-05 00:00</td>
+      <td>71525.52</td>
+      <td>71345.95</td>
+      <td>71884.47</td>
+      <td>70268.91</td>
+      <td>2026-02-05 02:15</td>
+      <td>70268.91</td>
+      <td>TARGET</td>
+      <td>+1077.04</td>
+      <td>+1205.95</td>
+      <td>+422.05</td>
+      <td>+1205.95</td>
+      <td>+422.05</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 03:15</td>
+      <td>69372.08</td>
+      <td>69229.54</td>
+      <td>69518.56</td>
+      <td>68651.50</td>
+      <td>2026-02-08 04:15</td>
+      <td>69518.56</td>
+      <td>STOP_LOSS</td>
+      <td>-289.02</td>
+      <td>+13.85</td>
+      <td>+1705.46</td>
+      <td>+13.85</td>
+      <td>+1705.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 05:30</td>
+      <td>70366.14</td>
+      <td>70077.72</td>
+      <td>70796.99</td>
+      <td>68639.18</td>
+      <td>2026-02-08 08:15</td>
+      <td>70796.99</td>
+      <td>STOP_LOSS</td>
+      <td>-719.27</td>
+      <td>+187.20</td>
+      <td>+1422.27</td>
+      <td>+187.20</td>
+      <td>+1422.27</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 20:00</td>
+      <td>71366.00</td>
+      <td>71038.03</td>
+      <td>72271.41</td>
+      <td>68571.27</td>
+      <td>2026-02-09 01:00</td>
+      <td>71035.55</td>
+      <td>TIME_EXIT</td>
+      <td>+2.48</td>
+      <td>+1038.03</td>
+      <td>+461.97</td>
+      <td>+1038.03</td>
+      <td>+461.97</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 11:15</td>
+      <td>69225.14</td>
+      <td>69133.82</td>
+      <td>69591.20</td>
+      <td>68219.06</td>
+      <td>2026-02-10 11:30</td>
+      <td>68219.06</td>
+      <td>TARGET</td>
+      <td>+914.76</td>
+      <td>+1333.82</td>
+      <td>+859.83</td>
+      <td>+1333.82</td>
+      <td>+859.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 10:30</td>
+      <td>67222.51</td>
+      <td>66882.13</td>
+      <td>67674.30</td>
+      <td>65297.79</td>
+      <td>2026-02-11 11:00</td>
+      <td>67674.30</td>
+      <td>STOP_LOSS</td>
+      <td>-792.17</td>
+      <td>+1126.13</td>
+      <td>+1952.21</td>
+      <td>+1126.13</td>
+      <td>+1952.21</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 08:15</td>
+      <td>70194.00</td>
+      <td>69983.55</td>
+      <td>70488.00</td>
+      <td>68974.65</td>
+      <td>2026-02-14 08:45</td>
+      <td>70488.00</td>
+      <td>STOP_LOSS</td>
+      <td>-504.45</td>
+      <td>+918.95</td>
+      <td>+576.46</td>
+      <td>+918.95</td>
+      <td>+576.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 05:15</td>
+      <td>68287.35</td>
+      <td>68208.00</td>
+      <td>68476.22</td>
+      <td>67671.56</td>
+      <td>2026-02-18 08:00</td>
+      <td>67671.56</td>
+      <td>TARGET</td>
+      <td>+536.44</td>
+      <td>+1131.10</td>
+      <td>+92.01</td>
+      <td>+1131.10</td>
+      <td>+92.01</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 22:30</td>
+      <td>65123.14</td>
+      <td>65006.11</td>
+      <td>65409.62</td>
+      <td>64199.09</td>
+      <td>2026-02-23 03:15</td>
+      <td>65409.62</td>
+      <td>STOP_LOSS</td>
+      <td>-403.51</td>
+      <td>+715.40</td>
+      <td>+671.39</td>
+      <td>+715.40</td>
+      <td>+671.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 13:00</td>
+      <td>64163.30</td>
+      <td>63956.62</td>
+      <td>64428.90</td>
+      <td>63012.06</td>
+      <td>2026-02-24 14:00</td>
+      <td>64428.90</td>
+      <td>STOP_LOSS</td>
+      <td>-472.28</td>
+      <td>+267.08</td>
+      <td>+786.49</td>
+      <td>+267.08</td>
+      <td>+786.49</td>
+    </tr>
+  </tbody>
+</table><h2>Imbalance (630 señales)</h2><h3>Imbalance LONG</h3><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>timestamp</th>
+      <th>price_bin</th>
+      <th>imbalance_ratio</th>
+      <th>streak</th>
+      <th>exit_time</th>
+      <th>exit_reason</th>
+      <th>pnl</th>
+      <th>mfe</th>
+      <th>mae</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-02-01 01:00</td>
+      <td>78790.00</td>
+      <td>21.92</td>
+      <td>3</td>
+      <td>2026-02-01 04:00</td>
+      <td>STOP_LOSS</td>
+      <td>-787.90</td>
+      <td>+329.30</td>
+      <td>+822.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 01:15</td>
+      <td>78970.00</td>
+      <td>3.75</td>
+      <td>3</td>
+      <td>2026-02-01 04:00</td>
+      <td>STOP_LOSS</td>
+      <td>-789.70</td>
+      <td>+91.40</td>
+      <td>+1002.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 01:30</td>
+      <td>78930.00</td>
+      <td>3.19</td>
+      <td>3</td>
+      <td>2026-02-01 04:00</td>
+      <td>STOP_LOSS</td>
+      <td>-789.30</td>
+      <td>+131.40</td>
+      <td>+962.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 06:30</td>
+      <td>78770.00</td>
+      <td>7.80</td>
+      <td>3</td>
+      <td>2026-02-01 11:15</td>
+      <td>STOP_LOSS</td>
+      <td>-787.70</td>
+      <td>+450.72</td>
+      <td>+1533.32</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 06:45</td>
+      <td>78780.00</td>
+      <td>5.04</td>
+      <td>3</td>
+      <td>2026-02-01 11:15</td>
+      <td>STOP_LOSS</td>
+      <td>-787.80</td>
+      <td>+440.72</td>
+      <td>+1543.32</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 07:00</td>
+      <td>79100.00</td>
+      <td>3.39</td>
+      <td>3</td>
+      <td>2026-02-01 07:45</td>
+      <td>STOP_LOSS</td>
+      <td>-791.00</td>
+      <td>+75.79</td>
+      <td>+1863.32</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 09:15</td>
+      <td>78490.00</td>
+      <td>5.11</td>
+      <td>3</td>
+      <td>2026-02-01 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-784.90</td>
+      <td>+278.68</td>
+      <td>+1728.02</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 15:15</td>
+      <td>78440.00</td>
+      <td>277630000.00</td>
+      <td>3</td>
+      <td>2026-02-01 16:15</td>
+      <td>STOP_LOSS</td>
+      <td>-784.40</td>
+      <td>-252.00</td>
+      <td>+2740.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 18:15</td>
+      <td>76860.00</td>
+      <td>52.77</td>
+      <td>3</td>
+      <td>2026-02-01 20:00</td>
+      <td>STOP_LOSS</td>
+      <td>-768.60</td>
+      <td>+1371.26</td>
+      <td>+1160.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 23:30</td>
+      <td>76970.00</td>
+      <td>3.47</td>
+      <td>3</td>
+      <td>2026-02-02 00:00</td>
+      <td>STOP_LOSS</td>
+      <td>-769.70</td>
+      <td>+52.40</td>
+      <td>+2366.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 05:00</td>
+      <td>76620.00</td>
+      <td>11.90</td>
+      <td>3</td>
+      <td>2026-02-02 09:15</td>
+      <td>TARGET</td>
+      <td>+1532.40</td>
+      <td>+1814.00</td>
+      <td>-32.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 06:15</td>
+      <td>77150.00</td>
+      <td>3.85</td>
+      <td>3</td>
+      <td>2026-02-02 11:15</td>
+      <td>TIME_EXIT</td>
+      <td>+872.04</td>
+      <td>+1308.00</td>
+      <td>-65.74</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 06:15</td>
+      <td>77290.00</td>
+      <td>20.48</td>
+      <td>3</td>
+      <td>2026-02-02 11:15</td>
+      <td>TIME_EXIT</td>
+      <td>+732.04</td>
+      <td>+1168.00</td>
+      <td>+74.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 06:45</td>
+      <td>77790.00</td>
+      <td>3.79</td>
+      <td>3</td>
+      <td>2026-02-02 11:45</td>
+      <td>TIME_EXIT</td>
+      <td>+54.79</td>
+      <td>+1095.00</td>
+      <td>+338.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 07:00</td>
+      <td>77620.00</td>
+      <td>14.13</td>
+      <td>3</td>
+      <td>2026-02-02 12:00</td>
+      <td>TIME_EXIT</td>
+      <td>+675.36</td>
+      <td>+1265.00</td>
+      <td>+168.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 07:30</td>
+      <td>77840.00</td>
+      <td>387990000.00</td>
+      <td>3</td>
+      <td>2026-02-02 12:30</td>
+      <td>TIME_EXIT</td>
+      <td>+1181.47</td>
+      <td>+1520.00</td>
+      <td>+388.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 07:45</td>
+      <td>77470.00</td>
+      <td>4.97</td>
+      <td>3</td>
+      <td>2026-02-02 12:30</td>
+      <td>TARGET</td>
+      <td>+1549.40</td>
+      <td>+1890.00</td>
+      <td>+18.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 08:00</td>
+      <td>77470.00</td>
+      <td>3.41</td>
+      <td>4</td>
+      <td>2026-02-02 12:30</td>
+      <td>TARGET</td>
+      <td>+1549.40</td>
+      <td>+1890.00</td>
+      <td>-94.62</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 08:00</td>
+      <td>77690.00</td>
+      <td>3.69</td>
+      <td>3</td>
+      <td>2026-02-02 12:30</td>
+      <td>TARGET</td>
+      <td>+1553.80</td>
+      <td>+1670.00</td>
+      <td>+125.38</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 08:15</td>
+      <td>77690.00</td>
+      <td>3.18</td>
+      <td>4</td>
+      <td>2026-02-02 12:30</td>
+      <td>TARGET</td>
+      <td>+1553.80</td>
+      <td>+1670.00</td>
+      <td>+125.38</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 08:30</td>
+      <td>77760.00</td>
+      <td>4.69</td>
+      <td>3</td>
+      <td>2026-02-02 12:30</td>
+      <td>TARGET</td>
+      <td>+1555.20</td>
+      <td>+1600.00</td>
+      <td>+195.38</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 08:30</td>
+      <td>77770.00</td>
+      <td>3.26</td>
+      <td>3</td>
+      <td>2026-02-02 12:30</td>
+      <td>TARGET</td>
+      <td>+1555.40</td>
+      <td>+1590.00</td>
+      <td>+205.38</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 09:15</td>
+      <td>78050.00</td>
+      <td>6.37</td>
+      <td>3</td>
+      <td>2026-02-02 14:15</td>
+      <td>TIME_EXIT</td>
+      <td>+915.63</td>
+      <td>+1310.00</td>
+      <td>+485.38</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 09:30</td>
+      <td>78190.00</td>
+      <td>9.31</td>
+      <td>3</td>
+      <td>2026-02-02 14:30</td>
+      <td>TIME_EXIT</td>
+      <td>+685.10</td>
+      <td>+1170.00</td>
+      <td>+625.38</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 15:15</td>
+      <td>78380.00</td>
+      <td>6.50</td>
+      <td>3</td>
+      <td>2026-02-02 20:15</td>
+      <td>TIME_EXIT</td>
+      <td>+240.73</td>
+      <td>+487.99</td>
+      <td>+492.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 18:00</td>
+      <td>78020.00</td>
+      <td>5.00</td>
+      <td>3</td>
+      <td>2026-02-02 23:00</td>
+      <td>TIME_EXIT</td>
+      <td>+507.78</td>
+      <td>+1166.81</td>
+      <td>-185.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 19:00</td>
+      <td>78680.00</td>
+      <td>952200000.00</td>
+      <td>3</td>
+      <td>2026-02-02 23:45</td>
+      <td>STOP_LOSS</td>
+      <td>-786.80</td>
+      <td>+506.81</td>
+      <td>+1035.91</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 09:15</td>
+      <td>78300.00</td>
+      <td>3.45</td>
+      <td>3</td>
+      <td>2026-02-03 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-783.00</td>
+      <td>+158.89</td>
+      <td>+2612.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 16:15</td>
+      <td>74910.00</td>
+      <td>6.03</td>
+      <td>3</td>
+      <td>2026-02-03 17:30</td>
+      <td>TARGET</td>
+      <td>+1498.20</td>
+      <td>+2050.00</td>
+      <td>+593.87</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 23:30</td>
+      <td>75880.00</td>
+      <td>5.89</td>
+      <td>3</td>
+      <td>2026-02-04 04:30</td>
+      <td>TIME_EXIT</td>
+      <td>+674.40</td>
+      <td>+1091.52</td>
+      <td>+117.62</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 23:45</td>
+      <td>75880.00</td>
+      <td>3.06</td>
+      <td>4</td>
+      <td>2026-02-04 04:45</td>
+      <td>TIME_EXIT</td>
+      <td>+634.30</td>
+      <td>+1091.52</td>
+      <td>-26.05</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 06:30</td>
+      <td>76070.00</td>
+      <td>4.33</td>
+      <td>3</td>
+      <td>2026-02-04 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-760.70</td>
+      <td>+268.65</td>
+      <td>+1382.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 06:45</td>
+      <td>76070.00</td>
+      <td>7.57</td>
+      <td>4</td>
+      <td>2026-02-04 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-760.70</td>
+      <td>+268.65</td>
+      <td>+1814.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 07:15</td>
+      <td>76230.00</td>
+      <td>3.70</td>
+      <td>3</td>
+      <td>2026-02-04 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-762.30</td>
+      <td>+108.65</td>
+      <td>+2362.25</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 07:30</td>
+      <td>76220.00</td>
+      <td>4.43</td>
+      <td>3</td>
+      <td>2026-02-04 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-762.20</td>
+      <td>+118.65</td>
+      <td>+2425.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 07:30</td>
+      <td>76230.00</td>
+      <td>4.11</td>
+      <td>4</td>
+      <td>2026-02-04 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-762.30</td>
+      <td>+108.65</td>
+      <td>+2435.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 13:30</td>
+      <td>74120.00</td>
+      <td>3.74</td>
+      <td>3</td>
+      <td>2026-02-04 13:45</td>
+      <td>STOP_LOSS</td>
+      <td>-741.20</td>
+      <td>+24.00</td>
+      <td>+1951.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 13:00</td>
+      <td>67680.00</td>
+      <td>3.40</td>
+      <td>3</td>
+      <td>2026-02-05 14:15</td>
+      <td>STOP_LOSS</td>
+      <td>-676.80</td>
+      <td>+1001.81</td>
+      <td>+5335.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 16:15</td>
+      <td>66240.00</td>
+      <td>7.98</td>
+      <td>3</td>
+      <td>2026-02-05 16:45</td>
+      <td>STOP_LOSS</td>
+      <td>-662.40</td>
+      <td>-70.00</td>
+      <td>+6240.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 19:45</td>
+      <td>64280.00</td>
+      <td>4.14</td>
+      <td>3</td>
+      <td>2026-02-05 20:30</td>
+      <td>STOP_LOSS</td>
+      <td>-642.80</td>
+      <td>+1730.00</td>
+      <td>+4280.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 20:00</td>
+      <td>64280.00</td>
+      <td>119050000.00</td>
+      <td>4</td>
+      <td>2026-02-05 20:30</td>
+      <td>STOP_LOSS</td>
+      <td>-642.80</td>
+      <td>+1730.00</td>
+      <td>+4280.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 22:00</td>
+      <td>63600.00</td>
+      <td>3.11</td>
+      <td>3</td>
+      <td>2026-02-05 22:45</td>
+      <td>TARGET</td>
+      <td>+1272.00</td>
+      <td>+3226.50</td>
+      <td>-170.17</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 22:00</td>
+      <td>64770.00</td>
+      <td>5.21</td>
+      <td>3</td>
+      <td>2026-02-05 22:15</td>
+      <td>STOP_LOSS</td>
+      <td>-647.70</td>
+      <td>+2056.50</td>
+      <td>+999.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 22:45</td>
+      <td>64900.00</td>
+      <td>8.38</td>
+      <td>3</td>
+      <td>2026-02-05 23:15</td>
+      <td>STOP_LOSS</td>
+      <td>-649.00</td>
+      <td>+1926.50</td>
+      <td>+1129.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 01:15</td>
+      <td>64680.00</td>
+      <td>3.98</td>
+      <td>3</td>
+      <td>2026-02-06 02:30</td>
+      <td>TARGET</td>
+      <td>+1293.60</td>
+      <td>+2146.50</td>
+      <td>+180.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 10:00</td>
+      <td>66800.00</td>
+      <td>3.40</td>
+      <td>3</td>
+      <td>2026-02-06 11:30</td>
+      <td>TARGET</td>
+      <td>+1336.00</td>
+      <td>+4700.00</td>
+      <td>+170.64</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 12:30</td>
+      <td>68600.00</td>
+      <td>4.44</td>
+      <td>3</td>
+      <td>2026-02-06 13:45</td>
+      <td>TARGET</td>
+      <td>+1372.00</td>
+      <td>+2900.00</td>
+      <td>+264.81</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 14:15</td>
+      <td>70500.00</td>
+      <td>3.58</td>
+      <td>3</td>
+      <td>2026-02-06 15:00</td>
+      <td>STOP_LOSS</td>
+      <td>-705.00</td>
+      <td>+1000.00</td>
+      <td>+1159.09</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 19:00</td>
+      <td>70770.00</td>
+      <td>3.63</td>
+      <td>3</td>
+      <td>2026-02-06 21:00</td>
+      <td>STOP_LOSS</td>
+      <td>-707.70</td>
+      <td>+981.33</td>
+      <td>+1052.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 19:30</td>
+      <td>70930.00</td>
+      <td>3.72</td>
+      <td>3</td>
+      <td>2026-02-06 21:00</td>
+      <td>STOP_LOSS</td>
+      <td>-709.30</td>
+      <td>+821.33</td>
+      <td>+1212.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 23:30</td>
+      <td>70510.00</td>
+      <td>9.93</td>
+      <td>3</td>
+      <td>2026-02-07 02:45</td>
+      <td>STOP_LOSS</td>
+      <td>-705.10</td>
+      <td>+1180.07</td>
+      <td>+3161.67</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 00:00</td>
+      <td>70270.00</td>
+      <td>4.23</td>
+      <td>3</td>
+      <td>2026-02-07 01:15</td>
+      <td>TARGET</td>
+      <td>+1405.40</td>
+      <td>+1420.07</td>
+      <td>+2970.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 00:00</td>
+      <td>70510.00</td>
+      <td>5.99</td>
+      <td>4</td>
+      <td>2026-02-07 02:45</td>
+      <td>STOP_LOSS</td>
+      <td>-705.10</td>
+      <td>+1180.07</td>
+      <td>+3210.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 00:00</td>
+      <td>70580.00</td>
+      <td>10444340000.00</td>
+      <td>3</td>
+      <td>2026-02-07 02:45</td>
+      <td>STOP_LOSS</td>
+      <td>-705.80</td>
+      <td>+1110.07</td>
+      <td>+3280.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 04:00</td>
+      <td>68590.00</td>
+      <td>6.66</td>
+      <td>3</td>
+      <td>2026-02-07 04:15</td>
+      <td>STOP_LOSS</td>
+      <td>-685.90</td>
+      <td>+372.29</td>
+      <td>+1290.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 16:00</td>
+      <td>69300.00</td>
+      <td>6.18</td>
+      <td>3</td>
+      <td>2026-02-07 21:00</td>
+      <td>TIME_EXIT</td>
+      <td>+57.18</td>
+      <td>+428.83</td>
+      <td>+512.66</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 19:00</td>
+      <td>69600.00</td>
+      <td>17.37</td>
+      <td>3</td>
+      <td>2026-02-07 20:00</td>
+      <td>STOP_LOSS</td>
+      <td>-696.00</td>
+      <td>+96.57</td>
+      <td>+812.66</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 21:30</td>
+      <td>69040.00</td>
+      <td>4.99</td>
+      <td>3</td>
+      <td>2026-02-08 02:30</td>
+      <td>TIME_EXIT</td>
+      <td>+151.08</td>
+      <td>+656.57</td>
+      <td>+140.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 23:15</td>
+      <td>69500.00</td>
+      <td>3.29</td>
+      <td>3</td>
+      <td>2026-02-08 04:15</td>
+      <td>TIME_EXIT</td>
+      <td>-26.34</td>
+      <td>+34.77</td>
+      <td>+547.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 23:15</td>
+      <td>69670.00</td>
+      <td>15.52</td>
+      <td>3</td>
+      <td>2026-02-08 01:15</td>
+      <td>STOP_LOSS</td>
+      <td>-696.70</td>
+      <td>-135.23</td>
+      <td>+717.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 23:30</td>
+      <td>69500.00</td>
+      <td>16.69</td>
+      <td>4</td>
+      <td>2026-02-08 04:30</td>
+      <td>TIME_EXIT</td>
+      <td>+12.13</td>
+      <td>+113.66</td>
+      <td>+547.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 00:45</td>
+      <td>69070.00</td>
+      <td>7.29</td>
+      <td>3</td>
+      <td>2026-02-08 05:30</td>
+      <td>TARGET</td>
+      <td>+1381.40</td>
+      <td>+1726.99</td>
+      <td>+117.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 03:00</td>
+      <td>69370.00</td>
+      <td>15.44</td>
+      <td>3</td>
+      <td>2026-02-08 05:30</td>
+      <td>TARGET</td>
+      <td>+1387.40</td>
+      <td>+1426.99</td>
+      <td>+154.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 03:15</td>
+      <td>69410.00</td>
+      <td>8.68</td>
+      <td>3</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1388.20</td>
+      <td>+1525.00</td>
+      <td>+194.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 03:15</td>
+      <td>69500.00</td>
+      <td>8777200000.00</td>
+      <td>5</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1390.00</td>
+      <td>+1435.00</td>
+      <td>+284.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 03:45</td>
+      <td>69420.00</td>
+      <td>1002780000.00</td>
+      <td>3</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1388.40</td>
+      <td>+1800.00</td>
+      <td>+204.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:00</td>
+      <td>69220.00</td>
+      <td>3.22</td>
+      <td>3</td>
+      <td>2026-02-08 05:30</td>
+      <td>TARGET</td>
+      <td>+1384.40</td>
+      <td>+2000.00</td>
+      <td>-107.16</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:00</td>
+      <td>69480.00</td>
+      <td>4192.18</td>
+      <td>3</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1389.60</td>
+      <td>+1740.00</td>
+      <td>+152.84</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:00</td>
+      <td>69490.00</td>
+      <td>18.64</td>
+      <td>3</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1389.80</td>
+      <td>+1730.00</td>
+      <td>+162.84</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:00</td>
+      <td>69500.00</td>
+      <td>23.85</td>
+      <td>6</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1390.00</td>
+      <td>+1720.00</td>
+      <td>+172.84</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:15</td>
+      <td>69440.00</td>
+      <td>4.37</td>
+      <td>3</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1388.80</td>
+      <td>+1780.00</td>
+      <td>+17.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:15</td>
+      <td>69500.00</td>
+      <td>5.09</td>
+      <td>7</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1390.00</td>
+      <td>+1720.00</td>
+      <td>+77.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:30</td>
+      <td>69500.00</td>
+      <td>5.86</td>
+      <td>8</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1390.00</td>
+      <td>+1720.00</td>
+      <td>-12.13</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:30</td>
+      <td>69510.00</td>
+      <td>3.00</td>
+      <td>3</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1390.20</td>
+      <td>+1710.00</td>
+      <td>-2.13</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:45</td>
+      <td>69510.00</td>
+      <td>5.16</td>
+      <td>4</td>
+      <td>2026-02-08 08:15</td>
+      <td>TARGET</td>
+      <td>+1390.20</td>
+      <td>+1771.74</td>
+      <td>-4.15</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:45</td>
+      <td>69650.00</td>
+      <td>9.97</td>
+      <td>3</td>
+      <td>2026-02-08 08:30</td>
+      <td>TARGET</td>
+      <td>+1393.00</td>
+      <td>+1631.74</td>
+      <td>+135.85</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 04:45</td>
+      <td>69670.00</td>
+      <td>6.21</td>
+      <td>4</td>
+      <td>2026-02-08 08:45</td>
+      <td>TARGET</td>
+      <td>+1393.40</td>
+      <td>+1611.74</td>
+      <td>+155.85</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 05:30</td>
+      <td>70300.00</td>
+      <td>3.89</td>
+      <td>3</td>
+      <td>2026-02-08 10:30</td>
+      <td>TIME_EXIT</td>
+      <td>+922.01</td>
+      <td>+1199.99</td>
+      <td>+409.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 05:45</td>
+      <td>70410.00</td>
+      <td>3.31</td>
+      <td>3</td>
+      <td>2026-02-08 10:45</td>
+      <td>TIME_EXIT</td>
+      <td>+1104.77</td>
+      <td>+1107.27</td>
+      <td>+519.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 07:15</td>
+      <td>69890.00</td>
+      <td>4.63</td>
+      <td>3</td>
+      <td>2026-02-08 10:00</td>
+      <td>TARGET</td>
+      <td>+1397.80</td>
+      <td>+1664.95</td>
+      <td>-127.66</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 09:15</td>
+      <td>70960.00</td>
+      <td>18.85</td>
+      <td>3</td>
+      <td>2026-02-08 14:15</td>
+      <td>TIME_EXIT</td>
+      <td>-399.67</td>
+      <td>+594.95</td>
+      <td>+708.67</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 10:30</td>
+      <td>71300.00</td>
+      <td>7.35</td>
+      <td>3</td>
+      <td>2026-02-08 13:45</td>
+      <td>STOP_LOSS</td>
+      <td>-713.00</td>
+      <td>+254.95</td>
+      <td>+1048.67</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 10:30</td>
+      <td>71490.00</td>
+      <td>6980000.00</td>
+      <td>3</td>
+      <td>2026-02-08 13:30</td>
+      <td>STOP_LOSS</td>
+      <td>-714.90</td>
+      <td>+64.95</td>
+      <td>+1238.67</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 10:45</td>
+      <td>71240.00</td>
+      <td>5.61</td>
+      <td>3</td>
+      <td>2026-02-08 13:45</td>
+      <td>STOP_LOSS</td>
+      <td>-712.40</td>
+      <td>+314.95</td>
+      <td>+988.67</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 10:45</td>
+      <td>71300.00</td>
+      <td>3.93</td>
+      <td>4</td>
+      <td>2026-02-08 13:45</td>
+      <td>STOP_LOSS</td>
+      <td>-713.00</td>
+      <td>+254.95</td>
+      <td>+1048.67</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 12:15</td>
+      <td>70830.00</td>
+      <td>3.48</td>
+      <td>3</td>
+      <td>2026-02-08 17:15</td>
+      <td>TIME_EXIT</td>
+      <td>+194.81</td>
+      <td>+708.05</td>
+      <td>+578.67</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 15:30</td>
+      <td>71000.00</td>
+      <td>5.11</td>
+      <td>3</td>
+      <td>2026-02-08 20:30</td>
+      <td>STOP_LOSS</td>
+      <td>-710.00</td>
+      <td>+1271.41</td>
+      <td>+1000.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 15:30</td>
+      <td>71220.00</td>
+      <td>3.75</td>
+      <td>3</td>
+      <td>2026-02-08 20:15</td>
+      <td>STOP_LOSS</td>
+      <td>-712.20</td>
+      <td>+1051.41</td>
+      <td>+1220.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 20:00</td>
+      <td>71230.00</td>
+      <td>3.04</td>
+      <td>3</td>
+      <td>2026-02-08 20:15</td>
+      <td>STOP_LOSS</td>
+      <td>-712.30</td>
+      <td>+270.00</td>
+      <td>+1230.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 20:15</td>
+      <td>71500.00</td>
+      <td>1690000.00</td>
+      <td>3</td>
+      <td>2026-02-08 20:30</td>
+      <td>STOP_LOSS</td>
+      <td>-715.00</td>
+      <td>-46.47</td>
+      <td>+1500.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 22:30</td>
+      <td>70680.00</td>
+      <td>7.59</td>
+      <td>3</td>
+      <td>2026-02-09 03:30</td>
+      <td>TIME_EXIT</td>
+      <td>-129.16</td>
+      <td>+773.53</td>
+      <td>+602.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 23:30</td>
+      <td>70780.00</td>
+      <td>75130000.00</td>
+      <td>3</td>
+      <td>2026-02-09 04:30</td>
+      <td>TIME_EXIT</td>
+      <td>-347.93</td>
+      <td>+673.53</td>
+      <td>+468.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 06:45</td>
+      <td>69470.00</td>
+      <td>3.29</td>
+      <td>3</td>
+      <td>2026-02-09 07:30</td>
+      <td>STOP_LOSS</td>
+      <td>-694.70</td>
+      <td>+285.59</td>
+      <td>+1162.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 13:00</td>
+      <td>69720.00</td>
+      <td>17920000.00</td>
+      <td>3</td>
+      <td>2026-02-09 17:00</td>
+      <td>TARGET</td>
+      <td>+1394.40</td>
+      <td>+1406.00</td>
+      <td>+559.96</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 13:45</td>
+      <td>69930.00</td>
+      <td>3.82</td>
+      <td>3</td>
+      <td>2026-02-09 18:45</td>
+      <td>TIME_EXIT</td>
+      <td>+470.00</td>
+      <td>+1196.00</td>
+      <td>+106.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 15:00</td>
+      <td>70850.00</td>
+      <td>3.01</td>
+      <td>3</td>
+      <td>2026-02-09 15:15</td>
+      <td>STOP_LOSS</td>
+      <td>-708.50</td>
+      <td>+276.00</td>
+      <td>+1026.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 12:15</td>
+      <td>68770.00</td>
+      <td>7219.42</td>
+      <td>3</td>
+      <td>2026-02-10 17:15</td>
+      <td>TIME_EXIT</td>
+      <td>+45.52</td>
+      <td>+1223.65</td>
+      <td>+165.37</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 14:00</td>
+      <td>69300.00</td>
+      <td>9.44</td>
+      <td>3</td>
+      <td>2026-02-10 15:45</td>
+      <td>STOP_LOSS</td>
+      <td>-693.00</td>
+      <td>+693.65</td>
+      <td>+938.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 04:30</td>
+      <td>67140.00</td>
+      <td>3.13</td>
+      <td>3</td>
+      <td>2026-02-11 07:45</td>
+      <td>STOP_LOSS</td>
+      <td>-671.40</td>
+      <td>+284.24</td>
+      <td>+770.51</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 05:30</td>
+      <td>66800.00</td>
+      <td>3.84</td>
+      <td>3</td>
+      <td>2026-02-11 10:30</td>
+      <td>TIME_EXIT</td>
+      <td>+422.51</td>
+      <td>+874.30</td>
+      <td>+430.51</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 07:45</td>
+      <td>66780.00</td>
+      <td>10.85</td>
+      <td>3</td>
+      <td>2026-02-11 11:00</td>
+      <td>TARGET</td>
+      <td>+1335.60</td>
+      <td>+2054.34</td>
+      <td>+1024.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 08:15</td>
+      <td>66780.00</td>
+      <td>627690000.00</td>
+      <td>4</td>
+      <td>2026-02-11 11:00</td>
+      <td>TARGET</td>
+      <td>+1335.60</td>
+      <td>+2054.34</td>
+      <td>+1024.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 08:45</td>
+      <td>66950.00</td>
+      <td>4.86</td>
+      <td>3</td>
+      <td>2026-02-11 11:00</td>
+      <td>TARGET</td>
+      <td>+1339.00</td>
+      <td>+1884.34</td>
+      <td>+1194.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 09:00</td>
+      <td>66950.00</td>
+      <td>205.65</td>
+      <td>4</td>
+      <td>2026-02-11 11:00</td>
+      <td>TARGET</td>
+      <td>+1339.00</td>
+      <td>+1884.34</td>
+      <td>+1194.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 09:00</td>
+      <td>67080.00</td>
+      <td>3.68</td>
+      <td>3</td>
+      <td>2026-02-11 11:00</td>
+      <td>TARGET</td>
+      <td>+1341.60</td>
+      <td>+1754.34</td>
+      <td>+1324.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 09:15</td>
+      <td>67080.00</td>
+      <td>5.17</td>
+      <td>4</td>
+      <td>2026-02-11 11:00</td>
+      <td>TARGET</td>
+      <td>+1341.60</td>
+      <td>+1754.34</td>
+      <td>+1324.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 11:00</td>
+      <td>67560.00</td>
+      <td>15.22</td>
+      <td>3</td>
+      <td>2026-02-11 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-675.60</td>
+      <td>+1022.42</td>
+      <td>+1804.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 15:30</td>
+      <td>67200.00</td>
+      <td>137320000.00</td>
+      <td>3</td>
+      <td>2026-02-11 20:30</td>
+      <td>TIME_EXIT</td>
+      <td>-116.32</td>
+      <td>+1169.77</td>
+      <td>+412.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 16:00</td>
+      <td>67250.00</td>
+      <td>3.41</td>
+      <td>3</td>
+      <td>2026-02-11 21:00</td>
+      <td>TIME_EXIT</td>
+      <td>+115.56</td>
+      <td>+1119.77</td>
+      <td>+462.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 16:30</td>
+      <td>67700.00</td>
+      <td>8.24</td>
+      <td>3</td>
+      <td>2026-02-11 20:15</td>
+      <td>STOP_LOSS</td>
+      <td>-677.00</td>
+      <td>+669.77</td>
+      <td>+912.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 16:30</td>
+      <td>67720.00</td>
+      <td>5.97</td>
+      <td>3</td>
+      <td>2026-02-11 20:15</td>
+      <td>STOP_LOSS</td>
+      <td>-677.20</td>
+      <td>+649.77</td>
+      <td>+932.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 16:45</td>
+      <td>67700.00</td>
+      <td>3.46</td>
+      <td>4</td>
+      <td>2026-02-11 20:15</td>
+      <td>STOP_LOSS</td>
+      <td>-677.00</td>
+      <td>+669.77</td>
+      <td>+912.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 17:15</td>
+      <td>67240.00</td>
+      <td>7.19</td>
+      <td>3</td>
+      <td>2026-02-11 22:15</td>
+      <td>TIME_EXIT</td>
+      <td>+569.42</td>
+      <td>+1129.77</td>
+      <td>+452.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 17:30</td>
+      <td>67240.00</td>
+      <td>5.15</td>
+      <td>4</td>
+      <td>2026-02-11 22:30</td>
+      <td>TIME_EXIT</td>
+      <td>+619.75</td>
+      <td>+1129.77</td>
+      <td>+452.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 18:30</td>
+      <td>68200.00</td>
+      <td>5.10</td>
+      <td>3</td>
+      <td>2026-02-11 19:15</td>
+      <td>STOP_LOSS</td>
+      <td>-682.00</td>
+      <td>-152.52</td>
+      <td>+1412.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 18:30</td>
+      <td>68240.00</td>
+      <td>3.59</td>
+      <td>3</td>
+      <td>2026-02-11 19:15</td>
+      <td>STOP_LOSS</td>
+      <td>-682.40</td>
+      <td>-192.52</td>
+      <td>+1452.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 21:15</td>
+      <td>67510.00</td>
+      <td>334530000.00</td>
+      <td>3</td>
+      <td>2026-02-12 02:00</td>
+      <td>STOP_LOSS</td>
+      <td>-675.10</td>
+      <td>+537.48</td>
+      <td>+839.55</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 21:30</td>
+      <td>67510.00</td>
+      <td>11.34</td>
+      <td>4</td>
+      <td>2026-02-12 02:00</td>
+      <td>STOP_LOSS</td>
+      <td>-675.10</td>
+      <td>+537.48</td>
+      <td>+839.55</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 02:45</td>
+      <td>67150.00</td>
+      <td>3.14</td>
+      <td>3</td>
+      <td>2026-02-12 07:45</td>
+      <td>TIME_EXIT</td>
+      <td>+864.01</td>
+      <td>+876.60</td>
+      <td>+258.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 03:30</td>
+      <td>67320.00</td>
+      <td>3.34</td>
+      <td>3</td>
+      <td>2026-02-12 08:30</td>
+      <td>TIME_EXIT</td>
+      <td>+764.79</td>
+      <td>+979.00</td>
+      <td>+428.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 03:45</td>
+      <td>67260.00</td>
+      <td>5.90</td>
+      <td>3</td>
+      <td>2026-02-12 08:45</td>
+      <td>TIME_EXIT</td>
+      <td>+816.65</td>
+      <td>+1039.00</td>
+      <td>+368.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 03:45</td>
+      <td>67280.00</td>
+      <td>10.78</td>
+      <td>3</td>
+      <td>2026-02-12 08:45</td>
+      <td>TIME_EXIT</td>
+      <td>+796.65</td>
+      <td>+1019.00</td>
+      <td>+388.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 04:15</td>
+      <td>67310.00</td>
+      <td>5.52</td>
+      <td>3</td>
+      <td>2026-02-12 09:15</td>
+      <td>TIME_EXIT</td>
+      <td>+675.12</td>
+      <td>+989.00</td>
+      <td>+418.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 05:00</td>
+      <td>67300.00</td>
+      <td>3.12</td>
+      <td>3</td>
+      <td>2026-02-12 10:00</td>
+      <td>TIME_EXIT</td>
+      <td>+544.30</td>
+      <td>+999.00</td>
+      <td>+408.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 05:00</td>
+      <td>67310.00</td>
+      <td>10.37</td>
+      <td>4</td>
+      <td>2026-02-12 10:00</td>
+      <td>TIME_EXIT</td>
+      <td>+534.30</td>
+      <td>+989.00</td>
+      <td>+418.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 07:45</td>
+      <td>67800.00</td>
+      <td>9.75</td>
+      <td>3</td>
+      <td>2026-02-12 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-678.00</td>
+      <td>+610.52</td>
+      <td>+785.02</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 08:00</td>
+      <td>68090.00</td>
+      <td>3.32</td>
+      <td>3</td>
+      <td>2026-02-12 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-680.90</td>
+      <td>+320.52</td>
+      <td>+1590.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 08:15</td>
+      <td>68200.00</td>
+      <td>4.17</td>
+      <td>4</td>
+      <td>2026-02-12 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-682.00</td>
+      <td>+210.52</td>
+      <td>+2199.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 08:30</td>
+      <td>68080.00</td>
+      <td>3.04</td>
+      <td>3</td>
+      <td>2026-02-12 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-680.80</td>
+      <td>+330.52</td>
+      <td>+2131.17</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 08:30</td>
+      <td>68270.00</td>
+      <td>234.87</td>
+      <td>3</td>
+      <td>2026-02-12 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-682.70</td>
+      <td>+140.52</td>
+      <td>+2321.17</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 11:30</td>
+      <td>68280.00</td>
+      <td>4.27</td>
+      <td>3</td>
+      <td>2026-02-12 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-682.80</td>
+      <td>-280.00</td>
+      <td>+3162.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 22:15</td>
+      <td>66130.00</td>
+      <td>3.14</td>
+      <td>3</td>
+      <td>2026-02-13 03:15</td>
+      <td>TIME_EXIT</td>
+      <td>-6.01</td>
+      <td>+684.00</td>
+      <td>+92.01</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 22:45</td>
+      <td>66500.00</td>
+      <td>13.20</td>
+      <td>3</td>
+      <td>2026-02-13 03:45</td>
+      <td>TIME_EXIT</td>
+      <td>-140.72</td>
+      <td>+314.00</td>
+      <td>+497.02</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 08:45</td>
+      <td>66970.00</td>
+      <td>8.63</td>
+      <td>3</td>
+      <td>2026-02-13 12:00</td>
+      <td>TARGET</td>
+      <td>+1339.40</td>
+      <td>+2512.97</td>
+      <td>+102.53</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 09:00</td>
+      <td>66970.00</td>
+      <td>5.53</td>
+      <td>4</td>
+      <td>2026-02-13 12:00</td>
+      <td>TARGET</td>
+      <td>+1339.40</td>
+      <td>+2512.97</td>
+      <td>+102.53</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 09:45</td>
+      <td>67140.00</td>
+      <td>4.64</td>
+      <td>3</td>
+      <td>2026-02-13 12:00</td>
+      <td>TARGET</td>
+      <td>+1342.80</td>
+      <td>+2342.97</td>
+      <td>+272.53</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 10:30</td>
+      <td>67390.00</td>
+      <td>3.70</td>
+      <td>3</td>
+      <td>2026-02-13 12:15</td>
+      <td>TARGET</td>
+      <td>+1347.80</td>
+      <td>+2092.97</td>
+      <td>+522.53</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 12:00</td>
+      <td>68000.00</td>
+      <td>6.67</td>
+      <td>3</td>
+      <td>2026-02-13 13:30</td>
+      <td>TARGET</td>
+      <td>+1360.00</td>
+      <td>+1482.97</td>
+      <td>-129.74</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 12:00</td>
+      <td>68280.00</td>
+      <td>7.42</td>
+      <td>4</td>
+      <td>2026-02-13 17:00</td>
+      <td>TIME_EXIT</td>
+      <td>+525.80</td>
+      <td>+1202.97</td>
+      <td>+150.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 12:00</td>
+      <td>68290.00</td>
+      <td>63.67</td>
+      <td>3</td>
+      <td>2026-02-13 17:00</td>
+      <td>TIME_EXIT</td>
+      <td>+515.80</td>
+      <td>+1192.97</td>
+      <td>+160.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 14:45</td>
+      <td>69230.00</td>
+      <td>9.70</td>
+      <td>3</td>
+      <td>2026-02-13 19:45</td>
+      <td>TIME_EXIT</td>
+      <td>-234.72</td>
+      <td>+181.44</td>
+      <td>+546.68</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 15:45</td>
+      <td>69220.00</td>
+      <td>4.94</td>
+      <td>3</td>
+      <td>2026-02-13 20:45</td>
+      <td>TIME_EXIT</td>
+      <td>-366.04</td>
+      <td>+16.33</td>
+      <td>+536.68</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 15:45</td>
+      <td>69300.00</td>
+      <td>5.49</td>
+      <td>3</td>
+      <td>2026-02-13 20:45</td>
+      <td>TIME_EXIT</td>
+      <td>-446.04</td>
+      <td>-63.67</td>
+      <td>+616.68</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 21:30</td>
+      <td>69000.00</td>
+      <td>17.61</td>
+      <td>3</td>
+      <td>2026-02-14 02:30</td>
+      <td>TIME_EXIT</td>
+      <td>-170.80</td>
+      <td>+137.50</td>
+      <td>+237.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 02:45</td>
+      <td>68760.00</td>
+      <td>4.24</td>
+      <td>3</td>
+      <td>2026-02-14 07:45</td>
+      <td>TIME_EXIT</td>
+      <td>+911.86</td>
+      <td>+1140.00</td>
+      <td>+29.87</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 04:45</td>
+      <td>69300.00</td>
+      <td>3.09</td>
+      <td>4</td>
+      <td>2026-02-14 09:45</td>
+      <td>TIME_EXIT</td>
+      <td>+340.20</td>
+      <td>+1260.01</td>
+      <td>+81.29</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 05:00</td>
+      <td>69300.00</td>
+      <td>1069300000.00</td>
+      <td>5</td>
+      <td>2026-02-14 10:00</td>
+      <td>TIME_EXIT</td>
+      <td>+413.23</td>
+      <td>+1260.01</td>
+      <td>-98.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 06:30</td>
+      <td>69740.00</td>
+      <td>10.76</td>
+      <td>3</td>
+      <td>2026-02-14 11:30</td>
+      <td>TIME_EXIT</td>
+      <td>-66.40</td>
+      <td>+820.01</td>
+      <td>+675.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 08:00</td>
+      <td>69880.00</td>
+      <td>4.35</td>
+      <td>3</td>
+      <td>2026-02-14 10:15</td>
+      <td>STOP_LOSS</td>
+      <td>-698.80</td>
+      <td>+680.01</td>
+      <td>+815.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 08:45</td>
+      <td>70500.00</td>
+      <td>5.42</td>
+      <td>3</td>
+      <td>2026-02-14 09:45</td>
+      <td>STOP_LOSS</td>
+      <td>-705.00</td>
+      <td>+33.67</td>
+      <td>+1435.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 17:15</td>
+      <td>69890.00</td>
+      <td>3.76</td>
+      <td>3</td>
+      <td>2026-02-14 22:15</td>
+      <td>TIME_EXIT</td>
+      <td>-360.66</td>
+      <td>+360.46</td>
+      <td>+439.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 17:30</td>
+      <td>69910.00</td>
+      <td>1384.35</td>
+      <td>3</td>
+      <td>2026-02-14 22:30</td>
+      <td>TIME_EXIT</td>
+      <td>-502.78</td>
+      <td>+340.46</td>
+      <td>+560.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 05:30</td>
+      <td>70550.00</td>
+      <td>6.71</td>
+      <td>3</td>
+      <td>2026-02-15 09:45</td>
+      <td>STOP_LOSS</td>
+      <td>-705.50</td>
+      <td>+118.00</td>
+      <td>+1671.64</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 05:45</td>
+      <td>70450.00</td>
+      <td>3.06</td>
+      <td>3</td>
+      <td>2026-02-15 09:45</td>
+      <td>STOP_LOSS</td>
+      <td>-704.50</td>
+      <td>+218.00</td>
+      <td>+1677.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 06:00</td>
+      <td>70540.00</td>
+      <td>33.16</td>
+      <td>3</td>
+      <td>2026-02-15 09:45</td>
+      <td>STOP_LOSS</td>
+      <td>-705.40</td>
+      <td>+91.85</td>
+      <td>+1767.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 06:00</td>
+      <td>70550.00</td>
+      <td>18.55</td>
+      <td>4</td>
+      <td>2026-02-15 09:45</td>
+      <td>STOP_LOSS</td>
+      <td>-705.50</td>
+      <td>+81.85</td>
+      <td>+1777.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 13:45</td>
+      <td>69080.00</td>
+      <td>46780000.00</td>
+      <td>3</td>
+      <td>2026-02-15 14:45</td>
+      <td>STOP_LOSS</td>
+      <td>-690.80</td>
+      <td>+5.22</td>
+      <td>+1080.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 17:30</td>
+      <td>68490.00</td>
+      <td>3.19</td>
+      <td>3</td>
+      <td>2026-02-15 22:30</td>
+      <td>TIME_EXIT</td>
+      <td>+100.12</td>
+      <td>+588.49</td>
+      <td>+170.36</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 21:00</td>
+      <td>68800.00</td>
+      <td>3.81</td>
+      <td>3</td>
+      <td>2026-02-16 02:00</td>
+      <td>TIME_EXIT</td>
+      <td>-326.84</td>
+      <td>+265.50</td>
+      <td>+656.78</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 22:00</td>
+      <td>68920.00</td>
+      <td>4.24</td>
+      <td>3</td>
+      <td>2026-02-16 00:15</td>
+      <td>STOP_LOSS</td>
+      <td>-689.20</td>
+      <td>+3.33</td>
+      <td>+776.78</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 04:00</td>
+      <td>68420.00</td>
+      <td>17.50</td>
+      <td>3</td>
+      <td>2026-02-16 09:00</td>
+      <td>TIME_EXIT</td>
+      <td>+477.93</td>
+      <td>+640.77</td>
+      <td>+81.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 04:00</td>
+      <td>68450.00</td>
+      <td>7.74</td>
+      <td>3</td>
+      <td>2026-02-16 09:00</td>
+      <td>TIME_EXIT</td>
+      <td>+447.93</td>
+      <td>+610.77</td>
+      <td>+111.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 07:15</td>
+      <td>68920.00</td>
+      <td>3.21</td>
+      <td>3</td>
+      <td>2026-02-16 10:45</td>
+      <td>STOP_LOSS</td>
+      <td>-689.20</td>
+      <td>+1206.67</td>
+      <td>+695.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 07:30</td>
+      <td>68920.00</td>
+      <td>13.85</td>
+      <td>4</td>
+      <td>2026-02-16 10:45</td>
+      <td>STOP_LOSS</td>
+      <td>-689.20</td>
+      <td>+1206.67</td>
+      <td>+1625.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 08:00</td>
+      <td>68510.00</td>
+      <td>3.39</td>
+      <td>3</td>
+      <td>2026-02-16 10:00</td>
+      <td>TARGET</td>
+      <td>+1370.20</td>
+      <td>+1616.67</td>
+      <td>+1215.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 10:30</td>
+      <td>68570.00</td>
+      <td>3.95</td>
+      <td>3</td>
+      <td>2026-02-16 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-685.70</td>
+      <td>+148.30</td>
+      <td>+1275.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 11:15</td>
+      <td>68570.00</td>
+      <td>5.56</td>
+      <td>4</td>
+      <td>2026-02-16 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-685.70</td>
+      <td>+148.30</td>
+      <td>+1275.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 11:30</td>
+      <td>68560.00</td>
+      <td>4.50</td>
+      <td>3</td>
+      <td>2026-02-16 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-685.60</td>
+      <td>+158.30</td>
+      <td>+1265.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 11:45</td>
+      <td>68360.00</td>
+      <td>4.06</td>
+      <td>3</td>
+      <td>2026-02-16 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-683.60</td>
+      <td>+247.22</td>
+      <td>+1065.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 17:30</td>
+      <td>68110.00</td>
+      <td>3.94</td>
+      <td>3</td>
+      <td>2026-02-16 22:30</td>
+      <td>TIME_EXIT</td>
+      <td>+743.12</td>
+      <td>+932.74</td>
+      <td>-92.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 18:00</td>
+      <td>68530.00</td>
+      <td>5.28</td>
+      <td>3</td>
+      <td>2026-02-16 23:00</td>
+      <td>TIME_EXIT</td>
+      <td>+594.74</td>
+      <td>+711.50</td>
+      <td>+142.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 18:45</td>
+      <td>68630.00</td>
+      <td>5668520000.00</td>
+      <td>3</td>
+      <td>2026-02-16 23:45</td>
+      <td>TIME_EXIT</td>
+      <td>+208.48</td>
+      <td>+611.50</td>
+      <td>+242.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 18:45</td>
+      <td>68670.00</td>
+      <td>515480000.00</td>
+      <td>3</td>
+      <td>2026-02-16 23:45</td>
+      <td>TIME_EXIT</td>
+      <td>+168.48</td>
+      <td>+571.50</td>
+      <td>+282.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 19:00</td>
+      <td>68890.00</td>
+      <td>1280000.00</td>
+      <td>3</td>
+      <td>2026-02-17 00:00</td>
+      <td>TIME_EXIT</td>
+      <td>-164.00</td>
+      <td>+351.50</td>
+      <td>+502.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 19:30</td>
+      <td>68570.00</td>
+      <td>5.57</td>
+      <td>3</td>
+      <td>2026-02-17 00:30</td>
+      <td>TIME_EXIT</td>
+      <td>-5.22</td>
+      <td>+671.50</td>
+      <td>+182.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 19:30</td>
+      <td>68600.00</td>
+      <td>3.23</td>
+      <td>3</td>
+      <td>2026-02-17 00:30</td>
+      <td>TIME_EXIT</td>
+      <td>-35.22</td>
+      <td>+641.50</td>
+      <td>+212.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 13:30</td>
+      <td>67570.00</td>
+      <td>1703220000.00</td>
+      <td>3</td>
+      <td>2026-02-17 14:45</td>
+      <td>STOP_LOSS</td>
+      <td>-675.70</td>
+      <td>+665.39</td>
+      <td>+688.92</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 16:00</td>
+      <td>68080.00</td>
+      <td>9.00</td>
+      <td>3</td>
+      <td>2026-02-17 20:00</td>
+      <td>STOP_LOSS</td>
+      <td>-680.80</td>
+      <td>+155.39</td>
+      <td>+686.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 16:00</td>
+      <td>68090.00</td>
+      <td>19.51</td>
+      <td>3</td>
+      <td>2026-02-17 20:00</td>
+      <td>STOP_LOSS</td>
+      <td>-680.90</td>
+      <td>+145.39</td>
+      <td>+696.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 16:00</td>
+      <td>68150.00</td>
+      <td>81.09</td>
+      <td>3</td>
+      <td>2026-02-17 20:00</td>
+      <td>STOP_LOSS</td>
+      <td>-681.50</td>
+      <td>+85.39</td>
+      <td>+756.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 16:15</td>
+      <td>68150.00</td>
+      <td>4.82</td>
+      <td>4</td>
+      <td>2026-02-17 20:00</td>
+      <td>STOP_LOSS</td>
+      <td>-681.50</td>
+      <td>-86.00</td>
+      <td>+756.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 16:30</td>
+      <td>67960.00</td>
+      <td>286630000.00</td>
+      <td>3</td>
+      <td>2026-02-17 21:30</td>
+      <td>TIME_EXIT</td>
+      <td>-500.00</td>
+      <td>+104.00</td>
+      <td>+566.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 18:00</td>
+      <td>67790.00</td>
+      <td>191620000.00</td>
+      <td>3</td>
+      <td>2026-02-17 22:00</td>
+      <td>STOP_LOSS</td>
+      <td>-677.90</td>
+      <td>+136.29</td>
+      <td>+897.97</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 23:30</td>
+      <td>67350.00</td>
+      <td>4.77</td>
+      <td>3</td>
+      <td>2026-02-18 04:30</td>
+      <td>TIME_EXIT</td>
+      <td>+724.00</td>
+      <td>+753.90</td>
+      <td>+81.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 01:45</td>
+      <td>67860.00</td>
+      <td>4.68</td>
+      <td>3</td>
+      <td>2026-02-18 06:45</td>
+      <td>TIME_EXIT</td>
+      <td>+297.79</td>
+      <td>+616.22</td>
+      <td>+253.55</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 02:00</td>
+      <td>67860.00</td>
+      <td>31.42</td>
+      <td>4</td>
+      <td>2026-02-18 07:00</td>
+      <td>TIME_EXIT</td>
+      <td>+304.22</td>
+      <td>+616.22</td>
+      <td>+253.55</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 02:15</td>
+      <td>67710.00</td>
+      <td>3.86</td>
+      <td>3</td>
+      <td>2026-02-18 07:15</td>
+      <td>TIME_EXIT</td>
+      <td>+331.90</td>
+      <td>+766.22</td>
+      <td>+103.55</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 02:30</td>
+      <td>67650.00</td>
+      <td>5.07</td>
+      <td>3</td>
+      <td>2026-02-18 07:30</td>
+      <td>TIME_EXIT</td>
+      <td>+130.22</td>
+      <td>+826.22</td>
+      <td>+43.55</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 05:00</td>
+      <td>68210.00</td>
+      <td>4.93</td>
+      <td>3</td>
+      <td>2026-02-18 08:00</td>
+      <td>STOP_LOSS</td>
+      <td>-682.10</td>
+      <td>+266.22</td>
+      <td>+1133.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 05:00</td>
+      <td>68220.00</td>
+      <td>5.00</td>
+      <td>3</td>
+      <td>2026-02-18 08:00</td>
+      <td>STOP_LOSS</td>
+      <td>-682.20</td>
+      <td>+256.22</td>
+      <td>+1143.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 05:15</td>
+      <td>68230.00</td>
+      <td>5.92</td>
+      <td>3</td>
+      <td>2026-02-18 08:00</td>
+      <td>STOP_LOSS</td>
+      <td>-682.30</td>
+      <td>+70.01</td>
+      <td>+1153.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 08:00</td>
+      <td>67070.00</td>
+      <td>5.32</td>
+      <td>3</td>
+      <td>2026-02-18 13:00</td>
+      <td>TIME_EXIT</td>
+      <td>+2.01</td>
+      <td>+1277.72</td>
+      <td>+352.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 08:45</td>
+      <td>67460.00</td>
+      <td>4.12</td>
+      <td>3</td>
+      <td>2026-02-18 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-674.60</td>
+      <td>+887.72</td>
+      <td>+742.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 17:30</td>
+      <td>66370.00</td>
+      <td>16.61</td>
+      <td>3</td>
+      <td>2026-02-18 22:30</td>
+      <td>TIME_EXIT</td>
+      <td>+428.41</td>
+      <td>+453.54</td>
+      <td>+316.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 18:45</td>
+      <td>66260.00</td>
+      <td>6.25</td>
+      <td>3</td>
+      <td>2026-02-18 23:45</td>
+      <td>TIME_EXIT</td>
+      <td>+575.20</td>
+      <td>+698.90</td>
+      <td>+27.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 21:30</td>
+      <td>66350.00</td>
+      <td>4.12</td>
+      <td>3</td>
+      <td>2026-02-19 02:30</td>
+      <td>TIME_EXIT</td>
+      <td>+424.70</td>
+      <td>+720.56</td>
+      <td>-40.90</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 22:00</td>
+      <td>66540.00</td>
+      <td>7.48</td>
+      <td>3</td>
+      <td>2026-02-19 03:00</td>
+      <td>TIME_EXIT</td>
+      <td>+453.71</td>
+      <td>+530.56</td>
+      <td>+0.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 03:15</td>
+      <td>67000.00</td>
+      <td>221.62</td>
+      <td>3</td>
+      <td>2026-02-19 08:15</td>
+      <td>TIME_EXIT</td>
+      <td>-159.08</td>
+      <td>+320.00</td>
+      <td>+258.23</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 03:30</td>
+      <td>67230.00</td>
+      <td>3.21</td>
+      <td>3</td>
+      <td>2026-02-19 08:30</td>
+      <td>TIME_EXIT</td>
+      <td>-556.69</td>
+      <td>+90.00</td>
+      <td>+577.84</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 04:15</td>
+      <td>67140.00</td>
+      <td>4.51</td>
+      <td>3</td>
+      <td>2026-02-19 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-671.40</td>
+      <td>+180.00</td>
+      <td>+814.66</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 10:00</td>
+      <td>66420.00</td>
+      <td>3.97</td>
+      <td>3</td>
+      <td>2026-02-19 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-664.20</td>
+      <td>+629.99</td>
+      <td>+788.17</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 00:30</td>
+      <td>67300.00</td>
+      <td>251.86</td>
+      <td>3</td>
+      <td>2026-02-20 05:30</td>
+      <td>TIME_EXIT</td>
+      <td>+492.86</td>
+      <td>+706.00</td>
+      <td>+184.62</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 00:45</td>
+      <td>67300.00</td>
+      <td>5.96</td>
+      <td>4</td>
+      <td>2026-02-20 05:45</td>
+      <td>TIME_EXIT</td>
+      <td>+579.99</td>
+      <td>+706.00</td>
+      <td>+184.62</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 08:45</td>
+      <td>67310.00</td>
+      <td>3.41</td>
+      <td>3</td>
+      <td>2026-02-20 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-673.10</td>
+      <td>+773.98</td>
+      <td>+1029.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 10:00</td>
+      <td>67080.00</td>
+      <td>6.35</td>
+      <td>3</td>
+      <td>2026-02-20 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-670.80</td>
+      <td>+1003.98</td>
+      <td>+799.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 11:30</td>
+      <td>67220.00</td>
+      <td>9.03</td>
+      <td>3</td>
+      <td>2026-02-20 12:15</td>
+      <td>STOP_LOSS</td>
+      <td>-672.20</td>
+      <td>+863.98</td>
+      <td>+683.36</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 12:30</td>
+      <td>67070.00</td>
+      <td>3.13</td>
+      <td>3</td>
+      <td>2026-02-20 17:30</td>
+      <td>TIME_EXIT</td>
+      <td>+664.00</td>
+      <td>+930.00</td>
+      <td>+117.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 17:00</td>
+      <td>67760.00</td>
+      <td>7.99</td>
+      <td>3</td>
+      <td>2026-02-20 22:00</td>
+      <td>TIME_EXIT</td>
+      <td>+168.82</td>
+      <td>+473.99</td>
+      <td>+239.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 18:30</td>
+      <td>67720.00</td>
+      <td>7.80</td>
+      <td>3</td>
+      <td>2026-02-20 23:30</td>
+      <td>TIME_EXIT</td>
+      <td>+357.87</td>
+      <td>+513.99</td>
+      <td>+80.69</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 19:15</td>
+      <td>68000.00</td>
+      <td>685660000.00</td>
+      <td>3</td>
+      <td>2026-02-21 00:15</td>
+      <td>TIME_EXIT</td>
+      <td>-199.71</td>
+      <td>+233.99</td>
+      <td>+323.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 19:45</td>
+      <td>67940.00</td>
+      <td>6.66</td>
+      <td>3</td>
+      <td>2026-02-21 00:45</td>
+      <td>TIME_EXIT</td>
+      <td>-272.23</td>
+      <td>+293.99</td>
+      <td>+405.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 20:15</td>
+      <td>67990.00</td>
+      <td>4.79</td>
+      <td>3</td>
+      <td>2026-02-21 01:15</td>
+      <td>TIME_EXIT</td>
+      <td>-273.00</td>
+      <td>+109.54</td>
+      <td>+455.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 22:30</td>
+      <td>67960.00</td>
+      <td>4.46</td>
+      <td>3</td>
+      <td>2026-02-21 03:30</td>
+      <td>TIME_EXIT</td>
+      <td>-176.29</td>
+      <td>+139.54</td>
+      <td>+425.31</td>
+    </tr>
+    <tr>
+      <td>2026-02-21 12:45</td>
+      <td>68590.00</td>
+      <td>6.77</td>
+      <td>3</td>
+      <td>2026-02-21 17:45</td>
+      <td>TIME_EXIT</td>
+      <td>-378.81</td>
+      <td>+68.50</td>
+      <td>+488.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-21 13:00</td>
+      <td>68300.00</td>
+      <td>10.27</td>
+      <td>3</td>
+      <td>2026-02-21 18:00</td>
+      <td>TIME_EXIT</td>
+      <td>-8.97</td>
+      <td>+358.50</td>
+      <td>+198.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-21 17:15</td>
+      <td>68480.00</td>
+      <td>18.06</td>
+      <td>3</td>
+      <td>2026-02-21 22:15</td>
+      <td>TIME_EXIT</td>
+      <td>-363.40</td>
+      <td>+91.03</td>
+      <td>+670.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 08:00</td>
+      <td>68120.00</td>
+      <td>4.53</td>
+      <td>3</td>
+      <td>2026-02-22 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-681.20</td>
+      <td>+125.00</td>
+      <td>+816.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 08:00</td>
+      <td>68160.00</td>
+      <td>2557840000.00</td>
+      <td>3</td>
+      <td>2026-02-22 11:00</td>
+      <td>STOP_LOSS</td>
+      <td>-681.60</td>
+      <td>+85.00</td>
+      <td>+856.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 18:15</td>
+      <td>67440.00</td>
+      <td>7.12</td>
+      <td>3</td>
+      <td>2026-02-22 21:45</td>
+      <td>STOP_LOSS</td>
+      <td>-674.40</td>
+      <td>+311.44</td>
+      <td>+3149.29</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 21:15</td>
+      <td>67490.00</td>
+      <td>4.13</td>
+      <td>3</td>
+      <td>2026-02-22 21:45</td>
+      <td>STOP_LOSS</td>
+      <td>-674.90</td>
+      <td>-16.00</td>
+      <td>+3199.29</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 03:00</td>
+      <td>65290.00</td>
+      <td>4.41</td>
+      <td>3</td>
+      <td>2026-02-23 07:00</td>
+      <td>TARGET</td>
+      <td>+1305.80</td>
+      <td>+1310.00</td>
+      <td>+6.20</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 08:00</td>
+      <td>66240.00</td>
+      <td>8.15</td>
+      <td>3</td>
+      <td>2026-02-23 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-662.40</td>
+      <td>+271.51</td>
+      <td>+1061.17</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 11:30</td>
+      <td>65540.00</td>
+      <td>6.14</td>
+      <td>3</td>
+      <td>2026-02-23 14:15</td>
+      <td>STOP_LOSS</td>
+      <td>-655.40</td>
+      <td>+710.00</td>
+      <td>+1491.29</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 12:15</td>
+      <td>66090.00</td>
+      <td>4.71</td>
+      <td>3</td>
+      <td>2026-02-23 13:00</td>
+      <td>STOP_LOSS</td>
+      <td>-660.90</td>
+      <td>-154.00</td>
+      <td>+2201.21</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 13:45</td>
+      <td>64110.00</td>
+      <td>24.85</td>
+      <td>3</td>
+      <td>2026-02-24 18:45</td>
+      <td>TIME_EXIT</td>
+      <td>-67.34</td>
+      <td>+633.11</td>
+      <td>+289.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 22:00</td>
+      <td>64140.00</td>
+      <td>3.07</td>
+      <td>3</td>
+      <td>2026-02-24 22:15</td>
+      <td>TARGET</td>
+      <td>+1282.80</td>
+      <td>+2170.00</td>
+      <td>-615.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 22:00</td>
+      <td>65030.00</td>
+      <td>6.66</td>
+      <td>3</td>
+      <td>2026-02-25 03:00</td>
+      <td>TIME_EXIT</td>
+      <td>-40.90</td>
+      <td>+1280.00</td>
+      <td>+274.74</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 07:45</td>
+      <td>65450.00</td>
+      <td>3.58</td>
+      <td>3</td>
+      <td>2026-02-25 11:30</td>
+      <td>TARGET</td>
+      <td>+1309.00</td>
+      <td>+2128.00</td>
+      <td>+249.20</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 10:15</td>
+      <td>66210.00</td>
+      <td>5.38</td>
+      <td>3</td>
+      <td>2026-02-25 12:30</td>
+      <td>TARGET</td>
+      <td>+1324.20</td>
+      <td>+3290.00</td>
+      <td>+67.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 10:30</td>
+      <td>66250.00</td>
+      <td>15.39</td>
+      <td>3</td>
+      <td>2026-02-25 12:45</td>
+      <td>TARGET</td>
+      <td>+1325.00</td>
+      <td>+3300.00</td>
+      <td>+47.34</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 10:45</td>
+      <td>66220.00</td>
+      <td>4.33</td>
+      <td>3</td>
+      <td>2026-02-25 12:30</td>
+      <td>TARGET</td>
+      <td>+1324.40</td>
+      <td>+3330.00</td>
+      <td>+17.34</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 10:45</td>
+      <td>66390.00</td>
+      <td>3.65</td>
+      <td>3</td>
+      <td>2026-02-25 13:00</td>
+      <td>TARGET</td>
+      <td>+1327.80</td>
+      <td>+3160.00</td>
+      <td>+187.34</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 11:15</td>
+      <td>66540.00</td>
+      <td>3.01</td>
+      <td>3</td>
+      <td>2026-02-25 13:15</td>
+      <td>TARGET</td>
+      <td>+1330.80</td>
+      <td>+3010.00</td>
+      <td>+337.34</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 11:15</td>
+      <td>66600.00</td>
+      <td>4.25</td>
+      <td>3</td>
+      <td>2026-02-25 13:15</td>
+      <td>TARGET</td>
+      <td>+1332.00</td>
+      <td>+2950.00</td>
+      <td>+397.34</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 11:45</td>
+      <td>66660.00</td>
+      <td>4.74</td>
+      <td>3</td>
+      <td>2026-02-25 13:15</td>
+      <td>TARGET</td>
+      <td>+1333.20</td>
+      <td>+2890.00</td>
+      <td>-55.13</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 13:15</td>
+      <td>67730.00</td>
+      <td>3.40</td>
+      <td>3</td>
+      <td>2026-02-25 15:15</td>
+      <td>TARGET</td>
+      <td>+1354.60</td>
+      <td>+1820.00</td>
+      <td>-93.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 16:00</td>
+      <td>69000.00</td>
+      <td>4.09</td>
+      <td>3</td>
+      <td>2026-02-25 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-690.00</td>
+      <td>+988.83</td>
+      <td>+1400.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 20:45</td>
+      <td>67680.00</td>
+      <td>6.94</td>
+      <td>3</td>
+      <td>2026-02-26 01:45</td>
+      <td>TIME_EXIT</td>
+      <td>+891.36</td>
+      <td>+1180.00</td>
+      <td>-47.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 22:15</td>
+      <td>68590.00</td>
+      <td>4.27</td>
+      <td>3</td>
+      <td>2026-02-25 23:00</td>
+      <td>STOP_LOSS</td>
+      <td>-685.90</td>
+      <td>+270.00</td>
+      <td>+810.07</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 23:00</td>
+      <td>67780.00</td>
+      <td>9.19</td>
+      <td>3</td>
+      <td>2026-02-26 04:00</td>
+      <td>TIME_EXIT</td>
+      <td>+449.23</td>
+      <td>+1080.00</td>
+      <td>-83.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 06:30</td>
+      <td>68150.00</td>
+      <td>7.41</td>
+      <td>3</td>
+      <td>2026-02-26 11:30</td>
+      <td>TIME_EXIT</td>
+      <td>-350.26</td>
+      <td>+572.64</td>
+      <td>+499.18</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 06:30</td>
+      <td>68260.00</td>
+      <td>6.41</td>
+      <td>3</td>
+      <td>2026-02-26 11:30</td>
+      <td>TIME_EXIT</td>
+      <td>-460.26</td>
+      <td>+462.64</td>
+      <td>+609.18</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 06:30</td>
+      <td>68410.00</td>
+      <td>4.78</td>
+      <td>3</td>
+      <td>2026-02-26 11:00</td>
+      <td>STOP_LOSS</td>
+      <td>-684.10</td>
+      <td>+312.64</td>
+      <td>+759.18</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 06:45</td>
+      <td>68410.00</td>
+      <td>4.18</td>
+      <td>4</td>
+      <td>2026-02-26 11:00</td>
+      <td>STOP_LOSS</td>
+      <td>-684.10</td>
+      <td>+312.64</td>
+      <td>+1145.78</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 06:45</td>
+      <td>68500.00</td>
+      <td>12.19</td>
+      <td>3</td>
+      <td>2026-02-26 11:00</td>
+      <td>STOP_LOSS</td>
+      <td>-685.00</td>
+      <td>+222.64</td>
+      <td>+1235.78</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 11:30</td>
+      <td>68170.00</td>
+      <td>4.01</td>
+      <td>3</td>
+      <td>2026-02-26 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-681.70</td>
+      <td>-266.88</td>
+      <td>+1670.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 15:30</td>
+      <td>67010.00</td>
+      <td>134.74</td>
+      <td>3</td>
+      <td>2026-02-26 20:30</td>
+      <td>TIME_EXIT</td>
+      <td>+496.23</td>
+      <td>+893.12</td>
+      <td>-140.14</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 16:00</td>
+      <td>67290.00</td>
+      <td>23.70</td>
+      <td>3</td>
+      <td>2026-02-26 21:00</td>
+      <td>TIME_EXIT</td>
+      <td>+66.64</td>
+      <td>+541.11</td>
+      <td>+139.86</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 16:00</td>
+      <td>67400.00</td>
+      <td>4.07</td>
+      <td>3</td>
+      <td>2026-02-26 21:00</td>
+      <td>TIME_EXIT</td>
+      <td>-43.36</td>
+      <td>+431.11</td>
+      <td>+249.86</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 17:15</td>
+      <td>67590.00</td>
+      <td>15.05</td>
+      <td>3</td>
+      <td>2026-02-26 22:00</td>
+      <td>STOP_LOSS</td>
+      <td>-675.90</td>
+      <td>+66.11</td>
+      <td>+705.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 21:30</td>
+      <td>67160.00</td>
+      <td>4.61</td>
+      <td>3</td>
+      <td>2026-02-27 02:30</td>
+      <td>TIME_EXIT</td>
+      <td>+681.51</td>
+      <td>+1056.80</td>
+      <td>+275.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 01:00</td>
+      <td>67820.00</td>
+      <td>4.41</td>
+      <td>3</td>
+      <td>2026-02-27 06:00</td>
+      <td>TIME_EXIT</td>
+      <td>+152.86</td>
+      <td>+396.80</td>
+      <td>+360.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 02:15</td>
+      <td>67680.00</td>
+      <td>3.77</td>
+      <td>3</td>
+      <td>2026-02-27 07:00</td>
+      <td>STOP_LOSS</td>
+      <td>-676.80</td>
+      <td>+469.93</td>
+      <td>+991.09</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 11:30</td>
+      <td>65890.00</td>
+      <td>6.74</td>
+      <td>3</td>
+      <td>2026-02-27 14:15</td>
+      <td>STOP_LOSS</td>
+      <td>-658.90</td>
+      <td>+421.11</td>
+      <td>+776.28</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 14:45</td>
+      <td>65480.00</td>
+      <td>4.42</td>
+      <td>3</td>
+      <td>2026-02-27 19:45</td>
+      <td>TIME_EXIT</td>
+      <td>+157.99</td>
+      <td>+308.07</td>
+      <td>+565.54</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 14:45</td>
+      <td>65750.00</td>
+      <td>5.27</td>
+      <td>3</td>
+      <td>2026-02-27 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-657.50</td>
+      <td>+38.07</td>
+      <td>+835.54</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 15:00</td>
+      <td>65750.00</td>
+      <td>18.94</td>
+      <td>4</td>
+      <td>2026-02-27 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-657.50</td>
+      <td>+119.63</td>
+      <td>+835.54</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 15:00</td>
+      <td>65760.00</td>
+      <td>8.27</td>
+      <td>3</td>
+      <td>2026-02-27 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-657.60</td>
+      <td>+109.63</td>
+      <td>+845.54</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 15:15</td>
+      <td>65490.00</td>
+      <td>6.12</td>
+      <td>3</td>
+      <td>2026-02-27 20:15</td>
+      <td>TIME_EXIT</td>
+      <td>+396.41</td>
+      <td>+410.00</td>
+      <td>+575.54</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 19:45</td>
+      <td>65510.00</td>
+      <td>31.19</td>
+      <td>3</td>
+      <td>2026-02-28 00:00</td>
+      <td>TIME_EXIT</td>
+      <td>+453.53</td>
+      <td>+515.52</td>
+      <td>-41.67</td>
+    </tr>
+  </tbody>
+</table><h3>Imbalance SHORT</h3><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>timestamp</th>
+      <th>price_bin</th>
+      <th>imbalance_ratio</th>
+      <th>streak</th>
+      <th>exit_time</th>
+      <th>exit_reason</th>
+      <th>pnl</th>
+      <th>mfe</th>
+      <th>mae</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-02-01 00:30</td>
+      <td>78850.00</td>
+      <td>3.20</td>
+      <td>3</td>
+      <td>2026-02-01 05:30</td>
+      <td>TIME_EXIT</td>
+      <td>-13.00</td>
+      <td>+882.31</td>
+      <td>+269.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 05:00</td>
+      <td>78390.00</td>
+      <td>3.07</td>
+      <td>3</td>
+      <td>2026-02-01 07:00</td>
+      <td>STOP_LOSS</td>
+      <td>-783.90</td>
+      <td>+241.90</td>
+      <td>+830.72</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 06:00</td>
+      <td>78630.00</td>
+      <td>6.09</td>
+      <td>3</td>
+      <td>2026-02-01 11:00</td>
+      <td>TIME_EXIT</td>
+      <td>+441.68</td>
+      <td>+520.00</td>
+      <td>+590.72</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 07:30</td>
+      <td>78630.00</td>
+      <td>14.44</td>
+      <td>4</td>
+      <td>2026-02-01 12:15</td>
+      <td>TARGET</td>
+      <td>+1572.60</td>
+      <td>+1868.02</td>
+      <td>+247.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 11:15</td>
+      <td>78000.00</td>
+      <td>3.17</td>
+      <td>3</td>
+      <td>2026-02-01 16:15</td>
+      <td>TIME_EXIT</td>
+      <td>+300.00</td>
+      <td>+1238.02</td>
+      <td>+520.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 11:45</td>
+      <td>77840.00</td>
+      <td>4.25</td>
+      <td>3</td>
+      <td>2026-02-01 16:45</td>
+      <td>TIME_EXIT</td>
+      <td>+665.22</td>
+      <td>+1078.02</td>
+      <td>+603.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 12:00</td>
+      <td>77840.00</td>
+      <td>97.49</td>
+      <td>4</td>
+      <td>2026-02-01 17:00</td>
+      <td>TIME_EXIT</td>
+      <td>+646.87</td>
+      <td>+1078.02</td>
+      <td>+603.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 14:15</td>
+      <td>77740.00</td>
+      <td>4.54</td>
+      <td>3</td>
+      <td>2026-02-01 19:15</td>
+      <td>TIME_EXIT</td>
+      <td>+543.79</td>
+      <td>+1380.13</td>
+      <td>+703.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 14:45</td>
+      <td>77420.00</td>
+      <td>3.03</td>
+      <td>3</td>
+      <td>2026-02-01 15:00</td>
+      <td>STOP_LOSS</td>
+      <td>-774.20</td>
+      <td>+1060.13</td>
+      <td>+1023.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 16:45</td>
+      <td>77540.00</td>
+      <td>132780000.00</td>
+      <td>3</td>
+      <td>2026-02-01 20:00</td>
+      <td>TARGET</td>
+      <td>+1550.80</td>
+      <td>+1840.00</td>
+      <td>+691.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 17:15</td>
+      <td>77000.00</td>
+      <td>19.12</td>
+      <td>3</td>
+      <td>2026-02-01 19:00</td>
+      <td>STOP_LOSS</td>
+      <td>-770.00</td>
+      <td>+1300.00</td>
+      <td>+1231.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 18:30</td>
+      <td>76850.00</td>
+      <td>23.60</td>
+      <td>3</td>
+      <td>2026-02-01 19:00</td>
+      <td>STOP_LOSS</td>
+      <td>-768.50</td>
+      <td>+1150.00</td>
+      <td>+1381.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 18:30</td>
+      <td>76960.00</td>
+      <td>3.87</td>
+      <td>3</td>
+      <td>2026-02-01 19:00</td>
+      <td>STOP_LOSS</td>
+      <td>-769.60</td>
+      <td>+1260.00</td>
+      <td>+1271.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 20:00</td>
+      <td>77040.00</td>
+      <td>3.28</td>
+      <td>3</td>
+      <td>2026-02-01 21:15</td>
+      <td>STOP_LOSS</td>
+      <td>-770.40</td>
+      <td>+2436.00</td>
+      <td>+1191.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 20:00</td>
+      <td>77100.00</td>
+      <td>13.30</td>
+      <td>3</td>
+      <td>2026-02-01 21:15</td>
+      <td>STOP_LOSS</td>
+      <td>-771.00</td>
+      <td>+2496.00</td>
+      <td>+1131.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 20:30</td>
+      <td>77100.00</td>
+      <td>8.95</td>
+      <td>4</td>
+      <td>2026-02-01 21:15</td>
+      <td>STOP_LOSS</td>
+      <td>-771.00</td>
+      <td>+2496.00</td>
+      <td>+1131.26</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 22:00</td>
+      <td>76910.00</td>
+      <td>8.27</td>
+      <td>3</td>
+      <td>2026-02-01 22:15</td>
+      <td>STOP_LOSS</td>
+      <td>-769.10</td>
+      <td>+2306.00</td>
+      <td>+1014.91</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 22:00</td>
+      <td>77520.00</td>
+      <td>6.86</td>
+      <td>3</td>
+      <td>2026-02-02 00:00</td>
+      <td>TARGET</td>
+      <td>+1550.40</td>
+      <td>+2916.00</td>
+      <td>+404.91</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 22:15</td>
+      <td>76640.00</td>
+      <td>33.82</td>
+      <td>3</td>
+      <td>2026-02-01 22:30</td>
+      <td>STOP_LOSS</td>
+      <td>-766.40</td>
+      <td>+2036.00</td>
+      <td>+1196.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 22:15</td>
+      <td>76810.00</td>
+      <td>4.67</td>
+      <td>3</td>
+      <td>2026-02-01 22:30</td>
+      <td>STOP_LOSS</td>
+      <td>-768.10</td>
+      <td>+2206.00</td>
+      <td>+1026.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-01 23:30</td>
+      <td>77080.00</td>
+      <td>3.45</td>
+      <td>3</td>
+      <td>2026-02-02 00:15</td>
+      <td>TARGET</td>
+      <td>+1541.60</td>
+      <td>+2476.00</td>
+      <td>-57.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 01:30</td>
+      <td>76260.00</td>
+      <td>4.20</td>
+      <td>3</td>
+      <td>2026-02-02 05:15</td>
+      <td>STOP_LOSS</td>
+      <td>-762.60</td>
+      <td>+1348.86</td>
+      <td>+1447.85</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 01:45</td>
+      <td>75920.00</td>
+      <td>4.20</td>
+      <td>3</td>
+      <td>2026-02-02 03:30</td>
+      <td>STOP_LOSS</td>
+      <td>-759.20</td>
+      <td>+1008.86</td>
+      <td>+1895.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 02:00</td>
+      <td>75630.00</td>
+      <td>4.50</td>
+      <td>3</td>
+      <td>2026-02-02 03:30</td>
+      <td>STOP_LOSS</td>
+      <td>-756.30</td>
+      <td>+718.86</td>
+      <td>+2246.69</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 02:00</td>
+      <td>75680.00</td>
+      <td>53.14</td>
+      <td>3</td>
+      <td>2026-02-02 03:30</td>
+      <td>STOP_LOSS</td>
+      <td>-756.80</td>
+      <td>+768.86</td>
+      <td>+2196.69</td>
+    </tr>
+    <tr>
+      <td>2026-02-02 03:00</td>
+      <td>75660.00</td>
+      <td>109.76</td>
+      <td>3</td>
+      <td>2026-02-02 03:30</td>
+      <td>STOP_LOSS</td>
+      <td>-756.60</td>
+      <td>+702.49</td>
+      <td>+2216.69</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 05:00</td>
+      <td>78630.00</td>
+      <td>7.91</td>
+      <td>3</td>
+      <td>2026-02-03 10:00</td>
+      <td>TIME_EXIT</td>
+      <td>+219.85</td>
+      <td>+680.00</td>
+      <td>+454.29</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 07:45</td>
+      <td>78220.00</td>
+      <td>4.52</td>
+      <td>3</td>
+      <td>2026-02-03 12:45</td>
+      <td>TIME_EXIT</td>
+      <td>+87.67</td>
+      <td>+1164.46</td>
+      <td>+238.89</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 13:00</td>
+      <td>77490.00</td>
+      <td>4.40</td>
+      <td>3</td>
+      <td>2026-02-03 14:00</td>
+      <td>TARGET</td>
+      <td>+1549.80</td>
+      <td>+4544.50</td>
+      <td>-78.47</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 13:30</td>
+      <td>76630.00</td>
+      <td>21.04</td>
+      <td>3</td>
+      <td>2026-02-03 14:30</td>
+      <td>TARGET</td>
+      <td>+1532.60</td>
+      <td>+3684.50</td>
+      <td>+330.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 14:30</td>
+      <td>75680.00</td>
+      <td>5.33</td>
+      <td>3</td>
+      <td>2026-02-03 15:15</td>
+      <td>TARGET</td>
+      <td>+1513.60</td>
+      <td>+2734.50</td>
+      <td>+1280.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 19:00</td>
+      <td>76210.00</td>
+      <td>8.81</td>
+      <td>3</td>
+      <td>2026-02-04 00:00</td>
+      <td>TIME_EXIT</td>
+      <td>-428.00</td>
+      <td>+803.21</td>
+      <td>+588.12</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 19:15</td>
+      <td>76070.00</td>
+      <td>5.25</td>
+      <td>3</td>
+      <td>2026-02-04 00:15</td>
+      <td>TIME_EXIT</td>
+      <td>-320.12</td>
+      <td>+663.21</td>
+      <td>+728.12</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 22:45</td>
+      <td>76680.00</td>
+      <td>34.52</td>
+      <td>3</td>
+      <td>2026-02-04 03:45</td>
+      <td>TIME_EXIT</td>
+      <td>+27.32</td>
+      <td>+972.59</td>
+      <td>+291.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-03 22:45</td>
+      <td>76690.00</td>
+      <td>3.77</td>
+      <td>3</td>
+      <td>2026-02-04 03:45</td>
+      <td>TIME_EXIT</td>
+      <td>+37.32</td>
+      <td>+982.59</td>
+      <td>+281.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 00:15</td>
+      <td>76680.00</td>
+      <td>3.55</td>
+      <td>4</td>
+      <td>2026-02-04 05:15</td>
+      <td>TIME_EXIT</td>
+      <td>+553.93</td>
+      <td>+597.09</td>
+      <td>+291.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 01:30</td>
+      <td>76710.00</td>
+      <td>3.25</td>
+      <td>3</td>
+      <td>2026-02-04 06:30</td>
+      <td>TIME_EXIT</td>
+      <td>+613.00</td>
+      <td>+742.90</td>
+      <td>+70.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 08:15</td>
+      <td>75720.00</td>
+      <td>3.07</td>
+      <td>3</td>
+      <td>2026-02-04 12:00</td>
+      <td>TARGET</td>
+      <td>+1514.40</td>
+      <td>+2315.99</td>
+      <td>+540.85</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 08:15</td>
+      <td>75750.00</td>
+      <td>3.20</td>
+      <td>3</td>
+      <td>2026-02-04 12:00</td>
+      <td>TARGET</td>
+      <td>+1515.00</td>
+      <td>+2345.99</td>
+      <td>+510.85</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 08:30</td>
+      <td>76120.00</td>
+      <td>3.64</td>
+      <td>3</td>
+      <td>2026-02-04 11:45</td>
+      <td>TARGET</td>
+      <td>+1522.40</td>
+      <td>+3032.00</td>
+      <td>+140.85</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 10:15</td>
+      <td>75750.00</td>
+      <td>9.70</td>
+      <td>4</td>
+      <td>2026-02-04 12:00</td>
+      <td>TARGET</td>
+      <td>+1515.00</td>
+      <td>+3581.00</td>
+      <td>+189.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 10:30</td>
+      <td>75770.00</td>
+      <td>8.24</td>
+      <td>3</td>
+      <td>2026-02-04 12:00</td>
+      <td>TARGET</td>
+      <td>+1515.40</td>
+      <td>+3601.00</td>
+      <td>-0.77</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 10:30</td>
+      <td>75790.00</td>
+      <td>3.55</td>
+      <td>3</td>
+      <td>2026-02-04 11:45</td>
+      <td>TARGET</td>
+      <td>+1515.80</td>
+      <td>+3621.00</td>
+      <td>-20.77</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 10:30</td>
+      <td>75850.00</td>
+      <td>3.70</td>
+      <td>3</td>
+      <td>2026-02-04 11:45</td>
+      <td>TARGET</td>
+      <td>+1517.00</td>
+      <td>+3681.00</td>
+      <td>-80.77</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 10:45</td>
+      <td>74860.00</td>
+      <td>3.59</td>
+      <td>3</td>
+      <td>2026-02-04 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-748.60</td>
+      <td>+2691.00</td>
+      <td>+909.23</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 10:45</td>
+      <td>75400.00</td>
+      <td>3.30</td>
+      <td>3</td>
+      <td>2026-02-04 12:00</td>
+      <td>TARGET</td>
+      <td>+1508.00</td>
+      <td>+3231.00</td>
+      <td>+369.23</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 11:00</td>
+      <td>75270.00</td>
+      <td>3.87</td>
+      <td>3</td>
+      <td>2026-02-04 13:00</td>
+      <td>TARGET</td>
+      <td>+1505.40</td>
+      <td>+3101.00</td>
+      <td>+499.23</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 12:45</td>
+      <td>74000.00</td>
+      <td>7.21</td>
+      <td>3</td>
+      <td>2026-02-04 14:15</td>
+      <td>TARGET</td>
+      <td>+1480.00</td>
+      <td>+1831.00</td>
+      <td>+249.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 19:00</td>
+      <td>72650.00</td>
+      <td>136.23</td>
+      <td>3</td>
+      <td>2026-02-04 19:15</td>
+      <td>STOP_LOSS</td>
+      <td>-726.50</td>
+      <td>+1344.45</td>
+      <td>+1030.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 19:30</td>
+      <td>72970.00</td>
+      <td>7.40</td>
+      <td>3</td>
+      <td>2026-02-04 23:45</td>
+      <td>TARGET</td>
+      <td>+1459.40</td>
+      <td>+1690.00</td>
+      <td>+550.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 19:45</td>
+      <td>72970.00</td>
+      <td>4.71</td>
+      <td>4</td>
+      <td>2026-02-04 23:45</td>
+      <td>TARGET</td>
+      <td>+1459.40</td>
+      <td>+1817.22</td>
+      <td>+550.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 20:45</td>
+      <td>73310.00</td>
+      <td>724470000.00</td>
+      <td>3</td>
+      <td>2026-02-04 23:15</td>
+      <td>TARGET</td>
+      <td>+1466.20</td>
+      <td>+2609.00</td>
+      <td>+31.18</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 21:00</td>
+      <td>72830.00</td>
+      <td>5.31</td>
+      <td>3</td>
+      <td>2026-02-04 23:45</td>
+      <td>TARGET</td>
+      <td>+1456.60</td>
+      <td>+2158.00</td>
+      <td>+511.18</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 22:45</td>
+      <td>72690.00</td>
+      <td>4.60</td>
+      <td>3</td>
+      <td>2026-02-05 00:45</td>
+      <td>TARGET</td>
+      <td>+1453.80</td>
+      <td>+2550.00</td>
+      <td>+164.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-04 22:45</td>
+      <td>72730.00</td>
+      <td>3.55</td>
+      <td>3</td>
+      <td>2026-02-05 00:45</td>
+      <td>TARGET</td>
+      <td>+1454.60</td>
+      <td>+2590.00</td>
+      <td>+124.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 01:45</td>
+      <td>70800.00</td>
+      <td>4.72</td>
+      <td>3</td>
+      <td>2026-02-05 04:00</td>
+      <td>STOP_LOSS</td>
+      <td>-708.00</td>
+      <td>+660.00</td>
+      <td>+1178.58</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 02:15</td>
+      <td>70700.00</td>
+      <td>5.33</td>
+      <td>3</td>
+      <td>2026-02-05 04:00</td>
+      <td>STOP_LOSS</td>
+      <td>-707.00</td>
+      <td>+360.10</td>
+      <td>+1278.58</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 02:30</td>
+      <td>71150.00</td>
+      <td>491.35</td>
+      <td>3</td>
+      <td>2026-02-05 06:00</td>
+      <td>STOP_LOSS</td>
+      <td>-711.50</td>
+      <td>+715.95</td>
+      <td>+828.58</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 08:00</td>
+      <td>70700.00</td>
+      <td>38750000.00</td>
+      <td>3</td>
+      <td>2026-02-05 09:15</td>
+      <td>TARGET</td>
+      <td>+1414.00</td>
+      <td>+3979.85</td>
+      <td>+264.24</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 08:15</td>
+      <td>70390.00</td>
+      <td>3.58</td>
+      <td>3</td>
+      <td>2026-02-05 12:00</td>
+      <td>TARGET</td>
+      <td>+1407.80</td>
+      <td>+3669.85</td>
+      <td>+482.04</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 19:00</td>
+      <td>63000.00</td>
+      <td>15.24</td>
+      <td>3</td>
+      <td>2026-02-05 19:15</td>
+      <td>STOP_LOSS</td>
+      <td>-630.00</td>
+      <td>+3000.00</td>
+      <td>+3010.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 19:15</td>
+      <td>63110.00</td>
+      <td>4.90</td>
+      <td>3</td>
+      <td>2026-02-05 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-631.10</td>
+      <td>+3110.00</td>
+      <td>+2900.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 19:15</td>
+      <td>63120.00</td>
+      <td>4.23</td>
+      <td>3</td>
+      <td>2026-02-05 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-631.20</td>
+      <td>+3120.00</td>
+      <td>+2890.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 20:30</td>
+      <td>63850.00</td>
+      <td>476890000.00</td>
+      <td>3</td>
+      <td>2026-02-05 21:00</td>
+      <td>TARGET</td>
+      <td>+1277.00</td>
+      <td>+3850.00</td>
+      <td>+2160.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-05 23:15</td>
+      <td>65120.00</td>
+      <td>7.28</td>
+      <td>3</td>
+      <td>2026-02-06 00:45</td>
+      <td>TARGET</td>
+      <td>+1302.40</td>
+      <td>+1349.83</td>
+      <td>+1706.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 00:30</td>
+      <td>64910.00</td>
+      <td>21.20</td>
+      <td>3</td>
+      <td>2026-02-06 02:00</td>
+      <td>STOP_LOSS</td>
+      <td>-649.10</td>
+      <td>+1139.83</td>
+      <td>+1916.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 01:00</td>
+      <td>64010.00</td>
+      <td>10.61</td>
+      <td>3</td>
+      <td>2026-02-06 01:15</td>
+      <td>STOP_LOSS</td>
+      <td>-640.10</td>
+      <td>-410.51</td>
+      <td>+2816.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 20:15</td>
+      <td>71110.00</td>
+      <td>4.52</td>
+      <td>3</td>
+      <td>2026-02-07 01:15</td>
+      <td>TIME_EXIT</td>
+      <td>-41.31</td>
+      <td>+1392.00</td>
+      <td>+580.07</td>
+    </tr>
+    <tr>
+      <td>2026-02-06 20:15</td>
+      <td>71120.00</td>
+      <td>17.10</td>
+      <td>3</td>
+      <td>2026-02-07 01:15</td>
+      <td>TIME_EXIT</td>
+      <td>-31.31</td>
+      <td>+1402.00</td>
+      <td>+570.07</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 02:45</td>
+      <td>70040.00</td>
+      <td>6.96</td>
+      <td>3</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1400.80</td>
+      <td>+2740.00</td>
+      <td>+270.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 02:45</td>
+      <td>70240.00</td>
+      <td>4.04</td>
+      <td>3</td>
+      <td>2026-02-07 03:45</td>
+      <td>TARGET</td>
+      <td>+1404.80</td>
+      <td>+2940.00</td>
+      <td>+70.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:00</td>
+      <td>69940.00</td>
+      <td>66.33</td>
+      <td>3</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1398.80</td>
+      <td>+2640.00</td>
+      <td>+360.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:00</td>
+      <td>70240.00</td>
+      <td>3.83</td>
+      <td>4</td>
+      <td>2026-02-07 03:45</td>
+      <td>TARGET</td>
+      <td>+1404.80</td>
+      <td>+2940.00</td>
+      <td>+60.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:15</td>
+      <td>69910.00</td>
+      <td>3.06</td>
+      <td>3</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1398.20</td>
+      <td>+2610.00</td>
+      <td>+390.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:30</td>
+      <td>69810.00</td>
+      <td>77304.93</td>
+      <td>3</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1396.20</td>
+      <td>+2510.00</td>
+      <td>+261.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:30</td>
+      <td>69850.00</td>
+      <td>4767.81</td>
+      <td>3</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1397.00</td>
+      <td>+2550.00</td>
+      <td>+221.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:30</td>
+      <td>69860.00</td>
+      <td>11.63</td>
+      <td>3</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1397.20</td>
+      <td>+2560.00</td>
+      <td>+211.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:30</td>
+      <td>69910.00</td>
+      <td>27.72</td>
+      <td>4</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1398.20</td>
+      <td>+2610.00</td>
+      <td>+161.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:30</td>
+      <td>69960.00</td>
+      <td>10.48</td>
+      <td>3</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1399.20</td>
+      <td>+2660.00</td>
+      <td>+111.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 03:45</td>
+      <td>69840.00</td>
+      <td>3.97</td>
+      <td>3</td>
+      <td>2026-02-07 04:00</td>
+      <td>TARGET</td>
+      <td>+1396.80</td>
+      <td>+2540.00</td>
+      <td>-755.45</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 05:00</td>
+      <td>67790.00</td>
+      <td>5.63</td>
+      <td>3</td>
+      <td>2026-02-07 05:15</td>
+      <td>STOP_LOSS</td>
+      <td>-677.90</td>
+      <td>+207.52</td>
+      <td>+2209.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 06:15</td>
+      <td>68470.00</td>
+      <td>6.96</td>
+      <td>3</td>
+      <td>2026-02-07 09:15</td>
+      <td>STOP_LOSS</td>
+      <td>-684.70</td>
+      <td>+887.52</td>
+      <td>+1529.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 06:30</td>
+      <td>68100.00</td>
+      <td>3.08</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-681.00</td>
+      <td>+517.52</td>
+      <td>+1899.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 06:30</td>
+      <td>68470.00</td>
+      <td>3.55</td>
+      <td>4</td>
+      <td>2026-02-07 09:15</td>
+      <td>STOP_LOSS</td>
+      <td>-684.70</td>
+      <td>+887.52</td>
+      <td>+1529.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 06:45</td>
+      <td>68040.00</td>
+      <td>4.34</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-680.40</td>
+      <td>+457.52</td>
+      <td>+1959.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:00</td>
+      <td>68040.00</td>
+      <td>3.37</td>
+      <td>4</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-680.40</td>
+      <td>+457.52</td>
+      <td>+1959.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:00</td>
+      <td>68260.00</td>
+      <td>5.99</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-682.60</td>
+      <td>+677.52</td>
+      <td>+1739.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:30</td>
+      <td>67620.00</td>
+      <td>3.62</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-676.20</td>
+      <td>+20.00</td>
+      <td>+2379.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:30</td>
+      <td>67650.00</td>
+      <td>5.92</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-676.50</td>
+      <td>+50.00</td>
+      <td>+2349.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:30</td>
+      <td>67750.00</td>
+      <td>3.75</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-677.50</td>
+      <td>+150.00</td>
+      <td>+2249.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:30</td>
+      <td>67930.00</td>
+      <td>5.99</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-679.30</td>
+      <td>+330.00</td>
+      <td>+2069.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:45</td>
+      <td>67600.00</td>
+      <td>5.07</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-676.00</td>
+      <td>-100.00</td>
+      <td>+2399.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:45</td>
+      <td>67610.00</td>
+      <td>9.61</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-676.10</td>
+      <td>-90.00</td>
+      <td>+2389.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 07:45</td>
+      <td>67640.00</td>
+      <td>5.38</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-676.40</td>
+      <td>-60.00</td>
+      <td>+2359.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 08:30</td>
+      <td>68010.00</td>
+      <td>4.62</td>
+      <td>3</td>
+      <td>2026-02-07 09:00</td>
+      <td>STOP_LOSS</td>
+      <td>-680.10</td>
+      <td>+310.00</td>
+      <td>+1989.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 09:00</td>
+      <td>68340.00</td>
+      <td>3.16</td>
+      <td>3</td>
+      <td>2026-02-07 09:15</td>
+      <td>STOP_LOSS</td>
+      <td>-683.40</td>
+      <td>-18.75</td>
+      <td>+1659.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 09:00</td>
+      <td>68440.00</td>
+      <td>3.65</td>
+      <td>3</td>
+      <td>2026-02-07 09:15</td>
+      <td>STOP_LOSS</td>
+      <td>-684.40</td>
+      <td>+81.25</td>
+      <td>+1559.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 09:15</td>
+      <td>69840.00</td>
+      <td>3.21</td>
+      <td>4</td>
+      <td>2026-02-07 11:45</td>
+      <td>TARGET</td>
+      <td>+1396.80</td>
+      <td>+1481.25</td>
+      <td>+147.09</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 09:15</td>
+      <td>69990.00</td>
+      <td>3.58</td>
+      <td>3</td>
+      <td>2026-02-07 11:30</td>
+      <td>TARGET</td>
+      <td>+1399.80</td>
+      <td>+1631.25</td>
+      <td>-2.91</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 11:15</td>
+      <td>69050.00</td>
+      <td>5.82</td>
+      <td>3</td>
+      <td>2026-02-07 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-690.50</td>
+      <td>+691.25</td>
+      <td>+848.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 11:30</td>
+      <td>68880.00</td>
+      <td>6.53</td>
+      <td>3</td>
+      <td>2026-02-07 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-688.80</td>
+      <td>+521.25</td>
+      <td>+1018.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 11:30</td>
+      <td>68960.00</td>
+      <td>3.23</td>
+      <td>3</td>
+      <td>2026-02-07 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-689.60</td>
+      <td>+601.25</td>
+      <td>+938.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 11:45</td>
+      <td>68350.00</td>
+      <td>6.28</td>
+      <td>3</td>
+      <td>2026-02-07 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-683.50</td>
+      <td>-181.50</td>
+      <td>+1548.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 11:45</td>
+      <td>68440.00</td>
+      <td>3.76</td>
+      <td>4</td>
+      <td>2026-02-07 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-684.40</td>
+      <td>-91.50</td>
+      <td>+1458.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 12:00</td>
+      <td>69120.00</td>
+      <td>5.02</td>
+      <td>3</td>
+      <td>2026-02-07 13:00</td>
+      <td>STOP_LOSS</td>
+      <td>-691.20</td>
+      <td>+588.50</td>
+      <td>+778.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 12:15</td>
+      <td>69020.00</td>
+      <td>5.97</td>
+      <td>3</td>
+      <td>2026-02-07 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-690.20</td>
+      <td>+488.50</td>
+      <td>+878.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 15:00</td>
+      <td>69090.00</td>
+      <td>15.85</td>
+      <td>3</td>
+      <td>2026-02-07 20:00</td>
+      <td>TIME_EXIT</td>
+      <td>+14.44</td>
+      <td>+226.87</td>
+      <td>+638.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 16:00</td>
+      <td>69380.00</td>
+      <td>8.68</td>
+      <td>3</td>
+      <td>2026-02-07 21:00</td>
+      <td>TIME_EXIT</td>
+      <td>+22.82</td>
+      <td>+592.66</td>
+      <td>+348.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 16:15</td>
+      <td>69390.00</td>
+      <td>9.39</td>
+      <td>3</td>
+      <td>2026-02-07 21:15</td>
+      <td>TIME_EXIT</td>
+      <td>+340.00</td>
+      <td>+602.66</td>
+      <td>+338.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 20:00</td>
+      <td>68880.00</td>
+      <td>15.71</td>
+      <td>3</td>
+      <td>2026-02-07 23:15</td>
+      <td>STOP_LOSS</td>
+      <td>-688.80</td>
+      <td>+92.66</td>
+      <td>+816.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 20:15</td>
+      <td>68880.00</td>
+      <td>14.58</td>
+      <td>4</td>
+      <td>2026-02-07 23:15</td>
+      <td>STOP_LOSS</td>
+      <td>-688.80</td>
+      <td>-8.00</td>
+      <td>+816.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 21:00</td>
+      <td>69180.00</td>
+      <td>51.90</td>
+      <td>3</td>
+      <td>2026-02-08 02:00</td>
+      <td>TIME_EXIT</td>
+      <td>-201.57</td>
+      <td>+292.00</td>
+      <td>+516.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 21:15</td>
+      <td>69140.00</td>
+      <td>3.71</td>
+      <td>3</td>
+      <td>2026-02-08 02:15</td>
+      <td>TIME_EXIT</td>
+      <td>-136.44</td>
+      <td>+252.00</td>
+      <td>+556.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 21:15</td>
+      <td>69180.00</td>
+      <td>7.63</td>
+      <td>4</td>
+      <td>2026-02-08 02:15</td>
+      <td>TIME_EXIT</td>
+      <td>-96.44</td>
+      <td>+292.00</td>
+      <td>+516.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 21:15</td>
+      <td>69260.00</td>
+      <td>3.22</td>
+      <td>3</td>
+      <td>2026-02-08 02:15</td>
+      <td>TIME_EXIT</td>
+      <td>-16.44</td>
+      <td>+372.00</td>
+      <td>+436.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 21:15</td>
+      <td>69280.00</td>
+      <td>7.70</td>
+      <td>3</td>
+      <td>2026-02-08 02:15</td>
+      <td>TIME_EXIT</td>
+      <td>+3.56</td>
+      <td>+392.00</td>
+      <td>+416.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 23:15</td>
+      <td>69390.00</td>
+      <td>4.24</td>
+      <td>3</td>
+      <td>2026-02-08 04:15</td>
+      <td>TIME_EXIT</td>
+      <td>-83.66</td>
+      <td>+437.99</td>
+      <td>+144.77</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 23:30</td>
+      <td>69390.00</td>
+      <td>1358.60</td>
+      <td>4</td>
+      <td>2026-02-08 04:30</td>
+      <td>TIME_EXIT</td>
+      <td>-122.13</td>
+      <td>+437.99</td>
+      <td>+223.66</td>
+    </tr>
+    <tr>
+      <td>2026-02-07 23:45</td>
+      <td>69390.00</td>
+      <td>6.60</td>
+      <td>5</td>
+      <td>2026-02-08 04:45</td>
+      <td>TIME_EXIT</td>
+      <td>-320.69</td>
+      <td>+437.99</td>
+      <td>+329.07</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 02:15</td>
+      <td>69330.00</td>
+      <td>4.51</td>
+      <td>3</td>
+      <td>2026-02-08 05:15</td>
+      <td>STOP_LOSS</td>
+      <td>-693.30</td>
+      <td>+240.00</td>
+      <td>+1466.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 02:30</td>
+      <td>69180.00</td>
+      <td>3.94</td>
+      <td>3</td>
+      <td>2026-02-08 05:00</td>
+      <td>STOP_LOSS</td>
+      <td>-691.80</td>
+      <td>+90.00</td>
+      <td>+1616.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 14:15</td>
+      <td>70860.00</td>
+      <td>28.89</td>
+      <td>3</td>
+      <td>2026-02-08 19:15</td>
+      <td>TIME_EXIT</td>
+      <td>+8.57</td>
+      <td>+335.86</td>
+      <td>+678.05</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 14:45</td>
+      <td>70860.00</td>
+      <td>5.48</td>
+      <td>4</td>
+      <td>2026-02-08 19:45</td>
+      <td>TIME_EXIT</td>
+      <td>-206.09</td>
+      <td>+335.86</td>
+      <td>+678.05</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 17:45</td>
+      <td>70930.00</td>
+      <td>41.09</td>
+      <td>3</td>
+      <td>2026-02-08 20:00</td>
+      <td>STOP_LOSS</td>
+      <td>-709.30</td>
+      <td>+930.00</td>
+      <td>+1341.41</td>
+    </tr>
+    <tr>
+      <td>2026-02-08 18:30</td>
+      <td>70810.00</td>
+      <td>12.09</td>
+      <td>3</td>
+      <td>2026-02-08 20:00</td>
+      <td>STOP_LOSS</td>
+      <td>-708.10</td>
+      <td>+810.00</td>
+      <td>+1461.41</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 00:00</td>
+      <td>70840.00</td>
+      <td>7.45</td>
+      <td>3</td>
+      <td>2026-02-09 05:00</td>
+      <td>TIME_EXIT</td>
+      <td>+307.53</td>
+      <td>+528.30</td>
+      <td>+613.53</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 00:15</td>
+      <td>70930.00</td>
+      <td>4.26</td>
+      <td>3</td>
+      <td>2026-02-09 05:15</td>
+      <td>TIME_EXIT</td>
+      <td>+842.80</td>
+      <td>+875.88</td>
+      <td>+523.53</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 01:30</td>
+      <td>71070.00</td>
+      <td>4.43</td>
+      <td>3</td>
+      <td>2026-02-09 05:30</td>
+      <td>TARGET</td>
+      <td>+1421.40</td>
+      <td>+1676.03</td>
+      <td>+59.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 04:45</td>
+      <td>70500.00</td>
+      <td>3.30</td>
+      <td>3</td>
+      <td>2026-02-09 07:15</td>
+      <td>TARGET</td>
+      <td>+1410.00</td>
+      <td>+2079.42</td>
+      <td>+108.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 05:00</td>
+      <td>70340.00</td>
+      <td>3.05</td>
+      <td>3</td>
+      <td>2026-02-09 07:30</td>
+      <td>TARGET</td>
+      <td>+1406.80</td>
+      <td>+1919.42</td>
+      <td>+210.58</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 05:15</td>
+      <td>70120.00</td>
+      <td>4.80</td>
+      <td>3</td>
+      <td>2026-02-09 07:30</td>
+      <td>TARGET</td>
+      <td>+1402.40</td>
+      <td>+1699.42</td>
+      <td>-4.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 05:15</td>
+      <td>70340.00</td>
+      <td>20.32</td>
+      <td>4</td>
+      <td>2026-02-09 07:30</td>
+      <td>TARGET</td>
+      <td>+1406.80</td>
+      <td>+1919.42</td>
+      <td>-224.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 07:30</td>
+      <td>68680.00</td>
+      <td>11.70</td>
+      <td>3</td>
+      <td>2026-02-09 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-686.80</td>
+      <td>+372.00</td>
+      <td>+1204.82</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 07:45</td>
+      <td>68580.00</td>
+      <td>4.51</td>
+      <td>3</td>
+      <td>2026-02-09 10:00</td>
+      <td>STOP_LOSS</td>
+      <td>-685.80</td>
+      <td>+272.00</td>
+      <td>+1304.82</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 10:45</td>
+      <td>68800.00</td>
+      <td>4.28</td>
+      <td>3</td>
+      <td>2026-02-09 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-688.00</td>
+      <td>+492.00</td>
+      <td>+2212.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 11:00</td>
+      <td>68350.00</td>
+      <td>12.75</td>
+      <td>4</td>
+      <td>2026-02-09 11:15</td>
+      <td>STOP_LOSS</td>
+      <td>-683.50</td>
+      <td>-50.92</td>
+      <td>+2662.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 12:00</td>
+      <td>69820.00</td>
+      <td>3.19</td>
+      <td>3</td>
+      <td>2026-02-09 14:30</td>
+      <td>STOP_LOSS</td>
+      <td>-698.20</td>
+      <td>+1040.00</td>
+      <td>+1306.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 13:00</td>
+      <td>69130.00</td>
+      <td>5.19</td>
+      <td>3</td>
+      <td>2026-02-09 13:30</td>
+      <td>STOP_LOSS</td>
+      <td>-691.30</td>
+      <td>-30.04</td>
+      <td>+1996.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 13:15</td>
+      <td>69620.00</td>
+      <td>3.60</td>
+      <td>3</td>
+      <td>2026-02-09 13:45</td>
+      <td>STOP_LOSS</td>
+      <td>-696.20</td>
+      <td>+287.96</td>
+      <td>+1506.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 14:15</td>
+      <td>69940.00</td>
+      <td>5.91</td>
+      <td>3</td>
+      <td>2026-02-09 14:30</td>
+      <td>STOP_LOSS</td>
+      <td>-699.40</td>
+      <td>+116.48</td>
+      <td>+1186.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 17:45</td>
+      <td>70820.00</td>
+      <td>3.37</td>
+      <td>3</td>
+      <td>2026-02-09 22:45</td>
+      <td>TIME_EXIT</td>
+      <td>+333.18</td>
+      <td>+1076.20</td>
+      <td>-12.25</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 18:00</td>
+      <td>70520.00</td>
+      <td>1290450000.00</td>
+      <td>3</td>
+      <td>2026-02-09 23:00</td>
+      <td>TIME_EXIT</td>
+      <td>+164.86</td>
+      <td>+776.20</td>
+      <td>+199.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 18:00</td>
+      <td>70530.00</td>
+      <td>10.86</td>
+      <td>3</td>
+      <td>2026-02-09 23:00</td>
+      <td>TIME_EXIT</td>
+      <td>+174.86</td>
+      <td>+786.20</td>
+      <td>+189.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 18:00</td>
+      <td>70560.00</td>
+      <td>3.43</td>
+      <td>3</td>
+      <td>2026-02-09 23:00</td>
+      <td>TIME_EXIT</td>
+      <td>+204.86</td>
+      <td>+816.20</td>
+      <td>+159.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 18:30</td>
+      <td>69930.00</td>
+      <td>3.45</td>
+      <td>3</td>
+      <td>2026-02-09 19:00</td>
+      <td>STOP_LOSS</td>
+      <td>-699.30</td>
+      <td>+186.20</td>
+      <td>+789.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 18:30</td>
+      <td>69950.00</td>
+      <td>7.64</td>
+      <td>3</td>
+      <td>2026-02-09 19:00</td>
+      <td>STOP_LOSS</td>
+      <td>-699.50</td>
+      <td>+206.20</td>
+      <td>+769.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 18:45</td>
+      <td>69930.00</td>
+      <td>9.44</td>
+      <td>4</td>
+      <td>2026-02-09 19:00</td>
+      <td>STOP_LOSS</td>
+      <td>-699.30</td>
+      <td>+186.20</td>
+      <td>+789.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 18:45</td>
+      <td>70160.00</td>
+      <td>4.30</td>
+      <td>3</td>
+      <td>2026-02-09 23:45</td>
+      <td>TIME_EXIT</td>
+      <td>+57.11</td>
+      <td>+416.20</td>
+      <td>+559.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 20:45</td>
+      <td>70150.00</td>
+      <td>4.41</td>
+      <td>3</td>
+      <td>2026-02-10 01:45</td>
+      <td>TIME_EXIT</td>
+      <td>+318.38</td>
+      <td>+941.39</td>
+      <td>+377.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 20:45</td>
+      <td>70340.00</td>
+      <td>42750000.00</td>
+      <td>3</td>
+      <td>2026-02-10 01:45</td>
+      <td>TIME_EXIT</td>
+      <td>+508.38</td>
+      <td>+1131.39</td>
+      <td>+187.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 21:15</td>
+      <td>69930.00</td>
+      <td>12.65</td>
+      <td>5</td>
+      <td>2026-02-10 02:15</td>
+      <td>TIME_EXIT</td>
+      <td>+403.20</td>
+      <td>+721.39</td>
+      <td>+597.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 21:30</td>
+      <td>70020.00</td>
+      <td>4.26</td>
+      <td>3</td>
+      <td>2026-02-10 02:30</td>
+      <td>TIME_EXIT</td>
+      <td>+653.32</td>
+      <td>+811.39</td>
+      <td>+507.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 21:45</td>
+      <td>69910.00</td>
+      <td>101.13</td>
+      <td>3</td>
+      <td>2026-02-10 02:45</td>
+      <td>TIME_EXIT</td>
+      <td>+462.36</td>
+      <td>+701.39</td>
+      <td>+617.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 22:00</td>
+      <td>70020.00</td>
+      <td>4.51</td>
+      <td>4</td>
+      <td>2026-02-10 03:00</td>
+      <td>TIME_EXIT</td>
+      <td>+679.17</td>
+      <td>+811.39</td>
+      <td>+507.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-09 23:45</td>
+      <td>70020.00</td>
+      <td>4.30</td>
+      <td>5</td>
+      <td>2026-02-10 04:45</td>
+      <td>TIME_EXIT</td>
+      <td>+1100.34</td>
+      <td>+1338.00</td>
+      <td>+146.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 02:00</td>
+      <td>69690.00</td>
+      <td>3.53</td>
+      <td>3</td>
+      <td>2026-02-10 07:00</td>
+      <td>TIME_EXIT</td>
+      <td>+540.08</td>
+      <td>+1008.00</td>
+      <td>+117.35</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 02:00</td>
+      <td>69840.00</td>
+      <td>9.62</td>
+      <td>3</td>
+      <td>2026-02-10 07:00</td>
+      <td>TIME_EXIT</td>
+      <td>+690.08</td>
+      <td>+1158.00</td>
+      <td>-32.65</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 02:15</td>
+      <td>69620.00</td>
+      <td>39.10</td>
+      <td>3</td>
+      <td>2026-02-10 07:15</td>
+      <td>TIME_EXIT</td>
+      <td>+443.91</td>
+      <td>+938.00</td>
+      <td>+85.24</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 02:15</td>
+      <td>69690.00</td>
+      <td>4.77</td>
+      <td>4</td>
+      <td>2026-02-10 07:15</td>
+      <td>TIME_EXIT</td>
+      <td>+513.91</td>
+      <td>+1008.00</td>
+      <td>+15.24</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 02:30</td>
+      <td>69590.00</td>
+      <td>7.27</td>
+      <td>3</td>
+      <td>2026-02-10 07:30</td>
+      <td>TIME_EXIT</td>
+      <td>+592.21</td>
+      <td>+908.00</td>
+      <td>-90.10</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 10:45</td>
+      <td>69140.00</td>
+      <td>21.04</td>
+      <td>3</td>
+      <td>2026-02-10 14:30</td>
+      <td>STOP_LOSS</td>
+      <td>-691.40</td>
+      <td>+1340.00</td>
+      <td>+853.65</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 11:15</td>
+      <td>69590.00</td>
+      <td>22.28</td>
+      <td>4</td>
+      <td>2026-02-10 11:30</td>
+      <td>TARGET</td>
+      <td>+1391.80</td>
+      <td>+1790.00</td>
+      <td>+403.65</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 11:30</td>
+      <td>67840.00</td>
+      <td>3471900000.00</td>
+      <td>3</td>
+      <td>2026-02-10 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-678.40</td>
+      <td>-80.74</td>
+      <td>+2153.65</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 11:30</td>
+      <td>68350.00</td>
+      <td>7.42</td>
+      <td>5</td>
+      <td>2026-02-10 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-683.50</td>
+      <td>+429.26</td>
+      <td>+1643.65</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 11:30</td>
+      <td>68380.00</td>
+      <td>19.48</td>
+      <td>3</td>
+      <td>2026-02-10 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-683.80</td>
+      <td>+459.26</td>
+      <td>+1613.65</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 14:15</td>
+      <td>69810.00</td>
+      <td>3.07</td>
+      <td>3</td>
+      <td>2026-02-10 18:30</td>
+      <td>TARGET</td>
+      <td>+1396.20</td>
+      <td>+1448.00</td>
+      <td>+183.65</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 17:15</td>
+      <td>68890.00</td>
+      <td>10.61</td>
+      <td>3</td>
+      <td>2026-02-10 22:15</td>
+      <td>TIME_EXIT</td>
+      <td>-69.98</td>
+      <td>+528.00</td>
+      <td>+402.88</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 17:30</td>
+      <td>68700.00</td>
+      <td>5.45</td>
+      <td>3</td>
+      <td>2026-02-10 22:30</td>
+      <td>TIME_EXIT</td>
+      <td>-373.80</td>
+      <td>+338.00</td>
+      <td>+592.88</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 20:15</td>
+      <td>68680.00</td>
+      <td>8.83</td>
+      <td>3</td>
+      <td>2026-02-11 01:15</td>
+      <td>TIME_EXIT</td>
+      <td>+1103.37</td>
+      <td>+1124.00</td>
+      <td>+612.88</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 22:30</td>
+      <td>69090.00</td>
+      <td>3.24</td>
+      <td>3</td>
+      <td>2026-02-11 01:15</td>
+      <td>TARGET</td>
+      <td>+1381.80</td>
+      <td>+2390.85</td>
+      <td>+78.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 22:45</td>
+      <td>69030.00</td>
+      <td>4.08</td>
+      <td>3</td>
+      <td>2026-02-11 01:15</td>
+      <td>TARGET</td>
+      <td>+1380.60</td>
+      <td>+2472.01</td>
+      <td>+138.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 23:30</td>
+      <td>68960.00</td>
+      <td>5.15</td>
+      <td>3</td>
+      <td>2026-02-11 01:15</td>
+      <td>TARGET</td>
+      <td>+1379.20</td>
+      <td>+2402.01</td>
+      <td>-90.18</td>
+    </tr>
+    <tr>
+      <td>2026-02-10 23:45</td>
+      <td>68670.00</td>
+      <td>3.43</td>
+      <td>3</td>
+      <td>2026-02-11 03:00</td>
+      <td>TARGET</td>
+      <td>+1373.40</td>
+      <td>+2112.01</td>
+      <td>+81.91</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 01:15</td>
+      <td>67590.00</td>
+      <td>7.26</td>
+      <td>3</td>
+      <td>2026-02-11 06:15</td>
+      <td>TIME_EXIT</td>
+      <td>+611.57</td>
+      <td>+1032.01</td>
+      <td>+220.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 01:15</td>
+      <td>67640.00</td>
+      <td>5194770000.00</td>
+      <td>4</td>
+      <td>2026-02-11 06:15</td>
+      <td>TIME_EXIT</td>
+      <td>+661.57</td>
+      <td>+1082.01</td>
+      <td>+170.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 01:30</td>
+      <td>67480.00</td>
+      <td>3.03</td>
+      <td>3</td>
+      <td>2026-02-11 06:30</td>
+      <td>TIME_EXIT</td>
+      <td>+630.42</td>
+      <td>+922.01</td>
+      <td>+330.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 01:30</td>
+      <td>67500.00</td>
+      <td>6.07</td>
+      <td>3</td>
+      <td>2026-02-11 06:30</td>
+      <td>TIME_EXIT</td>
+      <td>+650.42</td>
+      <td>+942.01</td>
+      <td>+310.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 01:45</td>
+      <td>67480.00</td>
+      <td>3.79</td>
+      <td>4</td>
+      <td>2026-02-11 06:45</td>
+      <td>TIME_EXIT</td>
+      <td>+607.97</td>
+      <td>+922.01</td>
+      <td>+330.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 02:30</td>
+      <td>67480.00</td>
+      <td>3.52</td>
+      <td>5</td>
+      <td>2026-02-11 07:30</td>
+      <td>TIME_EXIT</td>
+      <td>+747.27</td>
+      <td>+922.01</td>
+      <td>+103.47</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 03:00</td>
+      <td>66940.00</td>
+      <td>82.50</td>
+      <td>3</td>
+      <td>2026-02-11 08:00</td>
+      <td>TIME_EXIT</td>
+      <td>+273.33</td>
+      <td>+570.51</td>
+      <td>+314.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 03:00</td>
+      <td>67350.00</td>
+      <td>2155730000.00</td>
+      <td>3</td>
+      <td>2026-02-11 08:00</td>
+      <td>TIME_EXIT</td>
+      <td>+683.33</td>
+      <td>+980.51</td>
+      <td>-95.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 03:15</td>
+      <td>66810.00</td>
+      <td>4.91</td>
+      <td>3</td>
+      <td>2026-02-11 08:15</td>
+      <td>TIME_EXIT</td>
+      <td>-183.06</td>
+      <td>+440.51</td>
+      <td>+444.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 03:15</td>
+      <td>67100.00</td>
+      <td>3.03</td>
+      <td>3</td>
+      <td>2026-02-11 08:15</td>
+      <td>TIME_EXIT</td>
+      <td>+106.94</td>
+      <td>+730.51</td>
+      <td>+154.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 03:45</td>
+      <td>66810.00</td>
+      <td>3.35</td>
+      <td>4</td>
+      <td>2026-02-11 08:45</td>
+      <td>TIME_EXIT</td>
+      <td>-243.03</td>
+      <td>+440.51</td>
+      <td>+444.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 05:15</td>
+      <td>67070.00</td>
+      <td>4.86</td>
+      <td>3</td>
+      <td>2026-02-11 10:15</td>
+      <td>TIME_EXIT</td>
+      <td>+51.23</td>
+      <td>+700.51</td>
+      <td>+354.24</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 05:30</td>
+      <td>66930.00</td>
+      <td>3.48</td>
+      <td>3</td>
+      <td>2026-02-11 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-669.30</td>
+      <td>+560.51</td>
+      <td>+744.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 06:00</td>
+      <td>67000.00</td>
+      <td>7.73</td>
+      <td>3</td>
+      <td>2026-02-11 10:30</td>
+      <td>STOP_LOSS</td>
+      <td>-670.00</td>
+      <td>+630.51</td>
+      <td>+1834.34</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 07:45</td>
+      <td>66660.00</td>
+      <td>8.20</td>
+      <td>3</td>
+      <td>2026-02-11 09:15</td>
+      <td>STOP_LOSS</td>
+      <td>-666.60</td>
+      <td>+904.00</td>
+      <td>+2174.34</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 11:45</td>
+      <td>67120.00</td>
+      <td>17.63</td>
+      <td>3</td>
+      <td>2026-02-11 12:00</td>
+      <td>TARGET</td>
+      <td>+1342.40</td>
+      <td>+1364.00</td>
+      <td>+740.44</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 15:15</td>
+      <td>67020.00</td>
+      <td>5.31</td>
+      <td>3</td>
+      <td>2026-02-11 16:00</td>
+      <td>STOP_LOSS</td>
+      <td>-670.20</td>
+      <td>+223.89</td>
+      <td>+1349.77</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 20:45</td>
+      <td>67090.00</td>
+      <td>6.08</td>
+      <td>3</td>
+      <td>2026-02-11 22:15</td>
+      <td>STOP_LOSS</td>
+      <td>-670.90</td>
+      <td>+90.00</td>
+      <td>+957.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 21:30</td>
+      <td>67420.00</td>
+      <td>5.17</td>
+      <td>3</td>
+      <td>2026-02-12 02:30</td>
+      <td>TIME_EXIT</td>
+      <td>+333.14</td>
+      <td>+749.55</td>
+      <td>+627.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-11 23:45</td>
+      <td>67640.00</td>
+      <td>3.82</td>
+      <td>3</td>
+      <td>2026-02-12 04:45</td>
+      <td>TIME_EXIT</td>
+      <td>+422.28</td>
+      <td>+969.55</td>
+      <td>+42.69</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 01:00</td>
+      <td>67640.00</td>
+      <td>3.84</td>
+      <td>4</td>
+      <td>2026-02-12 06:00</td>
+      <td>TIME_EXIT</td>
+      <td>+452.16</td>
+      <td>+969.55</td>
+      <td>-48.30</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 01:15</td>
+      <td>67490.00</td>
+      <td>8.27</td>
+      <td>3</td>
+      <td>2026-02-12 06:15</td>
+      <td>TIME_EXIT</td>
+      <td>+193.23</td>
+      <td>+819.55</td>
+      <td>-134.07</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 06:30</td>
+      <td>67440.00</td>
+      <td>5.32</td>
+      <td>3</td>
+      <td>2026-02-12 08:00</td>
+      <td>STOP_LOSS</td>
+      <td>-674.40</td>
+      <td>+91.19</td>
+      <td>+970.52</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 11:30</td>
+      <td>68260.00</td>
+      <td>3.72</td>
+      <td>3</td>
+      <td>2026-02-12 13:00</td>
+      <td>TARGET</td>
+      <td>+1365.20</td>
+      <td>+3142.00</td>
+      <td>-260.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-12 21:15</td>
+      <td>66110.00</td>
+      <td>3.64</td>
+      <td>3</td>
+      <td>2026-02-13 00:00</td>
+      <td>STOP_LOSS</td>
+      <td>-661.10</td>
+      <td>+237.54</td>
+      <td>+704.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-13 01:15</td>
+      <td>66570.00</td>
+      <td>7.36</td>
+      <td>3</td>
+      <td>2026-02-13 06:15</td>
+      <td>TIME_EXIT</td>
+      <td>-250.37</td>
+      <td>+567.02</td>
+      <td>+280.85</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 09:45</td>
+      <td>70030.00</td>
+      <td>18.26</td>
+      <td>3</td>
+      <td>2026-02-14 14:45</td>
+      <td>TIME_EXIT</td>
+      <td>+290.62</td>
+      <td>+965.40</td>
+      <td>+18.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 10:30</td>
+      <td>69410.00</td>
+      <td>4.11</td>
+      <td>3</td>
+      <td>2026-02-14 15:30</td>
+      <td>TIME_EXIT</td>
+      <td>-321.52</td>
+      <td>+201.91</td>
+      <td>+638.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 10:45</td>
+      <td>69290.00</td>
+      <td>15385450000.00</td>
+      <td>3</td>
+      <td>2026-02-14 12:15</td>
+      <td>STOP_LOSS</td>
+      <td>-692.90</td>
+      <td>+81.91</td>
+      <td>+758.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 10:45</td>
+      <td>69310.00</td>
+      <td>9.05</td>
+      <td>3</td>
+      <td>2026-02-14 12:15</td>
+      <td>STOP_LOSS</td>
+      <td>-693.10</td>
+      <td>+101.91</td>
+      <td>+738.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 10:45</td>
+      <td>69410.00</td>
+      <td>14.40</td>
+      <td>4</td>
+      <td>2026-02-14 15:45</td>
+      <td>TIME_EXIT</td>
+      <td>-359.87</td>
+      <td>+201.91</td>
+      <td>+638.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 11:00</td>
+      <td>69260.00</td>
+      <td>10707870000.00</td>
+      <td>3</td>
+      <td>2026-02-14 12:15</td>
+      <td>STOP_LOSS</td>
+      <td>-692.60</td>
+      <td>-23.02</td>
+      <td>+788.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 11:00</td>
+      <td>69270.00</td>
+      <td>4.30</td>
+      <td>3</td>
+      <td>2026-02-14 12:15</td>
+      <td>STOP_LOSS</td>
+      <td>-692.70</td>
+      <td>-13.02</td>
+      <td>+778.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 11:00</td>
+      <td>69290.00</td>
+      <td>119.52</td>
+      <td>4</td>
+      <td>2026-02-14 12:15</td>
+      <td>STOP_LOSS</td>
+      <td>-692.90</td>
+      <td>+6.98</td>
+      <td>+758.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 11:00</td>
+      <td>69310.00</td>
+      <td>20.89</td>
+      <td>4</td>
+      <td>2026-02-14 12:15</td>
+      <td>STOP_LOSS</td>
+      <td>-693.10</td>
+      <td>+26.98</td>
+      <td>+738.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 11:15</td>
+      <td>69400.00</td>
+      <td>5.77</td>
+      <td>3</td>
+      <td>2026-02-14 16:15</td>
+      <td>TIME_EXIT</td>
+      <td>-440.14</td>
+      <td>+116.98</td>
+      <td>+648.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 11:15</td>
+      <td>69420.00</td>
+      <td>3.12</td>
+      <td>3</td>
+      <td>2026-02-14 16:15</td>
+      <td>TIME_EXIT</td>
+      <td>-420.14</td>
+      <td>+136.98</td>
+      <td>+628.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 11:15</td>
+      <td>69440.00</td>
+      <td>3.66</td>
+      <td>3</td>
+      <td>2026-02-14 16:15</td>
+      <td>TIME_EXIT</td>
+      <td>-400.14</td>
+      <td>+156.98</td>
+      <td>+608.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 11:15</td>
+      <td>69580.00</td>
+      <td>6.13</td>
+      <td>3</td>
+      <td>2026-02-14 16:15</td>
+      <td>TIME_EXIT</td>
+      <td>-260.14</td>
+      <td>+296.98</td>
+      <td>+468.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:00</td>
+      <td>69810.00</td>
+      <td>7.72</td>
+      <td>3</td>
+      <td>2026-02-14 18:00</td>
+      <td>TIME_EXIT</td>
+      <td>-401.82</td>
+      <td>+526.98</td>
+      <td>+440.01</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:15</td>
+      <td>69370.00</td>
+      <td>4.16</td>
+      <td>3</td>
+      <td>2026-02-14 18:00</td>
+      <td>STOP_LOSS</td>
+      <td>-693.70</td>
+      <td>+86.98</td>
+      <td>+880.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:15</td>
+      <td>69420.00</td>
+      <td>5.14</td>
+      <td>4</td>
+      <td>2026-02-14 18:00</td>
+      <td>STOP_LOSS</td>
+      <td>-694.20</td>
+      <td>+136.98</td>
+      <td>+830.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:15</td>
+      <td>69440.00</td>
+      <td>3.04</td>
+      <td>4</td>
+      <td>2026-02-14 18:00</td>
+      <td>STOP_LOSS</td>
+      <td>-694.40</td>
+      <td>+156.98</td>
+      <td>+810.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:30</td>
+      <td>69290.00</td>
+      <td>4.63</td>
+      <td>5</td>
+      <td>2026-02-14 17:00</td>
+      <td>STOP_LOSS</td>
+      <td>-692.90</td>
+      <td>-249.26</td>
+      <td>+960.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:30</td>
+      <td>69320.00</td>
+      <td>10.98</td>
+      <td>3</td>
+      <td>2026-02-14 17:45</td>
+      <td>STOP_LOSS</td>
+      <td>-693.20</td>
+      <td>-219.26</td>
+      <td>+930.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:30</td>
+      <td>69370.00</td>
+      <td>3.38</td>
+      <td>4</td>
+      <td>2026-02-14 18:00</td>
+      <td>STOP_LOSS</td>
+      <td>-693.70</td>
+      <td>-169.26</td>
+      <td>+880.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:30</td>
+      <td>69420.00</td>
+      <td>4.81</td>
+      <td>5</td>
+      <td>2026-02-14 18:00</td>
+      <td>STOP_LOSS</td>
+      <td>-694.20</td>
+      <td>-119.26</td>
+      <td>+830.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:30</td>
+      <td>69570.00</td>
+      <td>4.41</td>
+      <td>3</td>
+      <td>2026-02-14 18:30</td>
+      <td>TIME_EXIT</td>
+      <td>-290.90</td>
+      <td>+30.74</td>
+      <td>+680.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 13:45</td>
+      <td>69570.00</td>
+      <td>3.46</td>
+      <td>4</td>
+      <td>2026-02-14 18:45</td>
+      <td>TIME_EXIT</td>
+      <td>-365.86</td>
+      <td>-39.00</td>
+      <td>+680.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 14:30</td>
+      <td>69880.00</td>
+      <td>14.76</td>
+      <td>3</td>
+      <td>2026-02-14 19:30</td>
+      <td>TIME_EXIT</td>
+      <td>-108.09</td>
+      <td>+260.48</td>
+      <td>+370.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 15:00</td>
+      <td>69810.00</td>
+      <td>3.24</td>
+      <td>3</td>
+      <td>2026-02-14 20:00</td>
+      <td>TIME_EXIT</td>
+      <td>-167.27</td>
+      <td>+190.48</td>
+      <td>+440.46</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 18:15</td>
+      <td>70180.00</td>
+      <td>6.24</td>
+      <td>3</td>
+      <td>2026-02-14 23:15</td>
+      <td>TIME_EXIT</td>
+      <td>+704.52</td>
+      <td>+830.00</td>
+      <td>-80.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 20:15</td>
+      <td>69750.00</td>
+      <td>6.03</td>
+      <td>3</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-697.50</td>
+      <td>+498.50</td>
+      <td>+768.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 21:00</td>
+      <td>69750.00</td>
+      <td>3.61</td>
+      <td>4</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-697.50</td>
+      <td>+498.50</td>
+      <td>+768.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 21:00</td>
+      <td>69760.00</td>
+      <td>12.59</td>
+      <td>3</td>
+      <td>2026-02-15 01:15</td>
+      <td>STOP_LOSS</td>
+      <td>-697.60</td>
+      <td>+508.50</td>
+      <td>+758.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 21:15</td>
+      <td>69710.00</td>
+      <td>3.30</td>
+      <td>3</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-697.10</td>
+      <td>+458.50</td>
+      <td>+808.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 21:30</td>
+      <td>69710.00</td>
+      <td>6.05</td>
+      <td>4</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-697.10</td>
+      <td>+458.50</td>
+      <td>+808.57</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 22:15</td>
+      <td>69510.00</td>
+      <td>3.12</td>
+      <td>3</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-695.10</td>
+      <td>+258.50</td>
+      <td>+1021.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 22:30</td>
+      <td>69360.00</td>
+      <td>3.18</td>
+      <td>3</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-693.60</td>
+      <td>+108.50</td>
+      <td>+1180.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 22:30</td>
+      <td>69420.00</td>
+      <td>6.35</td>
+      <td>6</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-694.20</td>
+      <td>+168.50</td>
+      <td>+1120.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 23:45</td>
+      <td>69490.00</td>
+      <td>7.84</td>
+      <td>3</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-694.90</td>
+      <td>+238.50</td>
+      <td>+1436.42</td>
+    </tr>
+    <tr>
+      <td>2026-02-14 23:45</td>
+      <td>69570.00</td>
+      <td>3.47</td>
+      <td>3</td>
+      <td>2026-02-15 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-695.70</td>
+      <td>+318.50</td>
+      <td>+1356.42</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 00:30</td>
+      <td>69250.00</td>
+      <td>5.62</td>
+      <td>3</td>
+      <td>2026-02-15 00:45</td>
+      <td>STOP_LOSS</td>
+      <td>-692.50</td>
+      <td>-110.11</td>
+      <td>+1733.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:00</td>
+      <td>70300.00</td>
+      <td>4.39</td>
+      <td>3</td>
+      <td>2026-02-15 10:30</td>
+      <td>TARGET</td>
+      <td>+1406.00</td>
+      <td>+1642.00</td>
+      <td>+118.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:00</td>
+      <td>70310.00</td>
+      <td>3.40</td>
+      <td>3</td>
+      <td>2026-02-15 10:30</td>
+      <td>TARGET</td>
+      <td>+1406.20</td>
+      <td>+1652.00</td>
+      <td>+108.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:00</td>
+      <td>70320.00</td>
+      <td>5.39</td>
+      <td>3</td>
+      <td>2026-02-15 10:30</td>
+      <td>TARGET</td>
+      <td>+1406.40</td>
+      <td>+1662.00</td>
+      <td>+98.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:15</td>
+      <td>70260.00</td>
+      <td>4.60</td>
+      <td>3</td>
+      <td>2026-02-15 10:45</td>
+      <td>TARGET</td>
+      <td>+1405.20</td>
+      <td>+1602.00</td>
+      <td>+158.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:15</td>
+      <td>70390.00</td>
+      <td>6.64</td>
+      <td>3</td>
+      <td>2026-02-15 10:30</td>
+      <td>TARGET</td>
+      <td>+1407.80</td>
+      <td>+1732.00</td>
+      <td>+28.48</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:30</td>
+      <td>70240.00</td>
+      <td>4.82</td>
+      <td>3</td>
+      <td>2026-02-15 10:45</td>
+      <td>TARGET</td>
+      <td>+1404.80</td>
+      <td>+1582.00</td>
+      <td>+20.92</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:30</td>
+      <td>70260.00</td>
+      <td>18.96</td>
+      <td>4</td>
+      <td>2026-02-15 10:45</td>
+      <td>TARGET</td>
+      <td>+1405.20</td>
+      <td>+1602.00</td>
+      <td>+0.92</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:45</td>
+      <td>70050.00</td>
+      <td>3.71</td>
+      <td>3</td>
+      <td>2026-02-15 14:45</td>
+      <td>TARGET</td>
+      <td>+1401.00</td>
+      <td>+1846.40</td>
+      <td>-429.94</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:45</td>
+      <td>70120.00</td>
+      <td>15.84</td>
+      <td>3</td>
+      <td>2026-02-15 13:00</td>
+      <td>TARGET</td>
+      <td>+1402.40</td>
+      <td>+1916.40</td>
+      <td>-499.94</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:45</td>
+      <td>70240.00</td>
+      <td>6.12</td>
+      <td>4</td>
+      <td>2026-02-15 10:45</td>
+      <td>TARGET</td>
+      <td>+1404.80</td>
+      <td>+2036.40</td>
+      <td>-619.94</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 09:45</td>
+      <td>70260.00</td>
+      <td>11.50</td>
+      <td>5</td>
+      <td>2026-02-15 10:45</td>
+      <td>TARGET</td>
+      <td>+1405.20</td>
+      <td>+2056.40</td>
+      <td>-639.94</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:15</td>
+      <td>69140.00</td>
+      <td>9.72</td>
+      <td>3</td>
+      <td>2026-02-15 15:15</td>
+      <td>TIME_EXIT</td>
+      <td>+580.08</td>
+      <td>+936.40</td>
+      <td>+115.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:15</td>
+      <td>69230.00</td>
+      <td>58.15</td>
+      <td>3</td>
+      <td>2026-02-15 15:15</td>
+      <td>TIME_EXIT</td>
+      <td>+670.08</td>
+      <td>+1026.40</td>
+      <td>+25.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:15</td>
+      <td>69240.00</td>
+      <td>2249.71</td>
+      <td>3</td>
+      <td>2026-02-15 15:15</td>
+      <td>TIME_EXIT</td>
+      <td>+680.08</td>
+      <td>+1036.40</td>
+      <td>+15.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:15</td>
+      <td>69250.00</td>
+      <td>821.99</td>
+      <td>4</td>
+      <td>2026-02-15 15:15</td>
+      <td>TIME_EXIT</td>
+      <td>+690.08</td>
+      <td>+1046.40</td>
+      <td>+5.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:15</td>
+      <td>69410.00</td>
+      <td>4.63</td>
+      <td>3</td>
+      <td>2026-02-15 15:15</td>
+      <td>TIME_EXIT</td>
+      <td>+850.08</td>
+      <td>+1206.40</td>
+      <td>-154.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:15</td>
+      <td>69620.00</td>
+      <td>5.50</td>
+      <td>3</td>
+      <td>2026-02-15 14:45</td>
+      <td>TARGET</td>
+      <td>+1392.40</td>
+      <td>+1416.40</td>
+      <td>-364.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:30</td>
+      <td>69110.00</td>
+      <td>3.62</td>
+      <td>3</td>
+      <td>2026-02-15 15:30</td>
+      <td>TIME_EXIT</td>
+      <td>+409.95</td>
+      <td>+906.40</td>
+      <td>+145.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:30</td>
+      <td>69140.00</td>
+      <td>12.52</td>
+      <td>4</td>
+      <td>2026-02-15 15:30</td>
+      <td>TIME_EXIT</td>
+      <td>+439.95</td>
+      <td>+936.40</td>
+      <td>+115.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 10:45</td>
+      <td>69040.00</td>
+      <td>3.78</td>
+      <td>3</td>
+      <td>2026-02-15 15:45</td>
+      <td>TIME_EXIT</td>
+      <td>+588.56</td>
+      <td>+836.40</td>
+      <td>+215.60</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 13:15</td>
+      <td>68850.00</td>
+      <td>20267240000.00</td>
+      <td>3</td>
+      <td>2026-02-15 18:15</td>
+      <td>TIME_EXIT</td>
+      <td>+60.01</td>
+      <td>+850.00</td>
+      <td>+246.43</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 13:15</td>
+      <td>68860.00</td>
+      <td>83744.58</td>
+      <td>3</td>
+      <td>2026-02-15 18:15</td>
+      <td>TIME_EXIT</td>
+      <td>+70.01</td>
+      <td>+860.00</td>
+      <td>+236.43</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 14:30</td>
+      <td>68830.00</td>
+      <td>6.38</td>
+      <td>3</td>
+      <td>2026-02-15 19:30</td>
+      <td>TIME_EXIT</td>
+      <td>-214.29</td>
+      <td>+830.00</td>
+      <td>+248.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 14:45</td>
+      <td>68760.00</td>
+      <td>101.94</td>
+      <td>3</td>
+      <td>2026-02-15 19:45</td>
+      <td>TIME_EXIT</td>
+      <td>-239.96</td>
+      <td>+760.00</td>
+      <td>+318.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 14:45</td>
+      <td>68770.00</td>
+      <td>270.31</td>
+      <td>3</td>
+      <td>2026-02-15 19:45</td>
+      <td>TIME_EXIT</td>
+      <td>-229.96</td>
+      <td>+770.00</td>
+      <td>+308.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 14:45</td>
+      <td>68780.00</td>
+      <td>5.65</td>
+      <td>3</td>
+      <td>2026-02-15 19:45</td>
+      <td>TIME_EXIT</td>
+      <td>-219.96</td>
+      <td>+780.00</td>
+      <td>+298.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 14:45</td>
+      <td>68790.00</td>
+      <td>519110000.00</td>
+      <td>3</td>
+      <td>2026-02-15 19:45</td>
+      <td>TIME_EXIT</td>
+      <td>-209.96</td>
+      <td>+790.00</td>
+      <td>+288.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 15:30</td>
+      <td>68500.00</td>
+      <td>4.20</td>
+      <td>3</td>
+      <td>2026-02-15 20:30</td>
+      <td>TIME_EXIT</td>
+      <td>-182.40</td>
+      <td>+500.00</td>
+      <td>+578.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 15:45</td>
+      <td>68360.00</td>
+      <td>32.56</td>
+      <td>3</td>
+      <td>2026-02-15 19:15</td>
+      <td>STOP_LOSS</td>
+      <td>-683.60</td>
+      <td>+360.00</td>
+      <td>+718.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 15:45</td>
+      <td>68370.00</td>
+      <td>32.55</td>
+      <td>3</td>
+      <td>2026-02-15 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-683.70</td>
+      <td>+370.00</td>
+      <td>+708.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 15:45</td>
+      <td>68380.00</td>
+      <td>14.46</td>
+      <td>3</td>
+      <td>2026-02-15 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-683.80</td>
+      <td>+380.00</td>
+      <td>+698.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 15:45</td>
+      <td>68400.00</td>
+      <td>5.27</td>
+      <td>3</td>
+      <td>2026-02-15 20:45</td>
+      <td>TIME_EXIT</td>
+      <td>-432.58</td>
+      <td>+400.00</td>
+      <td>+678.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 15:45</td>
+      <td>68430.00</td>
+      <td>5.99</td>
+      <td>3</td>
+      <td>2026-02-15 20:45</td>
+      <td>TIME_EXIT</td>
+      <td>-402.58</td>
+      <td>+430.00</td>
+      <td>+648.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 15:45</td>
+      <td>68610.00</td>
+      <td>3.03</td>
+      <td>3</td>
+      <td>2026-02-15 20:45</td>
+      <td>TIME_EXIT</td>
+      <td>-222.58</td>
+      <td>+610.00</td>
+      <td>+468.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 15:45</td>
+      <td>68630.00</td>
+      <td>3866970000.00</td>
+      <td>3</td>
+      <td>2026-02-15 20:45</td>
+      <td>TIME_EXIT</td>
+      <td>-202.58</td>
+      <td>+630.00</td>
+      <td>+448.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 16:00</td>
+      <td>68320.00</td>
+      <td>3.57</td>
+      <td>3</td>
+      <td>2026-02-15 19:15</td>
+      <td>STOP_LOSS</td>
+      <td>-683.20</td>
+      <td>+217.33</td>
+      <td>+758.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 16:00</td>
+      <td>68350.00</td>
+      <td>4.83</td>
+      <td>3</td>
+      <td>2026-02-15 19:15</td>
+      <td>STOP_LOSS</td>
+      <td>-683.50</td>
+      <td>+247.33</td>
+      <td>+728.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 16:00</td>
+      <td>68360.00</td>
+      <td>6.81</td>
+      <td>4</td>
+      <td>2026-02-15 19:15</td>
+      <td>STOP_LOSS</td>
+      <td>-683.60</td>
+      <td>+257.33</td>
+      <td>+718.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 16:00</td>
+      <td>68380.00</td>
+      <td>5.52</td>
+      <td>4</td>
+      <td>2026-02-15 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-683.80</td>
+      <td>+277.33</td>
+      <td>+698.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 16:00</td>
+      <td>68390.00</td>
+      <td>8.52</td>
+      <td>3</td>
+      <td>2026-02-15 19:30</td>
+      <td>STOP_LOSS</td>
+      <td>-683.90</td>
+      <td>+287.33</td>
+      <td>+688.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 16:00</td>
+      <td>68430.00</td>
+      <td>7.19</td>
+      <td>4</td>
+      <td>2026-02-15 21:00</td>
+      <td>TIME_EXIT</td>
+      <td>-513.37</td>
+      <td>+327.33</td>
+      <td>+648.49</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 20:00</td>
+      <td>68310.00</td>
+      <td>790000.00</td>
+      <td>3</td>
+      <td>2026-02-15 21:00</td>
+      <td>STOP_LOSS</td>
+      <td>-683.10</td>
+      <td>+166.78</td>
+      <td>+755.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 22:30</td>
+      <td>68710.00</td>
+      <td>3.32</td>
+      <td>3</td>
+      <td>2026-02-16 03:30</td>
+      <td>TIME_EXIT</td>
+      <td>+235.41</td>
+      <td>+566.78</td>
+      <td>+190.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 22:30</td>
+      <td>68720.00</td>
+      <td>3.45</td>
+      <td>3</td>
+      <td>2026-02-16 03:30</td>
+      <td>TIME_EXIT</td>
+      <td>+245.41</td>
+      <td>+576.78</td>
+      <td>+180.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 23:15</td>
+      <td>68500.00</td>
+      <td>3.24</td>
+      <td>3</td>
+      <td>2026-02-16 04:15</td>
+      <td>TIME_EXIT</td>
+      <td>-75.14</td>
+      <td>+356.78</td>
+      <td>+400.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 23:30</td>
+      <td>68370.00</td>
+      <td>4.45</td>
+      <td>3</td>
+      <td>2026-02-16 04:30</td>
+      <td>TIME_EXIT</td>
+      <td>-129.12</td>
+      <td>+226.78</td>
+      <td>+530.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-15 23:30</td>
+      <td>68500.00</td>
+      <td>4.26</td>
+      <td>4</td>
+      <td>2026-02-16 04:30</td>
+      <td>TIME_EXIT</td>
+      <td>+0.88</td>
+      <td>+356.78</td>
+      <td>+400.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 02:00</td>
+      <td>68480.00</td>
+      <td>6.57</td>
+      <td>3</td>
+      <td>2026-02-16 07:00</td>
+      <td>TIME_EXIT</td>
+      <td>-465.91</td>
+      <td>+251.24</td>
+      <td>+580.77</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 10:00</td>
+      <td>69940.00</td>
+      <td>3.66</td>
+      <td>3</td>
+      <td>2026-02-16 10:15</td>
+      <td>TARGET</td>
+      <td>+1398.80</td>
+      <td>+2645.89</td>
+      <td>-185.03</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 10:00</td>
+      <td>70120.00</td>
+      <td>16.17</td>
+      <td>4</td>
+      <td>2026-02-16 10:15</td>
+      <td>TARGET</td>
+      <td>+1402.40</td>
+      <td>+2825.89</td>
+      <td>-365.03</td>
+    </tr>
+    <tr>
+      <td>2026-02-16 12:30</td>
+      <td>68030.00</td>
+      <td>32.73</td>
+      <td>3</td>
+      <td>2026-02-16 17:30</td>
+      <td>TIME_EXIT</td>
+      <td>-207.99</td>
+      <td>+670.00</td>
+      <td>+256.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 02:15</td>
+      <td>68350.00</td>
+      <td>4.70</td>
+      <td>3</td>
+      <td>2026-02-17 07:15</td>
+      <td>TIME_EXIT</td>
+      <td>+433.70</td>
+      <td>+550.00</td>
+      <td>+169.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 06:00</td>
+      <td>68300.00</td>
+      <td>7.87</td>
+      <td>3</td>
+      <td>2026-02-17 11:00</td>
+      <td>TIME_EXIT</td>
+      <td>+202.33</td>
+      <td>+610.00</td>
+      <td>+60.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 12:45</td>
+      <td>67000.00</td>
+      <td>4.54</td>
+      <td>3</td>
+      <td>2026-02-17 13:00</td>
+      <td>STOP_LOSS</td>
+      <td>-670.00</td>
+      <td>+118.92</td>
+      <td>+1235.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 13:45</td>
+      <td>67590.00</td>
+      <td>9.32</td>
+      <td>3</td>
+      <td>2026-02-17 18:45</td>
+      <td>TIME_EXIT</td>
+      <td>-90.54</td>
+      <td>+708.92</td>
+      <td>+645.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 14:30</td>
+      <td>67000.00</td>
+      <td>6.90</td>
+      <td>4</td>
+      <td>2026-02-17 15:15</td>
+      <td>STOP_LOSS</td>
+      <td>-670.00</td>
+      <td>+118.92</td>
+      <td>+1235.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 17:00</td>
+      <td>67700.00</td>
+      <td>37.49</td>
+      <td>3</td>
+      <td>2026-02-17 22:00</td>
+      <td>TIME_EXIT</td>
+      <td>+599.22</td>
+      <td>+644.03</td>
+      <td>+228.08</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 17:00</td>
+      <td>67740.00</td>
+      <td>9.44</td>
+      <td>3</td>
+      <td>2026-02-17 22:00</td>
+      <td>TIME_EXIT</td>
+      <td>+639.22</td>
+      <td>+684.03</td>
+      <td>+188.08</td>
+    </tr>
+    <tr>
+      <td>2026-02-17 21:30</td>
+      <td>67480.00</td>
+      <td>37.14</td>
+      <td>3</td>
+      <td>2026-02-18 02:30</td>
+      <td>TIME_EXIT</td>
+      <td>-169.53</td>
+      <td>+587.97</td>
+      <td>+458.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 00:30</td>
+      <td>67640.00</td>
+      <td>18.07</td>
+      <td>3</td>
+      <td>2026-02-18 05:15</td>
+      <td>STOP_LOSS</td>
+      <td>-676.40</td>
+      <td>+139.90</td>
+      <td>+836.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 02:30</td>
+      <td>67740.00</td>
+      <td>3.51</td>
+      <td>3</td>
+      <td>2026-02-18 05:15</td>
+      <td>STOP_LOSS</td>
+      <td>-677.40</td>
+      <td>+133.55</td>
+      <td>+736.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 02:45</td>
+      <td>67670.00</td>
+      <td>4.70</td>
+      <td>3</td>
+      <td>2026-02-18 05:15</td>
+      <td>STOP_LOSS</td>
+      <td>-676.70</td>
+      <td>+55.09</td>
+      <td>+806.22</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 11:00</td>
+      <td>67260.00</td>
+      <td>3.28</td>
+      <td>3</td>
+      <td>2026-02-18 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-672.60</td>
+      <td>+1060.00</td>
+      <td>+1087.72</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 11:15</td>
+      <td>67260.00</td>
+      <td>21.38</td>
+      <td>4</td>
+      <td>2026-02-18 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-672.60</td>
+      <td>+1144.43</td>
+      <td>+1087.72</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 13:00</td>
+      <td>67000.00</td>
+      <td>4.78</td>
+      <td>3</td>
+      <td>2026-02-18 18:00</td>
+      <td>TIME_EXIT</td>
+      <td>+792.74</td>
+      <td>+1130.00</td>
+      <td>+486.97</td>
+    </tr>
+    <tr>
+      <td>2026-02-18 16:15</td>
+      <td>66220.00</td>
+      <td>3.22</td>
+      <td>3</td>
+      <td>2026-02-18 21:15</td>
+      <td>TIME_EXIT</td>
+      <td>-185.07</td>
+      <td>+350.00</td>
+      <td>+377.03</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 01:30</td>
+      <td>66840.00</td>
+      <td>3.30</td>
+      <td>3</td>
+      <td>2026-02-19 06:30</td>
+      <td>TIME_EXIT</td>
+      <td>-235.63</td>
+      <td>+160.24</td>
+      <td>+480.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 05:15</td>
+      <td>66990.00</td>
+      <td>214.96</td>
+      <td>3</td>
+      <td>2026-02-19 10:15</td>
+      <td>TIME_EXIT</td>
+      <td>+810.77</td>
+      <td>+852.86</td>
+      <td>+201.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 06:45</td>
+      <td>66790.00</td>
+      <td>3.02</td>
+      <td>3</td>
+      <td>2026-02-19 11:45</td>
+      <td>TIME_EXIT</td>
+      <td>+368.80</td>
+      <td>+1158.17</td>
+      <td>+168.40</td>
+    </tr>
+    <tr>
+      <td>2026-02-19 19:30</td>
+      <td>66730.00</td>
+      <td>3.48</td>
+      <td>3</td>
+      <td>2026-02-19 21:15</td>
+      <td>STOP_LOSS</td>
+      <td>-667.30</td>
+      <td>-31.55</td>
+      <td>+758.67</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 03:15</td>
+      <td>67740.00</td>
+      <td>4.64</td>
+      <td>3</td>
+      <td>2026-02-20 08:15</td>
+      <td>TIME_EXIT</td>
+      <td>-134.58</td>
+      <td>+79.88</td>
+      <td>+578.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 03:30</td>
+      <td>67740.00</td>
+      <td>12.00</td>
+      <td>4</td>
+      <td>2026-02-20 08:30</td>
+      <td>TIME_EXIT</td>
+      <td>+296.45</td>
+      <td>+351.61</td>
+      <td>+578.39</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 08:00</td>
+      <td>67870.00</td>
+      <td>13.48</td>
+      <td>3</td>
+      <td>2026-02-20 10:30</td>
+      <td>TARGET</td>
+      <td>+1357.40</td>
+      <td>+1589.80</td>
+      <td>+213.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 08:30</td>
+      <td>67760.00</td>
+      <td>35.36</td>
+      <td>3</td>
+      <td>2026-02-20 10:30</td>
+      <td>TARGET</td>
+      <td>+1355.20</td>
+      <td>+1479.80</td>
+      <td>+323.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 08:30</td>
+      <td>67890.00</td>
+      <td>7.06</td>
+      <td>3</td>
+      <td>2026-02-20 10:30</td>
+      <td>TARGET</td>
+      <td>+1357.80</td>
+      <td>+1609.80</td>
+      <td>+193.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 10:30</td>
+      <td>66730.00</td>
+      <td>15.32</td>
+      <td>4</td>
+      <td>2026-02-20 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-667.30</td>
+      <td>+230.00</td>
+      <td>+1353.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 10:30</td>
+      <td>66740.00</td>
+      <td>53.20</td>
+      <td>3</td>
+      <td>2026-02-20 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-667.40</td>
+      <td>+240.00</td>
+      <td>+1343.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 10:45</td>
+      <td>66620.00</td>
+      <td>67.75</td>
+      <td>3</td>
+      <td>2026-02-20 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-666.20</td>
+      <td>+87.13</td>
+      <td>+1463.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 10:45</td>
+      <td>66640.00</td>
+      <td>608.39</td>
+      <td>3</td>
+      <td>2026-02-20 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-666.40</td>
+      <td>+107.13</td>
+      <td>+1443.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 11:15</td>
+      <td>66620.00</td>
+      <td>6.77</td>
+      <td>4</td>
+      <td>2026-02-20 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-666.20</td>
+      <td>+83.36</td>
+      <td>+1463.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 11:15</td>
+      <td>66640.00</td>
+      <td>5.09</td>
+      <td>4</td>
+      <td>2026-02-20 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-666.40</td>
+      <td>+103.36</td>
+      <td>+1443.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 11:15</td>
+      <td>66650.00</td>
+      <td>4.89</td>
+      <td>3</td>
+      <td>2026-02-20 11:30</td>
+      <td>STOP_LOSS</td>
+      <td>-666.50</td>
+      <td>+113.36</td>
+      <td>+1433.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 11:15</td>
+      <td>67020.00</td>
+      <td>3.55</td>
+      <td>3</td>
+      <td>2026-02-20 12:00</td>
+      <td>STOP_LOSS</td>
+      <td>-670.20</td>
+      <td>+483.36</td>
+      <td>+1063.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 12:15</td>
+      <td>66530.00</td>
+      <td>862850000.00</td>
+      <td>3</td>
+      <td>2026-02-20 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-665.30</td>
+      <td>-406.03</td>
+      <td>+1470.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 12:15</td>
+      <td>66620.00</td>
+      <td>8.13</td>
+      <td>5</td>
+      <td>2026-02-20 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-666.20</td>
+      <td>-316.03</td>
+      <td>+1380.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 12:15</td>
+      <td>66640.00</td>
+      <td>5.07</td>
+      <td>5</td>
+      <td>2026-02-20 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-666.40</td>
+      <td>-296.03</td>
+      <td>+1360.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 12:15</td>
+      <td>66650.00</td>
+      <td>3.69</td>
+      <td>4</td>
+      <td>2026-02-20 12:30</td>
+      <td>STOP_LOSS</td>
+      <td>-666.50</td>
+      <td>-286.03</td>
+      <td>+1350.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 15:45</td>
+      <td>67920.00</td>
+      <td>3.42</td>
+      <td>3</td>
+      <td>2026-02-20 20:45</td>
+      <td>TIME_EXIT</td>
+      <td>-100.01</td>
+      <td>+399.70</td>
+      <td>+313.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-20 16:00</td>
+      <td>67920.00</td>
+      <td>4.81</td>
+      <td>4</td>
+      <td>2026-02-20 21:00</td>
+      <td>TIME_EXIT</td>
+      <td>-97.36</td>
+      <td>+399.70</td>
+      <td>+313.99</td>
+    </tr>
+    <tr>
+      <td>2026-02-21 01:00</td>
+      <td>67700.00</td>
+      <td>10.61</td>
+      <td>3</td>
+      <td>2026-02-21 06:00</td>
+      <td>TIME_EXIT</td>
+      <td>-300.27</td>
+      <td>+106.01</td>
+      <td>+379.41</td>
+    </tr>
+    <tr>
+      <td>2026-02-21 09:00</td>
+      <td>67960.00</td>
+      <td>5.98</td>
+      <td>3</td>
+      <td>2026-02-21 11:15</td>
+      <td>STOP_LOSS</td>
+      <td>-679.60</td>
+      <td>+45.00</td>
+      <td>+738.70</td>
+    </tr>
+    <tr>
+      <td>2026-02-21 16:45</td>
+      <td>68550.00</td>
+      <td>46.74</td>
+      <td>3</td>
+      <td>2026-02-21 21:45</td>
+      <td>TIME_EXIT</td>
+      <td>+604.00</td>
+      <td>+740.22</td>
+      <td>+55.63</td>
+    </tr>
+    <tr>
+      <td>2026-02-21 17:00</td>
+      <td>68550.00</td>
+      <td>27.99</td>
+      <td>4</td>
+      <td>2026-02-21 22:00</td>
+      <td>TIME_EXIT</td>
+      <td>+516.62</td>
+      <td>+740.22</td>
+      <td>+55.63</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 05:15</td>
+      <td>67940.00</td>
+      <td>4.48</td>
+      <td>3</td>
+      <td>2026-02-22 10:15</td>
+      <td>TIME_EXIT</td>
+      <td>+9.49</td>
+      <td>+68.41</td>
+      <td>+305.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 05:30</td>
+      <td>67940.00</td>
+      <td>3.33</td>
+      <td>4</td>
+      <td>2026-02-22 10:30</td>
+      <td>TIME_EXIT</td>
+      <td>+306.39</td>
+      <td>+368.92</td>
+      <td>+305.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 05:45</td>
+      <td>67960.00</td>
+      <td>4.05</td>
+      <td>3</td>
+      <td>2026-02-22 10:45</td>
+      <td>TIME_EXIT</td>
+      <td>+307.62</td>
+      <td>+388.92</td>
+      <td>+285.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 10:00</td>
+      <td>68000.00</td>
+      <td>3.01</td>
+      <td>3</td>
+      <td>2026-02-22 15:00</td>
+      <td>TIME_EXIT</td>
+      <td>+596.94</td>
+      <td>+810.00</td>
+      <td>+40.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 22:00</td>
+      <td>66000.00</td>
+      <td>1105.69</td>
+      <td>3</td>
+      <td>2026-02-22 22:45</td>
+      <td>TARGET</td>
+      <td>+1320.00</td>
+      <td>+1709.29</td>
+      <td>-490.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-22 22:00</td>
+      <td>66620.00</td>
+      <td>3.70</td>
+      <td>6</td>
+      <td>2026-02-22 22:15</td>
+      <td>TARGET</td>
+      <td>+1332.40</td>
+      <td>+2329.29</td>
+      <td>-1110.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 11:45</td>
+      <td>65720.00</td>
+      <td>3.76</td>
+      <td>3</td>
+      <td>2026-02-23 14:30</td>
+      <td>TARGET</td>
+      <td>+1314.40</td>
+      <td>+1671.29</td>
+      <td>+530.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 14:15</td>
+      <td>65050.00</td>
+      <td>3.47</td>
+      <td>3</td>
+      <td>2026-02-23 19:15</td>
+      <td>TIME_EXIT</td>
+      <td>+108.01</td>
+      <td>+1161.21</td>
+      <td>+144.51</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 14:15</td>
+      <td>65170.00</td>
+      <td>4.06</td>
+      <td>3</td>
+      <td>2026-02-23 19:15</td>
+      <td>TIME_EXIT</td>
+      <td>+228.01</td>
+      <td>+1281.21</td>
+      <td>+24.51</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 17:00</td>
+      <td>64010.00</td>
+      <td>11.18</td>
+      <td>4</td>
+      <td>2026-02-23 18:00</td>
+      <td>STOP_LOSS</td>
+      <td>-640.10</td>
+      <td>+121.21</td>
+      <td>+1025.98</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 22:15</td>
+      <td>63880.00</td>
+      <td>6.31</td>
+      <td>3</td>
+      <td>2026-02-23 22:30</td>
+      <td>STOP_LOSS</td>
+      <td>-638.80</td>
+      <td>+1179.20</td>
+      <td>+734.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-23 22:15</td>
+      <td>64530.00</td>
+      <td>3.08</td>
+      <td>3</td>
+      <td>2026-02-24 01:00</td>
+      <td>TARGET</td>
+      <td>+1290.60</td>
+      <td>+1829.20</td>
+      <td>+84.50</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 06:30</td>
+      <td>62910.00</td>
+      <td>7069150000.00</td>
+      <td>3</td>
+      <td>2026-02-24 11:30</td>
+      <td>TIME_EXIT</td>
+      <td>-426.87</td>
+      <td>+399.72</td>
+      <td>+553.83</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 11:00</td>
+      <td>62850.00</td>
+      <td>3.21</td>
+      <td>3</td>
+      <td>2026-02-24 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-628.50</td>
+      <td>+82.70</td>
+      <td>+1893.11</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 11:30</td>
+      <td>62760.00</td>
+      <td>151130000.00</td>
+      <td>3</td>
+      <td>2026-02-24 11:45</td>
+      <td>STOP_LOSS</td>
+      <td>-627.60</td>
+      <td>-507.14</td>
+      <td>+1983.11</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 15:00</td>
+      <td>64020.00</td>
+      <td>67.83</td>
+      <td>3</td>
+      <td>2026-02-24 16:00</td>
+      <td>STOP_LOSS</td>
+      <td>-640.20</td>
+      <td>+199.50</td>
+      <td>+723.11</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 15:00</td>
+      <td>64070.00</td>
+      <td>2066860000.00</td>
+      <td>3</td>
+      <td>2026-02-24 16:00</td>
+      <td>STOP_LOSS</td>
+      <td>-640.70</td>
+      <td>+249.50</td>
+      <td>+673.11</td>
+    </tr>
+    <tr>
+      <td>2026-02-24 21:30</td>
+      <td>64090.00</td>
+      <td>3.26</td>
+      <td>3</td>
+      <td>2026-02-24 22:00</td>
+      <td>STOP_LOSS</td>
+      <td>-640.90</td>
+      <td>-49.19</td>
+      <td>+2220.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 00:15</td>
+      <td>65790.00</td>
+      <td>253070000.00</td>
+      <td>3</td>
+      <td>2026-02-25 05:15</td>
+      <td>TIME_EXIT</td>
+      <td>+597.69</td>
+      <td>+1034.74</td>
+      <td>-140.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 04:30</td>
+      <td>64980.00</td>
+      <td>10.57</td>
+      <td>3</td>
+      <td>2026-02-25 06:00</td>
+      <td>STOP_LOSS</td>
+      <td>-649.80</td>
+      <td>+49.72</td>
+      <td>+949.94</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 06:45</td>
+      <td>65570.00</td>
+      <td>5.74</td>
+      <td>3</td>
+      <td>2026-02-25 09:45</td>
+      <td>STOP_LOSS</td>
+      <td>-655.70</td>
+      <td>+369.20</td>
+      <td>+1439.78</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 19:15</td>
+      <td>69020.00</td>
+      <td>4.25</td>
+      <td>3</td>
+      <td>2026-02-25 20:30</td>
+      <td>TARGET</td>
+      <td>+1380.40</td>
+      <td>+1420.00</td>
+      <td>-114.03</td>
+    </tr>
+    <tr>
+      <td>2026-02-25 20:00</td>
+      <td>68600.00</td>
+      <td>6.24</td>
+      <td>3</td>
+      <td>2026-02-26 01:00</td>
+      <td>TIME_EXIT</td>
+      <td>+73.73</td>
+      <td>+1000.00</td>
+      <td>+100.00</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 01:45</td>
+      <td>68600.00</td>
+      <td>22.39</td>
+      <td>3</td>
+      <td>2026-02-26 06:45</td>
+      <td>TIME_EXIT</td>
+      <td>+10.59</td>
+      <td>+808.00</td>
+      <td>+44.59</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 03:15</td>
+      <td>68450.00</td>
+      <td>5.92</td>
+      <td>3</td>
+      <td>2026-02-26 08:15</td>
+      <td>TIME_EXIT</td>
+      <td>+291.42</td>
+      <td>+658.00</td>
+      <td>+272.64</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 04:00</td>
+      <td>68260.00</td>
+      <td>3.13</td>
+      <td>3</td>
+      <td>2026-02-26 09:00</td>
+      <td>TIME_EXIT</td>
+      <td>+57.55</td>
+      <td>+468.00</td>
+      <td>+462.64</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 10:45</td>
+      <td>67950.00</td>
+      <td>53.27</td>
+      <td>3</td>
+      <td>2026-02-26 13:45</td>
+      <td>TARGET</td>
+      <td>+1359.00</td>
+      <td>+1450.00</td>
+      <td>+322.21</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 15:30</td>
+      <td>66910.00</td>
+      <td>3.06</td>
+      <td>3</td>
+      <td>2026-02-26 16:00</td>
+      <td>STOP_LOSS</td>
+      <td>-669.10</td>
+      <td>-240.14</td>
+      <td>+993.12</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 20:00</td>
+      <td>67390.00</td>
+      <td>4.44</td>
+      <td>3</td>
+      <td>2026-02-27 01:00</td>
+      <td>TIME_EXIT</td>
+      <td>-537.79</td>
+      <td>+505.00</td>
+      <td>+572.28</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 21:00</td>
+      <td>67270.00</td>
+      <td>276740000.00</td>
+      <td>3</td>
+      <td>2026-02-27 01:00</td>
+      <td>STOP_LOSS</td>
+      <td>-672.70</td>
+      <td>+385.00</td>
+      <td>+946.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 21:00</td>
+      <td>67390.00</td>
+      <td>3.07</td>
+      <td>4</td>
+      <td>2026-02-27 01:15</td>
+      <td>STOP_LOSS</td>
+      <td>-673.90</td>
+      <td>+505.00</td>
+      <td>+826.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-26 23:15</td>
+      <td>67480.00</td>
+      <td>6.52</td>
+      <td>3</td>
+      <td>2026-02-27 01:15</td>
+      <td>STOP_LOSS</td>
+      <td>-674.80</td>
+      <td>+380.29</td>
+      <td>+736.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 00:45</td>
+      <td>67670.00</td>
+      <td>3.59</td>
+      <td>3</td>
+      <td>2026-02-27 05:45</td>
+      <td>TIME_EXIT</td>
+      <td>-256.24</td>
+      <td>+210.70</td>
+      <td>+546.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 01:00</td>
+      <td>67670.00</td>
+      <td>4.33</td>
+      <td>4</td>
+      <td>2026-02-27 06:00</td>
+      <td>TIME_EXIT</td>
+      <td>-302.86</td>
+      <td>+210.70</td>
+      <td>+546.80</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 03:00</td>
+      <td>67670.00</td>
+      <td>4.77</td>
+      <td>5</td>
+      <td>2026-02-27 08:00</td>
+      <td>TIME_EXIT</td>
+      <td>+969.47</td>
+      <td>+1096.00</td>
+      <td>+479.93</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 06:00</td>
+      <td>67960.00</td>
+      <td>3.35</td>
+      <td>3</td>
+      <td>2026-02-27 07:45</td>
+      <td>TARGET</td>
+      <td>+1359.20</td>
+      <td>+2310.66</td>
+      <td>+189.93</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 07:15</td>
+      <td>67030.00</td>
+      <td>3.07</td>
+      <td>3</td>
+      <td>2026-02-27 10:30</td>
+      <td>TARGET</td>
+      <td>+1340.60</td>
+      <td>+1380.66</td>
+      <td>-70.38</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 09:15</td>
+      <td>65990.00</td>
+      <td>5.54</td>
+      <td>3</td>
+      <td>2026-02-27 14:15</td>
+      <td>TIME_EXIT</td>
+      <td>+784.79</td>
+      <td>+799.41</td>
+      <td>+354.90</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 13:00</td>
+      <td>65890.00</td>
+      <td>3.67</td>
+      <td>3</td>
+      <td>2026-02-27 18:00</td>
+      <td>TIME_EXIT</td>
+      <td>+312.79</td>
+      <td>+776.28</td>
+      <td>+177.38</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 13:45</td>
+      <td>65700.00</td>
+      <td>19.22</td>
+      <td>3</td>
+      <td>2026-02-27 18:45</td>
+      <td>TIME_EXIT</td>
+      <td>+172.41</td>
+      <td>+586.28</td>
+      <td>+88.07</td>
+    </tr>
+    <tr>
+      <td>2026-02-27 16:00</td>
+      <td>65380.00</td>
+      <td>3.51</td>
+      <td>3</td>
+      <td>2026-02-27 21:00</td>
+      <td>TIME_EXIT</td>
+      <td>-618.04</td>
+      <td>+465.54</td>
+      <td>+645.52</td>
+    </tr>
+  </tbody>
+</table>
+    </body>
+    </html>
+    

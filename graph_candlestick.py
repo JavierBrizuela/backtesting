@@ -4,7 +4,7 @@ from bokeh.layouts import column
 import pandas as pd
 import matplotlib
 import numpy as np
-from agg_trades_db import AggTradeDB
+from agg_trades_to_db import AggTradeDB
 from bokeh.models import LinearColorMapper
 from bokeh.palettes import RdYlGn11, linear_palette
 import os
@@ -15,7 +15,8 @@ interval = '15 minutes'
 start = '2026-02-01'
 end = '2026-02-21'
 simbol = 'BTCUSDT'
-db_path = f'data/{simbol}/tradebook/agg_trades.db'
+raw_path = f'data/{simbol}/tradebook/raw_data.db'
+analytics_path = f'data/{simbol}/tradebook/analytics.db'
 table = 'agg_trades'
 window=20
 
@@ -38,13 +39,13 @@ CHART_HEIGHT = 600
 VOLUME_HEIGHT = 250
 
 # Consultas a la base de datos
-db_connector = AggTradeDB(db_path)
+db_connector = AggTradeDB(raw_path, analytics_path, read_only=True)
 df_ohlc = db_connector.get_ohlc(interval, start, end)
 df_vol_profile = db_connector.get_volume_profile(interval, start, end, resolution)
 df_profile = db_connector.get_profile(start, end, resolution)
-df_trades = db_connector.get_institutional_trades(start, end, interval_trades)
+# df_trades = db_connector.get_institutional_trades(start, end, interval_trades)
 df_market_context = db_connector.con.execute(f"""
-                                             SELECT * FROM market_context_15_minutes WHERE open_time >= '{start}' and open_time <= '{end}' ORDER BY open_time;
+                                             SELECT * FROM analytics.market_context_15_minutes WHERE open_time >= '{start}' and open_time <= '{end}' ORDER BY open_time;
                                              """).fetchdf()                               
 db_connector.close_connection()
 
@@ -98,7 +99,7 @@ df_poc = df_vol_profile.loc[df_vol_profile.groupby('open_time')['total_volume'].
 plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution, color=None, line_color='black', source=ColumnDataSource(df_poc))
 
 # Grafica trades institucionales
-df_filtered = df_trades[df_trades['quantity'] == size_position][['quantity', 'is_buyer_maker', 'trade_count', 'interval_time', 'avg_price']]
+""" df_filtered = df_trades[df_trades['quantity'] == size_position][['quantity', 'is_buyer_maker', 'trade_count', 'interval_time', 'avg_price']]
 df_filtered['color'] = df_filtered['is_buyer_maker'].map({
     True: 'red',    # Seller taker
     False: 'green'  # Buyer taker
@@ -106,7 +107,7 @@ df_filtered['color'] = df_filtered['is_buyer_maker'].map({
 df_filtered['quantity_scaled'] = df_filtered['quantity'] * 4
 source_trades = ColumnDataSource(df_filtered)
 plt_candlestick.scatter(x='interval_time', y='avg_price', size='quantity_scaled', fill_color='color', line_color=None, line_width=2, source=source_trades, legend_label='Institucional Sell Trades', alpha=0.6)
-
+ """
 # Hover para las velas
 hover = HoverTool(
     renderers=[body],
@@ -293,10 +294,10 @@ df_profile['total_volume_normalized'] = start_time - pd.to_timedelta(df_profile[
 source_profile = ColumnDataSource(df_profile)
 plt_candlestick.hbar(y='price_bin', left='total_volume_normalized', right=start_time, height= resolution , fill_color='blue', source=source_profile, alpha=0.6)
 
-df_filtered['total'] = df_filtered['quantity'] * df_filtered['trade_count'] * df_filtered['avg_price']
-df_res = df_filtered.groupby(['quantity', 'is_buyer_maker']).agg(total_USD=('total', 'sum'),
-                                                                 ocurrencias=('trade_count', 'count')
-                                                                 ).reset_index().sort_values('ocurrencias', ascending=False)
+# df_filtered['total'] = df_filtered['quantity'] * df_filtered['trade_count'] * df_filtered['avg_price']
+# df_res = df_filtered.groupby(['quantity', 'is_buyer_maker']).agg(total_USD=('total', 'sum'),
+#                                                                  ocurrencias=('trade_count', 'count')
+#                                                                  ).reset_index().sort_values('ocurrencias', ascending=False)
 # 
 crosshair = CrosshairTool(
     dimensions='both',

@@ -1,7 +1,11 @@
 import os
+import time
+from datetime import datetime
 import requests
 from zipfile import ZipFile
 import tempfile
+import time
+from datetime import datetime
 
 class AggTradesBinanceDownloader:
     """
@@ -12,12 +16,13 @@ class AggTradesBinanceDownloader:
         # Usamos una carpeta temporal del sistema para no llenar el proyecto de basura
         self.download_dir = download_dir or os.path.join(tempfile.gettempdir(), "binance_backtesting")
         os.makedirs(self.download_dir, exist_ok=True)
-        print(f"[SISTEMA] Carpeta temporal configurada en: {self.download_dir}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}][SISTEMA] Carpeta temporal configurada en: {self.download_dir}")
 
     def _download_and_extract(self, url, filename_prefix):
         zip_path = os.path.join(self.download_dir, f"{filename_prefix}.zip")
-        
-        print(f"[DESCARGA] Bajando archivo: {url}")
+        start_time = time.time()
+
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] [DESCARGA] Bajando archivo: {url}")
         # Descarga por bloques (streaming) para no saturar la RAM ni la conexión
         response = requests.get(url, stream=True)
         if response.status_code == 200:
@@ -31,19 +36,23 @@ class AggTradesBinanceDownloader:
                         # Opcional: imprimir progreso si el archivo es muy grande (>50MB)
                         if total_size > 50*1024*1024:
                              print(f"  > {downloaded/(1024*1024):.1f} MB descargados...", end='\r')
-            
-            print(f"\n[SISTEMA] Extrayendo ZIP...")
+
+            dl_time = time.time() - start_time
+            extract_start = time.time()
+            print(f"\n[{datetime.now().strftime('%H:%M:%S')}] [SISTEMA] Extrayendo ZIP...")
             with ZipFile(zip_path, 'r') as zip_ref:
                 csv_name = zip_ref.namelist()[0]
                 zip_ref.extractall(self.download_dir)
                 csv_path = os.path.join(self.download_dir, csv_name)
-                
+
             # Eliminar el ZIP inmediatamente para liberar espacio en disco
             os.remove(zip_path)
-            print(f"[OK] CSV listo en disco: {csv_name}")
+            extract_time = time.time() - extract_start
+            total_time = time.time() - start_time
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] [OK] CSV listo en disco: {csv_name} (Descarga: {dl_time:.1f}s, Extraccion: {extract_time:.1f}s, Total: {total_time:.1f}s)")
             return csv_path
         else:
-            print(f"[ERROR] No se pudo descargar: {url} (Status: {response.status_code})")
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] [ERROR] No se pudo descargar: {url} (Status: {response.status_code})")
             return None
 
     def download_agg_trades_montly(self, symbol, year, month):
