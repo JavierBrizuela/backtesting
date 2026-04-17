@@ -4,14 +4,14 @@ from bokeh.layouts import column
 import pandas as pd
 import matplotlib
 import numpy as np
-from agg_trades_to_db import AggTradeDB
+from analytics_db import AnalyticsDB
 from bokeh.models import LinearColorMapper
 from bokeh.palettes import RdYlGn11, linear_palette
 import os
 from candlestick_analytics import hammer_candle
 
 # Parámetros de configuración simbolo, intervalo, fechas, base de datos
-interval = '15 minutes'
+interval = '4 hours'
 start = '2026-02-01'
 end = '2026-02-21'
 simbol = 'BTCUSDT'
@@ -38,16 +38,20 @@ CHART_WIDTH = 1900
 CHART_HEIGHT = 600
 VOLUME_HEIGHT = 250
 
+
 # Consultas a la base de datos
-db_connector = AggTradeDB(raw_path, analytics_path, read_only=True)
+db_connector = AnalyticsDB(analytics_path)
 df_ohlc = db_connector.get_ohlc(interval, start, end)
 df_vol_profile = db_connector.get_volume_profile(interval, start, end, resolution)
 df_profile = db_connector.get_profile(start, end, resolution)
 # df_trades = db_connector.get_institutional_trades(start, end, interval_trades)
-df_market_context = db_connector.con.execute(f"""
-                                             SELECT * FROM analytics.market_context_15_minutes WHERE open_time >= '{start}' and open_time <= '{end}' ORDER BY open_time;
-                                             """).fetchdf()                               
+df_market_context = db_connector.get_market_context(interval, start, end)
 db_connector.close_connection()
+
+# Convertir ambos dataframes y quitar el tzinfo
+df_ohlc['open_time'] = df_ohlc['open_time'].dt.tz_localize(None)
+df_vol_profile['open_time'] = df_vol_profile['open_time'].dt.tz_localize(None)
+df_market_context['open_time'] = df_market_context['open_time'].dt.tz_localize(None)
 
 # Calculos de amcho de vela y offset
 width_ms = (df_ohlc['open_time'].iloc[1] - df_ohlc['open_time'].iloc[0]).total_seconds() * 1000
@@ -56,7 +60,6 @@ offset_ms = width_ms * 0.5
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
     "red_white_green", ["#b50000", "#ffffff", "#007000"]
 )
-
 # Convertirlo a una lista de 256 hexadecimales para Bokeh
 palette_256 = [matplotlib.colors.rgb2hex(cmap(i)) for i in np.linspace(0, 1, 256)]
 # Configurar maximos y minimos para el LinearColorMapper
@@ -69,8 +72,15 @@ color_mapper = LinearColorMapper(
     )
 df_vol_profile['bar_left'] = df_vol_profile['open_time'] - pd.to_timedelta(offset_ms, unit='ms')
 df_vol_profile['bar_right'] = df_vol_profile['bar_left'] + pd.to_timedelta(df_vol_profile[volume_normalized] * width_ms, unit='ms')
-
 source_vol_profile = ColumnDataSource(df_vol_profile)
+
+# Mapea el color del fondo
+color_trend = {
+    'UPTREND': '#4CAF50',
+    'DOWNTREND': '#F44336',
+    'RANGING': "#2767B0"
+}
+
 # Calcula las mechas basándote en el color
 df_ohlc['upper_wick_end'] = np.where(
     df_ohlc['color'] == 'red', 
@@ -83,19 +93,47 @@ df_ohlc['lower_wick_end'] = np.where(
     df_ohlc['close'], 
     df_ohlc['open']
 )
-source_ohlc = ColumnDataSource(df_ohlc)
+# Calcula los bloques de tendencia y asigna el color de fondo correspondiente
+""" trend_4h = df_market_context[["open_time", "trend_direction"]].copy()
+trend_4h['trend_block'] = (trend_4h['trend_direction'] != trend_4h['trend_direction'].shift()).cumsum()
+Block_trend = trend_4h.groupby('trend_block').agg(x_start=('open_time', 'min'), x_end=('open_time', 'max'), trend_direction=('trend_direction', 'first')).reset_index(drop=True)
+Block_trend['x_end'] = Block_trend['x_end'] + pd.Timedelta(hours=4)
+Block_trend['bg_color'] = Block_trend['trend_direction'].map(color_trend)
+print(Block_trend.head(30))
+print(df_ohlc.head(30))
+source_block_trend = ColumnDataSource(Block_trend) """
+source_ohlc = ColumnDataSource(df_ohlc) 
+plt_candlestick = figure(x_axis_type='datetime', height=CHART_HEIGHT, width=CHART_WIDTH)
+# Muestra HH LH HL LL
+swing_highs = df_market_context[df_market_context['is_sh']][['open_time', 'high', 'sh_type']].copy()
+swing_lows = df_market_context[df_market_context['is_sl']][['open_time', 'low', 'sl_type']].copy()
+source_swing_highs = ColumnDataSource(swing_highs)
+source_swing_lows = ColumnDataSource(swing_lows)
 
 # Grafica Cuerpo y mecha de la vela
-plt_candlestick = figure(x_axis_type='datetime', height=CHART_HEIGHT, width=CHART_WIDTH)
+""" y_min = df_ohlc['low'].min() * 0.98
+y_max = df_ohlc['high'].max() * 1.02
+bg_rects = plt_candlestick.quad(
+    left='x_start',
+    right='x_end',
+    bottom=y_min,        # o un valor absurdamente bajo
+    top=y_max,   # o absurdamente alto
+    fill_color='bg_color',
+    line_color=None,
+    alpha=0.08,
+    source=source_block_trend,
+    level='underlay'
+) """
+plt_candlestick.scatter(x='open_time', y='high', size=10, fill_color='green', line_color=None, source=source_swing_highs, legend_label='Swing Highs')
+plt_candlestick.scatter(x='open_time', y='low', size=10, fill_color='red', line_color=None, source=source_swing_lows, legend_label='Swing Lows')
 upper_wick = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='upper_wick_end', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
 lower_wick = plt_candlestick.segment(x0='open_time', x1='open_time', y0='low', y1='lower_wick_end', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
-body = plt_candlestick.vbar(x='open_time', width=width_ms, top='open', bottom='close', fill_color='color', line_color='color', line_width=2, source=source_ohlc, legend_label=f'{simbol}-{interval} Candlesticks - {resolution} resolution', alpha=0.2)
+body = plt_candlestick.vbar(x='open_time', width=width_ms, top='open', bottom='close', fill_color='color', line_color='color',  line_width=2, source=source_ohlc, legend_label=f'{simbol}-{interval} Candlesticks - {resolution} resolution', alpha=0.2)
 
 # Grafica perfil de volumen por precio y tiempo
 #heatmap = plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution*0.9, line_color='black', line_alpha=0.3, color={'field': delta_normalized, 'transform': color_mapper}, source=source_vol_profile, alpha=0.4)
-
 # Grafica POC de cada vela
-df_poc = df_vol_profile.loc[df_vol_profile.groupby('open_time')['total_volume'].idxmax()][['open_time', 'price_bin', 'bar_left', 'bar_right', 'total_volume']].reset_index(drop=True).sort_values('open_time')
+df_poc = df_vol_profile.loc[df_vol_profile.node_type.values == 'POC'][['open_time', 'price_bin', 'bar_left', 'bar_right', 'total_volume']].reset_index(drop=True).sort_values('open_time')
 plt_candlestick.hbar(y='price_bin', left='bar_left', right='bar_right', height=resolution, color=None, line_color='black', source=ColumnDataSource(df_poc))
 
 # Grafica trades institucionales
@@ -197,7 +235,7 @@ plt_volume.add_tools(hover_volume)
 plt_volume.yaxis.formatter = NumeralTickFormatter(format="0,0.00")
 
 # Grafica de contexto de mercado
-df_market_context['efficiency_normalized'] = df_market_context['efficiency'] / df_market_context['efficiency'].max()
+""" df_market_context['efficiency_normalized'] = df_market_context['efficiency'] / df_market_context['efficiency'].max()
 df_market_context['efficiency_ma'] = df_market_context['efficiency_normalized'].rolling(window=window).mean()
 df_market_context['delta_efficiency_normalized'] = df_market_context['delta_efficiency'] / max(df_market_context['delta_efficiency'].abs().max(), df_market_context['delta_efficiency'].abs().min())
 plt_context = figure(x_axis_type='datetime', height=250, width=CHART_WIDTH, x_range=plt_candlestick.x_range, title='Market Context')
@@ -212,7 +250,7 @@ plt_context.line(x='open_time', y='efficiency_normalized', line_color='red', lin
 plt_context.line(x='open_time', y='efficiency_ma', line_color='red', line_width=2, source=source_market_context, legend_label=f'Efficiency MA {window}')
 plt_context.line(x='open_time', y='efficiency_ratio', line_color='black', line_width=2, source=source_market_context, legend_label='efficiency ratio Kaufman')
 plt_context.line(x='open_time', y='r_squared', line_color='blue', line_width=1, source=source_market_context, legend_label='R²')
-plt_context.line(x='open_time', y='delta_efficiency_normalized', line_color='green', line_width=2, source=source_market_context, legend_label='delta efficiency normalized', alpha=0.7)
+plt_context.line(x='open_time', y='delta_efficiency_normalized', line_color='green', line_width=2, source=source_market_context, legend_label='delta efficiency normalized', alpha=0.7) """
 #plt_context.line(x='open_time', y='coefficient_variation', line_color='orange', line_width=1, source=source_market_context, legend_label='Coefficient of Variation')
 #plt_context.line(x='open_time', y='atr_normalized', line_color='purple', line_width=1, source=source_market_context, legend_label='ATR Normalized')
 
@@ -228,11 +266,12 @@ hover_context = HoverTool(
         ("ATR Normalized", "@atr_normalized{0.00}"),
         ("Delta Efficiency", "@delta_efficiency{+0,0.00}")
     ], formatters={'@open_time': 'datetime'})
-plt_context.add_tools(hover_context)
+#plt_context.add_tools(hover_context)
 # Grafica velas que cumplas los requisitos
 df_ohlc['hammer_candle'] = df_ohlc.apply(lambda row: hammer_candle(row['open'], row['high'], row['low'], row['close']), axis=1)
 # POC ya viene de la DB en df_ohlc['poc'], no hace falta calcularlo
-df_ohlc = df_ohlc.merge(df_market_context[['open_time', 'efficiency_normalized', 'efficiency_ma']], on='open_time', how='left')
+
+""" df_ohlc = df_ohlc.merge(df_market_context[['open_time', 'efficiency_normalized', 'efficiency_ma']], on='open_time', how='left')
 df_buyl = df_ohlc[(df_ohlc['poc'] <= df_ohlc['close'] + abs(df_ohlc['close'] - df_ohlc['open']) * 0.2) & 
                  (df_ohlc['volume_high'] == True) & 
                  (df_ohlc['delta_normalized'] < 0.46) & 
@@ -246,7 +285,7 @@ df_sell = df_ohlc[(df_ohlc['poc'] >= df_ohlc['close'] ) &
                  (df_ohlc['color'] == 'green') &
                  (df_ohlc['delta_ma'] > 0)]
 plt_candlestick.vbar(x='open_time', width=width_ms, top='high', bottom='low', fill_color=None, line_color='red', line_width=2, fill_alpha=0.4, source=ColumnDataSource(df_sell), legend_label='absorption', alpha=0.8)
-
+ """
 # Graficar imbalance oferta y demanda
 """ IMB_RATIO = 3.0
 MIN_STREAK = 3
@@ -309,4 +348,4 @@ plt_candlestick.add_tools(crosshair)
 plt_volume.add_tools(crosshair)
 #plt_candlestick.scatter()
 #print(df_ohlc.head(40))
-show(column(plt_candlestick, plt_context, plt_volume)) # , plt_volume
+show(column(plt_candlestick, plt_volume)) # , plt_volume, plt_context

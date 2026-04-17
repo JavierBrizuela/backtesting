@@ -3,10 +3,9 @@ import pandas as pd
 import time
 from datetime import datetime
 class AggTradeDB:
-    def __init__(self, raw_path, analytics_path, UTC=False, local_tz='America/Argentina/Buenos_Aires' , read_only=False):
+    def __init__(self, raw_path, analytics_path, UTC=False, read_only=False):
         self.raw_path = raw_path
         self.analytics_path = analytics_path
-        self.local_tz = local_tz
         # Conectamos a raw_data.db como base de datos principal
         self.con = duckdb.connect(database=self.raw_path, read_only=read_only)
 
@@ -18,7 +17,6 @@ class AggTradeDB:
 
         # Atacheamos analytics.db para métricas procesadas
         self.con.execute(f"ATTACH '{self.analytics_path}' AS analytics (READ_ONLY {str(read_only).upper()})")
-        self.con.execute("LOAD icu")  # Cargar extensión de manejo de zonas horarias
         # UTC false para que use la zona horaria local del sistema, true para forzar UTC
         if UTC:
             self.con.execute("SET TimeZone='UTC'")
@@ -329,41 +327,32 @@ class AggTradeDB:
                 END AS is_swing_low
             FROM base_data
         ),
-        -- Combinar datos base con swings usando LAG simple
+        -- Combinar datos base con swings
         swings_combined AS (
             SELECT
                 b.*,
                 sh.is_swing_high,
-                sl.is_swing_low,
-                -- Número de fila para joining
-                ROW_NUMBER() OVER (ORDER BY b.open_time) as rn
+                sl.is_swing_low
             FROM base_data b
             LEFT JOIN swing_highs sh ON b.open_time = sh.open_time
             LEFT JOIN swing_lows sl ON b.open_time = sl.open_time
         ),
-        -- Forward fill de swings usando self-join simplificado
+        -- Forward fill de swings usando LAST_VALUE IGNORE NULLS (mucho más rápido en DuckDB)
         with_swings AS (
             SELECT
-                sc.*,
-                -- Last swing high es el máximo no nulo hasta esta fila
-                (SELECT MAX(s2.is_swing_high) FROM swings_combined s2
-                 WHERE s2.rn <= sc.rn AND s2.is_swing_high IS NOT NULL) AS last_sh,
-                -- Last swing low es el mínimo no nulo hasta esta fila
-                (SELECT MIN(s2.is_swing_low) FROM swings_combined s2
-                 WHERE s2.rn <= sc.rn AND s2.is_swing_low IS NOT NULL) AS last_sl,
-                -- Timestamp del último SH
-                (SELECT MAX(s2.open_time) FROM swings_combined s2
-                 WHERE s2.rn <= sc.rn AND s2.is_swing_high IS NOT NULL) AS last_sh_time,
-                -- Timestamp del último SL
-                (SELECT MAX(s2.open_time) FROM swings_combined s2
-                 WHERE s2.rn <= sc.rn AND s2.is_swing_low IS NOT NULL) AS last_sl_time,
-                -- Swing anterior (último SH antes del actual)
-                (SELECT MAX(s2.is_swing_high) FROM swings_combined s2
-                 WHERE s2.rn < sc.rn AND s2.is_swing_high IS NOT NULL) AS prev_sh,
-                -- Swing anterior SL
-                (SELECT MIN(s2.is_swing_low) FROM swings_combined s2
-                 WHERE s2.rn < sc.rn AND s2.is_swing_low IS NOT NULL) AS prev_sl
-            FROM swings_combined sc
+                *,
+                LAST_VALUE(is_swing_high IGNORE NULLS) OVER (ORDER BY open_time ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS last_sh,
+                LAST_VALUE(is_swing_low IGNORE NULLS) OVER (ORDER BY open_time ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS last_sl,
+                LAST_VALUE(CASE WHEN is_swing_high IS NOT NULL THEN open_time END IGNORE NULLS) OVER (ORDER BY open_time ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS last_sh_time,
+                LAST_VALUE(CASE WHEN is_swing_low IS NOT NULL THEN open_time END IGNORE NULLS) OVER (ORDER BY open_time ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS last_sl_time
+            FROM swings_combined
+        ),
+        with_prev_values AS (
+            SELECT
+                *,
+                LAG(last_sh) OVER (ORDER BY open_time) as prev_sh,
+                LAG(last_sl) OVER (ORDER BY open_time) as prev_sl
+            FROM with_swings
         ),
         -- Detectar estructura de mercado
         structure_detection AS (
@@ -390,41 +379,38 @@ class AggTradeDB:
                     WHEN close < last_sl AND last_sl IS NOT NULL THEN 'BOS_DOWN'
                     ELSE NULL
                 END AS structure_event,
-                -- Determinar dirección de tendencia
+                -- Determinar cambios en dirección de tendencia
                 CASE
-                    WHEN last_sh > LAG(last_sh, 1, last_sh) OVER (ORDER BY open_time)
-                         AND last_sl >= LAG(last_sl, 1, last_sl) OVER (ORDER BY open_time)
-                    THEN 'UPTREND'
-                    WHEN last_sl < LAG(last_sl, 1, last_sl) OVER (ORDER BY open_time)
-                         AND last_sh <= LAG(last_sh, 1, last_sh) OVER (ORDER BY open_time)
-                    THEN 'DOWNTREND'
-                    WHEN last_sh IS NOT NULL AND last_sl IS NOT NULL THEN 'RANGING'
-                    ELSE 'UNDEFINED'
-                END AS trend_dir,
-                -- Contador de velas desde último evento de estructura
-                open_time - COALESCE(
-                    MAX(CASE WHEN is_swing_high IS NOT NULL OR is_swing_low IS NOT NULL THEN open_time END) OVER (
-                        ORDER BY open_time ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-                    ),
-                    open_time
-                ) AS bars_since_event
-            FROM with_swings
+                    WHEN (last_sh > prev_sh AND last_sl >= prev_sl) OR structure_event = 'BOS_UP' THEN 'UPTREND'
+                    WHEN (last_sl < prev_sl AND last_sh <= prev_sh) OR structure_event = 'BOS_DOWN' THEN 'DOWNTREND'
+                    WHEN (last_sh < prev_sh AND last_sl > prev_sl) OR (last_sh > prev_sh AND last_sl < prev_sl) THEN 'RANGING'
+                    ELSE NULL
+                END AS trend_change
+            FROM with_prev_values
+        ),
+        -- Hacer la tendencia persistente (Sticky Trend)
+        with_sticky_trend AS (
+            SELECT
+                *,
+                LAST_VALUE(trend_change IGNORE NULLS) OVER (ORDER BY open_time ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as trend_dir_persistent
+            FROM structure_detection
         ),
         -- Calcular CHoCH (Change of Character) simplificado
         with_choch AS (
             SELECT
                 *,
+                COALESCE(trend_dir_persistent, 'UNDEFINED') as trend_dir,
                 -- Simplificado: solo marcamos si hay cambio de tendencia claro
                 CASE
-                    WHEN structure_event IN ('BOS_UP', 'HH') AND trend_dir = 'UPTREND'
-                        AND LAG(trend_dir, 1) OVER (ORDER BY open_time) = 'DOWNTREND'
+                    WHEN structure_event IN ('BOS_UP', 'HH') AND trend_dir_persistent = 'UPTREND'
+                        AND LAG(trend_dir_persistent) OVER (ORDER BY open_time) = 'DOWNTREND'
                     THEN 'CHoCH_UP'
-                    WHEN structure_event IN ('BOS_DOWN', 'LL') AND trend_dir = 'DOWNTREND'
-                        AND LAG(trend_dir, 1) OVER (ORDER BY open_time) = 'UPTREND'
+                    WHEN structure_event IN ('BOS_DOWN', 'LL') AND trend_dir_persistent = 'DOWNTREND'
+                        AND LAG(trend_dir_persistent) OVER (ORDER BY open_time) = 'UPTREND'
                     THEN 'CHoCH_DOWN'
                     ELSE structure_event
                 END AS final_structure_event
-            FROM structure_detection
+            FROM with_sticky_trend
         )
         INSERT OR IGNORE INTO analytics.market_context_{interval_name}
         SELECT
@@ -573,9 +559,10 @@ class AggTradeDB:
             SELECT
                 open_time,
                 SUM((price_bin + {half_res}) * total_volume) / NULLIF(SUM(total_volume), 0) AS vwap,
-                SQRT(SUM(total_volume * POWER((price_bin + {half_res}), 2)) / NULLIF(SUM(total_volume), 0)
-                     - POWER(SUM((price_bin + {half_res}) * total_volume) / NULLIF(SUM(total_volume), 0), 2)
-                ) AS vwap_std
+                SQRT(GREATEST(0,
+                    SUM(total_volume * POWER((price_bin + {half_res}), 2)) / NULLIF(SUM(total_volume), 0)
+                    - POWER(SUM((price_bin + {half_res}) * total_volume) / NULLIF(SUM(total_volume), 0), 2)
+                )) AS vwap_std
             FROM normalized
             GROUP BY open_time
         ),
