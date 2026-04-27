@@ -12,8 +12,8 @@ from candlestick_analytics import hammer_candle
 
 # Parámetros de configuración simbolo, intervalo, fechas, base de datos
 interval = '4 hours'
-start = '2026-02-01'
-end = '2026-02-21'
+start = '2026-01-01'
+end = '2026-03-24'
 simbol = 'BTCUSDT'
 raw_path = f'data/{simbol}/tradebook/raw_data.db'
 analytics_path = f'data/{simbol}/tradebook/analytics.db'
@@ -106,7 +106,9 @@ source_ohlc = ColumnDataSource(df_ohlc)
 plt_candlestick = figure(x_axis_type='datetime', height=CHART_HEIGHT, width=CHART_WIDTH)
 # Muestra HH LH HL LL
 swing_highs = df_market_context[df_market_context['is_sh']][['open_time', 'high', 'sh_type']].copy()
+swing_highs['alpha'] = np.where(swing_highs['sh_type'] == 'HH', 1, 0.5)
 swing_lows = df_market_context[df_market_context['is_sl']][['open_time', 'low', 'sl_type']].copy()
+swing_lows['alpha'] = np.where(swing_lows['sl_type'] == 'LL', 1, 0.5)
 source_swing_highs = ColumnDataSource(swing_highs)
 source_swing_lows = ColumnDataSource(swing_lows)
 
@@ -124,8 +126,8 @@ bg_rects = plt_candlestick.quad(
     source=source_block_trend,
     level='underlay'
 ) """
-plt_candlestick.scatter(x='open_time', y='high', size=10, fill_color='green', line_color=None, source=source_swing_highs, legend_label='Swing Highs')
-plt_candlestick.scatter(x='open_time', y='low', size=10, fill_color='red', line_color=None, source=source_swing_lows, legend_label='Swing Lows')
+plt_candlestick.scatter(x='open_time', y='high', size=10, fill_color='green', line_color=None, alpha='alpha', source=source_swing_highs, legend_label='Swing Highs')
+plt_candlestick.scatter(x='open_time', y='low', size=10, fill_color='red', line_color=None, alpha='alpha', source=source_swing_lows, legend_label='Swing Lows')
 upper_wick = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='upper_wick_end', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
 lower_wick = plt_candlestick.segment(x0='open_time', x1='open_time', y0='low', y1='lower_wick_end', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
 body = plt_candlestick.vbar(x='open_time', width=width_ms, top='open', bottom='close', fill_color='color', line_color='color',  line_width=2, source=source_ohlc, legend_label=f'{simbol}-{interval} Candlesticks - {resolution} resolution', alpha=0.2)
@@ -347,5 +349,5 @@ crosshair = CrosshairTool(
 plt_candlestick.add_tools(crosshair)
 plt_volume.add_tools(crosshair)
 #plt_candlestick.scatter()
-#print(df_ohlc.head(40))
+print(df_market_context.head(40))
 show(column(plt_candlestick, plt_volume)) # , plt_volume, plt_context

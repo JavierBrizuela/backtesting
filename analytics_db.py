@@ -206,6 +206,9 @@ class AnalyticsDB:
 
         query = f"""
         WITH 
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 1 · Resample: 1 minuto → 4 horas (o cualquier intervalo)
+        -- ─────────────────────────────────────────────────────────────────────────
         ohlc AS (
         SELECT 
             time_bucket('{interval}', open_time) AS open_time,
@@ -217,6 +220,9 @@ class AnalyticsDB:
         {where_sql}
         GROUP BY 1
         ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 2 · Número de fila + True Range
+        -- ─────────────────────────────────────────────────────────────────────────
         base AS (
         SELECT
             *,
@@ -228,6 +234,9 @@ class AnalyticsDB:
                 ) AS TR,
         FROM ohlc
         ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 3 · ATR 14 períodos
+        -- ─────────────────────────────────────────────────────────────────────────
         atr AS (
         SELECT
             *,
@@ -237,6 +246,9 @@ class AnalyticsDB:
             ) AS ATR_14
         from base
         ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 4 · Detección de Swing High / Swing Low
+        -- ─────────────────────────────────────────────────────────────────────────
         swing_raw AS(
         SELECT
             *,
@@ -261,6 +273,9 @@ class AnalyticsDB:
             ) AS is_sl
         FROM atr
         ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 5 · Secuencia de Swing Highs: HH / LH
+        -- ─────────────────────────────────────────────────────────────────────────
         sh_typed AS (
         SELECT
             *,
@@ -272,6 +287,9 @@ class AnalyticsDB:
         FROM swing_raw
         WHERE is_sh
         ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 6 · Secuencia de Swing Lows: HL / LL
+        -- ─────────────────────────────────────────────────────────────────────────
         sl_typed AS (
         SELECT
             *,
@@ -283,9 +301,9 @@ class AnalyticsDB:
         FROM swing_raw
         WHERE is_sl
         ),
-    -- ─────────────────────────────────────────────────────────────────────────
-    -- BLOQUE 7 · Unir clasificaciones HH/LH/HL/LL a la tabla principal
-    -- ─────────────────────────────────────────────────────────────────────────
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 7 · Unir clasificaciones HH/LH/HL/LL a la tabla principal
+        -- ─────────────────────────────────────────────────────────────────────────
         swings_classified AS (
             SELECT
                 s.*,
@@ -294,11 +312,133 @@ class AnalyticsDB:
             FROM swing_raw s
             LEFT JOIN sh_typed sh ON s.row = sh.row
             LEFT JOIN sl_typed sl ON s.row = sl.row
+        ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 8 · Propagar niveles y tipos hacia adelante
+        -- ─────────────────────────────────────────────────────────────────────────
+        with_levels AS (
+            SELECT
+            open_time, row, open, high, low, close, ATR_14,
+            is_sh, is_sl, sh_type, sl_type,
+            -- ── Último Swing High ────────────────────────────────────────────────
+            LAST_VALUE(CASE WHEN is_sh THEN high ELSE NULL END IGNORE NULLS) 
+                OVER (ORDER BY row ROWS BETWEEN 50 PRECEDING AND 1 PRECEDING) AS last_sh_level,
+                
+            LAST_VALUE(CASE WHEN is_sh THEN sh_type ELSE NULL END IGNORE NULLS) 
+                OVER (ORDER BY row ROWS BETWEEN 50 PRECEDING AND 1 PRECEDING) AS last_sh_type,
+                
+            LAST_VALUE(CASE WHEN is_sh THEN row ELSE NULL END IGNORE NULLS) 
+                OVER (ORDER BY row ROWS BETWEEN 50 PRECEDING AND 1 PRECEDING) AS last_sh_row,
+                
+            -- ── Último Swing Low ───────────────────────────────────────────────
+            LAST_VALUE(CASE WHEN is_sl THEN low ELSE NULL END IGNORE NULLS)
+                OVER (ORDER BY row ROWS BETWEEN 50 PRECEDING AND 1 PRECEDING) AS last_sl_level,
+                
+            LAST_VALUE(CASE WHEN is_sl THEN sl_type ELSE NULL END IGNORE NULLS)
+                OVER (ORDER BY row ROWS BETWEEN 50 PRECEDING AND 1 PRECEDING) AS last_sl_type,
+                
+            LAST_VALUE(CASE WHEN is_sl THEN row ELSE NULL END IGNORE NULLS)
+                OVER (ORDER BY row ROWS BETWEEN 50 PRECEDING AND 1 PRECEDING) AS last_sl_row
+        FROM swings_classified
+        ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 9 · Detección de BOS y CHoCH
+        -- ─────────────────────────────────────────────────────────────────────────
+        whith_events AS (
+            SELECT
+            *,
+            
+            CASE
+                -- ── Cruce alcista (close supera el último SH) ───────────────────────
+                WHEN last_sh_level IS NOT NULL
+                    AND close     >  last_sh_level
+                    AND LAG(close) OVER (ORDER BY row) <= last_sh_level
+                THEN
+                    CASE last_sh_type
+                        WHEN 'HH' THEN 'BOS_BULL'    -- continuación alcista
+                        WHEN 'LH' THEN 'CHOCH_BULL'  -- giro: rompe LH → posible inicio alcista
+                        ELSE           'BOS_BULL'    -- primer SH sin clasificación previa
+                    END
+                    
+                -- ── Cruce bajista (close rompe el último SL) ────────────────────────
+                WHEN last_sl_level IS NOT NULL
+                    AND close     <  last_sl_level
+                    AND LAG(close) OVER (ORDER BY row) >= last_sl_level
+                THEN
+                    CASE last_sl_type
+                        WHEN 'LL' THEN 'BOS_BEAR'    -- continuación bajista
+                        WHEN 'HL' THEN 'CHOCH_BEAR'  -- giro: rompe HL → posible inicio bajista
+                        ELSE           'BOS_BEAR'    -- primer SL sin clasificación previa
+                    END
+                    
+                ELSE NULL
+            END AS structure_event
+        FROM with_levels
+        ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 10 · Tendencia vigente
+        -- ─────────────────────────────────────────────────────────────────────────
+        with_trend AS (
+            SELECT
+                *,
+                LAST_VALUE(structure_event IGNORE NULLS)
+                    OVER (ORDER BY row ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) 
+                    AS last_event,
+                -- Score numérico de la estructura de swings
+                COALESCE(CASE last_sh_type WHEN 'HH' THEN 1 WHEN 'LH' THEN -1 ELSE 0 END, 0)
+                + COALESCE(CASE last_sl_type WHEN 'HL' THEN 1 WHEN 'LL' THEN -1 ELSE 0 END, 0)
+                AS swing_score
+            
+            FROM whith_events
         )
+        -- ═══════════════════════════════════════════════════════════════════════
+        -- TABLA FINAL
+        -- ═══════════════════════════════════════════════════════════════════════
         SELECT
-            *
-        FROM swings_classified 
-        WHERE is_sh OR is_sl
+            open_time, open, high, low, close, 
+            ATR_14,
+            ROUND((high-low)/NULLIF(ATR_14, 0), 2) AS body_atr_ratio,
+            is_sh, is_sl, sh_type, sl_type,
+            last_sh_level, last_sh_type, 
+            CASE
+                WHEN last_sh_row IS NOT NULL THEN CAST(row - last_sh_row AS INT)
+            END AS bars_since_last_sh,
+            
+            last_sl_level, last_sl_type,
+            CASE
+                WHEN last_sl_row IS NOT NULL THEN CAST(row - last_sl_row AS INT)
+            END AS bars_since_last_sl,
+            
+            structure_event, 
+            --    Versión refinada: cruza el evento con el swing_score actual
+            --    para detectar transiciones y rango
+            CASE
+                -- Tendencia alcista confirmada y swing score positivo
+                WHEN last_event IN ('BOS_BULL', 'CHOCH_BULL') AND swing_score >= 1
+                THEN 'BULLISH'
+
+                -- Tendencia alcista pero swings se deterioran → posible transición
+                WHEN last_event IN ('BOS_BULL', 'CHOCH_BULL') AND swing_score < 0
+                THEN 'TRANSITIONING_BEAR'
+
+                -- Tendencia bajista confirmada y swing score negativo
+                WHEN last_event IN ('BOS_BEAR', 'CHOCH_BEAR') AND swing_score <= -1
+                THEN 'BEARISH'
+
+                -- Tendencia bajista pero swings se recuperan → posible transición
+                WHEN last_event IN ('BOS_BEAR', 'CHOCH_BEAR') AND swing_score > 0
+                THEN 'TRANSITIONING_BULL'
+
+                -- Swing score puro sin evento claro
+                WHEN swing_score =  2 THEN 'BULLISH'
+                WHEN swing_score = -2 THEN 'BEARISH'
+
+                -- Sin eventos claros o señales mixtas → rango
+                ELSE 'RANGING'
+            END 
+            AS trend_refined,
+            last_event, swing_score
+        FROM with_trend 
         ORDER BY open_time ASC
         """
         return self.con.execute(query).fetchdf()
