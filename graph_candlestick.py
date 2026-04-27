@@ -76,8 +76,10 @@ source_vol_profile = ColumnDataSource(df_vol_profile)
 
 # Mapea el color del fondo
 color_trend = {
-    'UPTREND': '#4CAF50',
-    'DOWNTREND': '#F44336',
+    'BULLISH': '#4CAF50',
+    'TRANSITIONING_BULL': "#A1F1A1",
+    'BEARISH': '#F44336',
+    'TRANSITIONING_BEAR': "#F1A1A1",
     'RANGING': "#2767B0"
 }
 
@@ -94,16 +96,26 @@ df_ohlc['lower_wick_end'] = np.where(
     df_ohlc['open']
 )
 # Calcula los bloques de tendencia y asigna el color de fondo correspondiente
-""" trend_4h = df_market_context[["open_time", "trend_direction"]].copy()
-trend_4h['trend_block'] = (trend_4h['trend_direction'] != trend_4h['trend_direction'].shift()).cumsum()
-Block_trend = trend_4h.groupby('trend_block').agg(x_start=('open_time', 'min'), x_end=('open_time', 'max'), trend_direction=('trend_direction', 'first')).reset_index(drop=True)
-Block_trend['x_end'] = Block_trend['x_end'] + pd.Timedelta(hours=4)
-Block_trend['bg_color'] = Block_trend['trend_direction'].map(color_trend)
-print(Block_trend.head(30))
-print(df_ohlc.head(30))
-source_block_trend = ColumnDataSource(Block_trend) """
+trend = df_market_context[["open_time", "trend_refined"]].copy()
+trend['bg_color'] = trend['trend_refined'].map(color_trend)
+trend['close_time'] = trend['open_time'].shift(-1)
+source_trend = ColumnDataSource(trend)
 source_ohlc = ColumnDataSource(df_ohlc) 
 plt_candlestick = figure(x_axis_type='datetime', height=CHART_HEIGHT, width=CHART_WIDTH)
+y_min = df_ohlc['low'].min() * 0.98
+y_max = df_ohlc['high'].max() * 1.02
+bg_rects = plt_candlestick.quad(
+    left='open_time',
+    right='close_time',
+    bottom=y_min,        # o un valor absurdamente bajo
+    top=y_max,   # o absurdamente alto
+    fill_color='bg_color',
+    line_color=None,
+    alpha=0.08,
+    source=source_trend,
+    level='underlay'
+)
+
 # Muestra HH LH HL LL
 swing_highs = df_market_context[df_market_context['is_sh']][['open_time', 'high', 'sh_type']].copy()
 swing_highs['alpha'] = np.where(swing_highs['sh_type'] == 'HH', 1, 0.5)
@@ -111,23 +123,10 @@ swing_lows = df_market_context[df_market_context['is_sl']][['open_time', 'low', 
 swing_lows['alpha'] = np.where(swing_lows['sl_type'] == 'LL', 1, 0.5)
 source_swing_highs = ColumnDataSource(swing_highs)
 source_swing_lows = ColumnDataSource(swing_lows)
-
-# Grafica Cuerpo y mecha de la vela
-""" y_min = df_ohlc['low'].min() * 0.98
-y_max = df_ohlc['high'].max() * 1.02
-bg_rects = plt_candlestick.quad(
-    left='x_start',
-    right='x_end',
-    bottom=y_min,        # o un valor absurdamente bajo
-    top=y_max,   # o absurdamente alto
-    fill_color='bg_color',
-    line_color=None,
-    alpha=0.08,
-    source=source_block_trend,
-    level='underlay'
-) """
 plt_candlestick.scatter(x='open_time', y='high', size=10, fill_color='green', line_color=None, alpha='alpha', source=source_swing_highs, legend_label='Swing Highs')
 plt_candlestick.scatter(x='open_time', y='low', size=10, fill_color='red', line_color=None, alpha='alpha', source=source_swing_lows, legend_label='Swing Lows')
+
+# Grafica Cuerpo y mecha de la vela
 upper_wick = plt_candlestick.segment(x0='open_time', x1='open_time', y0='high', y1='upper_wick_end', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
 lower_wick = plt_candlestick.segment(x0='open_time', x1='open_time', y0='low', y1='lower_wick_end', line_color='color', line_width=2, source=source_ohlc, alpha=0.2)
 body = plt_candlestick.vbar(x='open_time', width=width_ms, top='open', bottom='close', fill_color='color', line_color='color',  line_width=2, source=source_ohlc, legend_label=f'{simbol}-{interval} Candlesticks - {resolution} resolution', alpha=0.2)
