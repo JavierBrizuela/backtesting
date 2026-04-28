@@ -44,6 +44,8 @@ end_year = today.year
 end_month = today.month
 end_day = today.day
 
+os.makedirs(os.path.dirname(raw_path), exist_ok=True)
+
 agg_trades_df = AggTradesBinanceDownloader()
 agg_trades_DB = AggTradeDB(raw_path, analytics_path,UTC=True)
 
