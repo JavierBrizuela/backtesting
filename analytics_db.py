@@ -256,22 +256,76 @@ class AnalyticsDB:
                 high > LAG(high, 1) OVER (ORDER BY row)
                 AND high > LAG(high, 2) OVER (ORDER BY row)
                 AND high > LAG(high, 3) OVER (ORDER BY row)
+                AND high > LAG(high, 4) OVER (ORDER BY row)
+                AND high > LAG(high, 5) OVER (ORDER BY row)
                 AND high > LEAD(high, 1) OVER (ORDER BY row)
                 AND high > LEAD(high, 2) OVER (ORDER BY row)
-                AND high > LEAD(high, 3) OVER (ORDER BY row),
+                AND high > LEAD(high, 3) OVER (ORDER BY row)
+                AND high > LEAD(high, 4) OVER (ORDER BY row)
+                AND high > LEAD(high, 5) OVER (ORDER BY row),
                 FALSE
             ) AS is_sh,
             COALESCE(
                 low < LAG(low, 1) OVER (ORDER BY row)
                 AND low < LAG(low, 2) OVER (ORDER BY row)
                 AND low < LAG(low, 3) OVER (ORDER BY row)
+                AND low < LAG(low, 4) OVER (ORDER BY row)
+                AND low < LAG(low, 5) OVER (ORDER BY row)
                 AND low < LEAD(low, 1) OVER (ORDER BY row)
                 AND low < LEAD(low, 2) OVER (ORDER BY row)
-                AND low < LEAD(low, 3) OVER (ORDER BY row),
-
+                AND low < LEAD(low, 3) OVER (ORDER BY row)
+                AND low < LEAD(low, 4) OVER (ORDER BY row)
+                AND low < LEAD(low, 5) OVER (ORDER BY row),
                 FALSE
             ) AS is_sl
         FROM atr
+        ),
+        -- ─────────────────────────────────────────────────────────────────────────
+        -- BLOQUE 4b · Forzar alternancia SH → SL → SH → SL
+        -- ─────────────────────────────────────────────────────────────────────────
+        all_swing AS (
+        SELECT
+            row, 'SH' AS swing_type, high AS level FROM swing_raw WHERE is_sh
+        UNION ALL
+        SELECT
+            row, 'SL' AS swing_type, low AS level FROM swing_raw WHERE is_sl
+        ),
+        swing_with_lag AS (
+            SELECT *,
+                LAG(swing_type) OVER (ORDER BY row, swing_type) AS prev_swing_type
+            FROM all_swing
+        ),
+        swing_grp AS (
+        SELECT *,
+            SUM(
+                CASE WHEN swing_type IS DISTINCT FROM prev_swing_type THEN 1 ELSE 0 END
+            ) OVER (ORDER BY row, swing_type ROWS UNBOUNDED PRECEDING) AS grp
+        FROM swing_with_lag
+        ),
+        -- Por cada grupo de swings consecutivos del mismo tipo, conservar solo el más extremo
+        swing_alternating AS (
+            SELECT DISTINCT ON (grp)
+                grp,
+                swing_type,
+                row AS swing_row,
+                level
+            FROM swing_grp
+            ORDER BY 
+                grp,
+                CASE WHEN swing_type = 'SH' THEN -level ELSE level END ASC
+                --    SH: el más ALTO primero │ SL: el más BAJO primero
+        ),
+        -- Reconstruir is_sh / is_sl limpios sobre la tabla base
+        swing_clean AS (
+            SELECT
+                a.*,
+                (sa_sh.swing_row IS NOT NULL) AS is_sh,
+                (sa_sl.swing_row IS NOT NULL) AS is_sl
+            FROM atr a
+            LEFT JOIN swing_alternating sa_sh 
+                ON a.row = sa_sh.swing_row AND sa_sh.swing_type = 'SH'
+            LEFT JOIN swing_alternating sa_sl 
+                ON a.row = sa_sl.swing_row AND sa_sl.swing_type = 'SL'
         ),
         -- ─────────────────────────────────────────────────────────────────────────
         -- BLOQUE 5 · Secuencia de Swing Highs: HH / LH
@@ -280,11 +334,11 @@ class AnalyticsDB:
         SELECT
             *,
             CASE
-                WHEN LAG(high) OVER(ORDER BY row) IS NULL THEN NULL
+                WHEN LAG(high) OVER(ORDER BY row) IS NULL THEN 'LH'
                 WHEN high > LAG(high) OVER(ORDER BY row) THEN 'HH'
                 ELSE 'LH'
             END AS sh_type
-        FROM swing_raw
+        FROM swing_clean
         WHERE is_sh
         ),
         -- ─────────────────────────────────────────────────────────────────────────
@@ -294,11 +348,11 @@ class AnalyticsDB:
         SELECT
             *,
             CASE
-                WHEN LAG(low) OVER(ORDER BY row) IS NULL THEN NULL
+                WHEN LAG(low) OVER(ORDER BY row) IS NULL THEN 'HL'
                 WHEN low < LAG(low) OVER(ORDER BY row) THEN 'LL'
                 ELSE 'HL'
             END AS sl_type
-        FROM swing_raw
+        FROM swing_clean
         WHERE is_sl
         ),
         -- ─────────────────────────────────────────────────────────────────────────
@@ -309,7 +363,7 @@ class AnalyticsDB:
                 s.*,
                 sh.sh_type,
                 sl.sl_type
-            FROM swing_raw s
+            FROM swing_clean s
             LEFT JOIN sh_typed sh ON s.row = sh.row
             LEFT JOIN sl_typed sl ON s.row = sl.row
         ),
@@ -395,7 +449,7 @@ class AnalyticsDB:
         -- TABLA FINAL
         -- ═══════════════════════════════════════════════════════════════════════
         SELECT
-            open_time, open, high, low, close, 
+            open_time, open, high, low, close, row,
             ATR_14,
             ROUND((high-low)/NULLIF(ATR_14, 0), 2) AS body_atr_ratio,
             is_sh, is_sl, sh_type, sl_type,

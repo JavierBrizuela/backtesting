@@ -11,8 +11,8 @@ import os
 from candlestick_analytics import hammer_candle
 
 # Parámetros de configuración simbolo, intervalo, fechas, base de datos
-interval = '4 hours'
-start = '2026-01-01'
+interval = '1 day'
+start = '2025-01-01'
 end = '2026-03-24'
 simbol = 'BTCUSDT'
 raw_path = f'data/{simbol}/tradebook/raw_data.db'
@@ -82,6 +82,12 @@ color_trend = {
     'TRANSITIONING_BEAR': "#F1A1A1",
     'RANGING': "#2767B0"
 }
+color_event = {
+    'BOS_BULL': '#4CAF50',
+    'CHOCH_BULL': "#A1F1A1",
+    'BOS_BEAR': '#F44336',
+    'CHOCH_BEAR': "#F1A1A1"
+}
 
 # Calcula las mechas basándote en el color
 df_ohlc['upper_wick_end'] = np.where(
@@ -96,8 +102,11 @@ df_ohlc['lower_wick_end'] = np.where(
     df_ohlc['open']
 )
 # Calcula los bloques de tendencia y asigna el color de fondo correspondiente
-trend = df_market_context[["open_time", "trend_refined"]].copy()
-trend['bg_color'] = trend['trend_refined'].map(color_trend)
+trend = df_market_context[["open_time", "row", "swing_score", "last_event", "last_sh_type", "last_sl_type"]].copy()
+print(trend['last_event'].dtype)
+print(trend['last_event'].unique())
+#trend['bg_color'] = trend['trend_refined'].map(color_trend)
+trend['bg_color'] = trend['last_event'].map(color_event).fillna('#888888')
 trend['close_time'] = trend['open_time'].shift(-1)
 source_trend = ColumnDataSource(trend)
 source_ohlc = ColumnDataSource(df_ohlc) 
@@ -107,11 +116,11 @@ y_max = df_ohlc['high'].max() * 1.02
 bg_rects = plt_candlestick.quad(
     left='open_time',
     right='close_time',
-    bottom=y_min,        # o un valor absurdamente bajo
-    top=y_max,   # o absurdamente alto
+    bottom=y_min,
+    top=y_max,
     fill_color='bg_color',
     line_color=None,
-    alpha=0.08,
+    alpha=0.6,
     source=source_trend,
     level='underlay'
 )
@@ -149,7 +158,7 @@ plt_candlestick.scatter(x='interval_time', y='avg_price', size='quantity_scaled'
  """
 # Hover para las velas
 hover = HoverTool(
-    renderers=[body],
+    renderers=[body, bg_rects],
     tooltips=[
         ("Time", "@open_time{%F %T}"),
         ("Open", "@open{0.2f}"),
@@ -162,6 +171,10 @@ hover = HoverTool(
         ("POC", "@poc{0.2f}"),
         ("Price/VWAP Diff", "@price_vwap_diff{0.00%}"),
         ("VWAP Slope", "@vwap_slope{0.2f}"),
+        ("last_sh_type", "@last_sh_type"),
+        ("last_sl_type", "@last_sl_type"),
+        ("swing_score", "@swing_score"),
+        ("last_event", "@last_event")
     ],
     formatters={
         '@open_time': 'datetime',
