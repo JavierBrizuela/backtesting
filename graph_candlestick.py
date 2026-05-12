@@ -11,14 +11,17 @@ import os
 from candlestick_analytics import hammer_candle
 
 # Parámetros de configuración simbolo, intervalo, fechas, base de datos
-interval = '1 day'
-start = '2025-01-01'
-end = '2026-03-24'
+interval = '15 minutes'
+start = '2026-01-01'
+end = '2026-05-08'
 simbol = 'BTCUSDT'
 raw_path = f'data/{simbol}/tradebook/raw_data.db'
 analytics_path = f'data/{simbol}/tradebook/analytics.db'
 table = 'agg_trades'
 window=20
+
+#parametros de análisis de contexto de mercado
+context_interval = '1 day'
 
 # Parámetros de análisis de trades institucionales
 interval_trades = '5 minutes'
@@ -45,7 +48,7 @@ df_ohlc = db_connector.get_ohlc(interval, start, end)
 df_vol_profile = db_connector.get_volume_profile(interval, start, end, resolution)
 df_profile = db_connector.get_profile(start, end, resolution)
 # df_trades = db_connector.get_institutional_trades(start, end, interval_trades)
-df_market_context = db_connector.get_market_context(interval, start, end)
+df_market_context = db_connector.get_market_context(context_interval, start, end)
 db_connector.close_connection()
 
 # Convertir ambos dataframes y quitar el tzinfo
@@ -102,11 +105,8 @@ df_ohlc['lower_wick_end'] = np.where(
     df_ohlc['open']
 )
 # Calcula los bloques de tendencia y asigna el color de fondo correspondiente
-trend = df_market_context[["open_time", "row", "swing_score", "last_event", "last_sh_type", "last_sl_type"]].copy()
-print(trend['last_event'].dtype)
-print(trend['last_event'].unique())
-#trend['bg_color'] = trend['trend_refined'].map(color_trend)
-trend['bg_color'] = trend['last_event'].map(color_event).fillna('#888888')
+trend = df_market_context[["open_time", "row", "trend", "last_sh_type", "last_sl_type"]].copy()
+trend['bg_color'] = trend['trend'].map(color_event).fillna('#888888')
 trend['close_time'] = trend['open_time'].shift(-1)
 source_trend = ColumnDataSource(trend)
 source_ohlc = ColumnDataSource(df_ohlc) 
@@ -120,7 +120,7 @@ bg_rects = plt_candlestick.quad(
     top=y_max,
     fill_color='bg_color',
     line_color=None,
-    alpha=0.6,
+    alpha=0.4,
     source=source_trend,
     level='underlay'
 )
@@ -158,7 +158,7 @@ plt_candlestick.scatter(x='interval_time', y='avg_price', size='quantity_scaled'
  """
 # Hover para las velas
 hover = HoverTool(
-    renderers=[body, bg_rects],
+    renderers=[body],
     tooltips=[
         ("Time", "@open_time{%F %T}"),
         ("Open", "@open{0.2f}"),

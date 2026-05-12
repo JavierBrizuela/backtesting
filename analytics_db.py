@@ -256,26 +256,37 @@ class AnalyticsDB:
                 high > LAG(high, 1) OVER (ORDER BY row)
                 AND high > LAG(high, 2) OVER (ORDER BY row)
                 AND high > LAG(high, 3) OVER (ORDER BY row)
-                AND high > LAG(high, 4) OVER (ORDER BY row)
-                AND high > LAG(high, 5) OVER (ORDER BY row)
+                --AND high > LAG(high, 4) OVER (ORDER BY row)
+                --AND high > LAG(high, 5) OVER (ORDER BY row)
                 AND high > LEAD(high, 1) OVER (ORDER BY row)
                 AND high > LEAD(high, 2) OVER (ORDER BY row)
                 AND high > LEAD(high, 3) OVER (ORDER BY row)
-                AND high > LEAD(high, 4) OVER (ORDER BY row)
-                AND high > LEAD(high, 5) OVER (ORDER BY row),
+                --AND high > LEAD(high, 4) OVER (ORDER BY row),
+                --AND high > LEAD(high, 5) OVER (ORDER BY row),
+                -- Condición 2: el swing debe ser significativo vs ATR
+                 AND (high - GREATEST(
+                    LAG(low,1) OVER (ORDER BY row),
+                    LAG(low,2) OVER (ORDER BY row),
+                    LAG(low,3) OVER (ORDER BY row)
+                )) > ATR_14 * 0.75,
                 FALSE
             ) AS is_sh,
             COALESCE(
                 low < LAG(low, 1) OVER (ORDER BY row)
                 AND low < LAG(low, 2) OVER (ORDER BY row)
                 AND low < LAG(low, 3) OVER (ORDER BY row)
-                AND low < LAG(low, 4) OVER (ORDER BY row)
-                AND low < LAG(low, 5) OVER (ORDER BY row)
+                --AND low < LAG(low, 4) OVER (ORDER BY row)
+                --AND low < LAG(low, 5) OVER (ORDER BY row)
                 AND low < LEAD(low, 1) OVER (ORDER BY row)
                 AND low < LEAD(low, 2) OVER (ORDER BY row)
                 AND low < LEAD(low, 3) OVER (ORDER BY row)
-                AND low < LEAD(low, 4) OVER (ORDER BY row)
-                AND low < LEAD(low, 5) OVER (ORDER BY row),
+                --AND low < LEAD(low, 4) OVER (ORDER BY row),
+                --AND low < LEAD(low, 5) OVER (ORDER BY row),
+                AND (LEAST(
+                    LAG(high,1) OVER (ORDER BY row),
+                    LAG(high,2) OVER (ORDER BY row),
+                    LAG(high,3) OVER (ORDER BY row)
+                ) - low) > ATR_14 * 0.75,
                 FALSE
             ) AS is_sl
         FROM atr
@@ -398,7 +409,7 @@ class AnalyticsDB:
         -- ─────────────────────────────────────────────────────────────────────────
         -- BLOQUE 9 · Detección de BOS y CHoCH
         -- ─────────────────────────────────────────────────────────────────────────
-        whith_events AS (
+        raw_events AS (
             SELECT
             *,
             
@@ -407,27 +418,46 @@ class AnalyticsDB:
                 WHEN last_sh_level IS NOT NULL
                     AND close     >  last_sh_level
                     AND LAG(close) OVER (ORDER BY row) <= last_sh_level
-                THEN
-                    CASE last_sh_type
-                        WHEN 'HH' THEN 'BOS_BULL'    -- continuación alcista
-                        WHEN 'LH' THEN 'CHOCH_BULL'  -- giro: rompe LH → posible inicio alcista
-                        ELSE           'BOS_BULL'    -- primer SH sin clasificación previa
-                    END
+                THEN 'CROSS_BULL'
                     
                 -- ── Cruce bajista (close rompe el último SL) ────────────────────────
                 WHEN last_sl_level IS NOT NULL
                     AND close     <  last_sl_level
                     AND LAG(close) OVER (ORDER BY row) >= last_sl_level
-                THEN
-                    CASE last_sl_type
-                        WHEN 'LL' THEN 'BOS_BEAR'    -- continuación bajista
-                        WHEN 'HL' THEN 'CHOCH_BEAR'  -- giro: rompe HL → posible inicio bajista
-                        ELSE           'BOS_BEAR'    -- primer SL sin clasificación previa
-                    END
-                    
+                THEN 'CROSS_BEAR'
+                       
                 ELSE NULL
-            END AS structure_event
+            END AS cross_raw,
         FROM with_levels
+        ),
+        -- BLOQUE 9b · Registrar qué swing_row generó el último cruce de cada tipo
+        events_gated AS (
+            SELECT
+                *,
+                -- Fila del SH que disparó el último CROSS_BULL
+                LAST_VALUE(CASE WHEN cross_raw = 'CROSS_BULL' THEN last_sh_row ELSE NULL END IGNORE NULLS)
+                    OVER (ORDER BY row ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+                    AS last_used_sh_row,
+
+                -- Fila del SL que disparó el último CROSS_BEAR
+                LAST_VALUE(CASE WHEN cross_raw = 'CROSS_BEAR' THEN last_sl_row ELSE NULL END IGNORE NULLS)
+                    OVER (ORDER BY row ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+                    AS last_used_sl_row,
+
+                -- Gate: solo conservar si el swing no fue usado antes
+                CASE
+                    WHEN cross_raw = 'CROSS_BULL'
+                        AND last_sh_row != COALESCE(last_used_sh_row, -1)
+                    THEN 'CROSS_BULL'
+
+                    WHEN cross_raw = 'CROSS_BEAR'
+                        AND last_sl_row != COALESCE(last_used_sl_row, -1)
+                    THEN 'CROSS_BEAR'
+
+                    ELSE NULL
+                END AS cross_event
+
+            FROM raw_events
         ),
         -- ─────────────────────────────────────────────────────────────────────────
         -- BLOQUE 10 · Tendencia vigente
@@ -435,24 +465,34 @@ class AnalyticsDB:
         with_trend AS (
             SELECT
                 *,
-                LAST_VALUE(structure_event IGNORE NULLS)
+                LAST_VALUE(cross_event IGNORE NULLS)
                     OVER (ORDER BY row ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) 
-                    AS last_event,
-                -- Score numérico de la estructura de swings
-                COALESCE(CASE last_sh_type WHEN 'HH' THEN 1 WHEN 'LH' THEN -1 ELSE 0 END, 0)
-                + COALESCE(CASE last_sl_type WHEN 'HL' THEN 1 WHEN 'LL' THEN -1 ELSE 0 END, 0)
-                AS swing_score
+                    AS last_cross,
+            CASE
+                WHEN cross_event = 'CROSS_BULL' THEN 
+                    CASE LAST_VALUE(cross_event IGNORE NULLS)
+                        OVER (ORDER BY row ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+                        WHEN 'CROSS_BEAR' THEN 'CHOCH_BULL' ELSE 'BOS_BULL'
+                    END
+                WHEN cross_event = 'CROSS_BEAR' THEN
+                    CASE LAST_VALUE(cross_event IGNORE NULLS)
+                        OVER (ORDER BY row ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+                        WHEN 'CROSS_BULL' THEN 'CHOCH_BEAR' ELSE 'BOS_BEAR'
+                    END
+                ELSE NULL
+            END AS structure_event,
             
-            FROM whith_events
+            FROM events_gated
         )
         -- ═══════════════════════════════════════════════════════════════════════
         -- TABLA FINAL
-        -- ═══════════════════════════════════════════════════════════════════════
+        -- ══════════════════════════════════════════════════════════════════════════
         SELECT
             open_time, open, high, low, close, row,
             ATR_14,
             ROUND((high-low)/NULLIF(ATR_14, 0), 2) AS body_atr_ratio,
             is_sh, is_sl, sh_type, sl_type,
+            
             last_sh_level, last_sh_type, 
             CASE
                 WHEN last_sh_row IS NOT NULL THEN CAST(row - last_sh_row AS INT)
@@ -463,35 +503,9 @@ class AnalyticsDB:
                 WHEN last_sl_row IS NOT NULL THEN CAST(row - last_sl_row AS INT)
             END AS bars_since_last_sl,
             
-            structure_event, 
-            --    Versión refinada: cruza el evento con el swing_score actual
-            --    para detectar transiciones y rango
-            CASE
-                -- Tendencia alcista confirmada y swing score positivo
-                WHEN last_event IN ('BOS_BULL', 'CHOCH_BULL') AND swing_score >= 1
-                THEN 'BULLISH'
-
-                -- Tendencia alcista pero swings se deterioran → posible transición
-                WHEN last_event IN ('BOS_BULL', 'CHOCH_BULL') AND swing_score < 0
-                THEN 'TRANSITIONING_BEAR'
-
-                -- Tendencia bajista confirmada y swing score negativo
-                WHEN last_event IN ('BOS_BEAR', 'CHOCH_BEAR') AND swing_score <= -1
-                THEN 'BEARISH'
-
-                -- Tendencia bajista pero swings se recuperan → posible transición
-                WHEN last_event IN ('BOS_BEAR', 'CHOCH_BEAR') AND swing_score > 0
-                THEN 'TRANSITIONING_BULL'
-
-                -- Swing score puro sin evento claro
-                WHEN swing_score =  2 THEN 'BULLISH'
-                WHEN swing_score = -2 THEN 'BEARISH'
-
-                -- Sin eventos claros o señales mixtas → rango
-                ELSE 'RANGING'
-            END 
-            AS trend_refined,
-            last_event, swing_score
+            LAST_VALUE(structure_event IGNORE NULLS)
+            OVER (ORDER BY row ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+            AS trend
         FROM with_trend 
         ORDER BY open_time ASC
         """

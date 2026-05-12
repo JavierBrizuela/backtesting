@@ -15,7 +15,7 @@ Genera:
 
 import pandas as pd
 import numpy as np
-from agg_trades_to_db import AggTradeDB
+from analytics_db import AnalyticsDB
 import os
 
 # ==================== CONFIGURACIÓN ====================
@@ -25,9 +25,10 @@ RAW_PATH = f'data/{SYMBOL}/tradebook/raw_data.db'
 ANALYTICS_PATH = f'data/{SYMBOL}/tradebook/analytics.db'
 
 # Rango de fechas para escanear
-START_DATE = '2026-02-01'
-END_DATE = '2026-02-28'
+START_DATE = '2026-01-01'
+END_DATE = '2026-05-08'
 INTERVAL = '15 minutes'
+INTERVAL_CONTEXT = '4 hours'  # Para calcular market structure y tendencia general
 
 # Thresholds de absorción
 ABSORPTION_VOLUME_MA_MULT = 1.8  # Volumen >= 1.8x MA20
@@ -320,15 +321,15 @@ def detect_absorption_long(df):
         # FILTRO DE MARKET STRUCTURE: Solo operar Long en UPTREND
         # O cuando estamos cerca del last_swing_low (zona de soporte)
         trend_ok = False
-        if 'trend_direction' in row and pd.notna(row['trend_direction']):
-            if row['trend_direction'] == 'UPTREND':
+        if 'trend' in row and pd.notna(row['trend']):
+            if row['trend'] == 'CHOCH_BULL' or row['trend'] == 'BULL':
                 trend_ok = True
-            elif row['trend_direction'] == 'RANGING' and 'last_swing_low' in row:
+            """ elif row['trend'] == 'RANGING' and 'last_swing_low' in row:
                 # En rango, aceptar si estamos cerca del soporte (last_swing_low)
                 if pd.notna(row['last_swing_low']):
                     distance_to_sl = abs(row['close'] - row['last_swing_low']) / row['close']
                     if distance_to_sl < 0.01:  # Dentro del 1% del swing low
-                        trend_ok = True
+                        trend_ok = True """
 
         if not trend_ok:
             continue
@@ -771,7 +772,7 @@ def main():
 
     # Conectar a la DB
     print("\n[1/6] Conectando a la base de datos...")
-    db = AggTradeDB(RAW_PATH, ANALYTICS_PATH, read_only=True)
+    db = AnalyticsDB(ANALYTICS_PATH)
 
     # Obtener datos OHLC
     print("[2/6] Cargando datos OHLC...")
@@ -781,6 +782,7 @@ def main():
     # Obtener volume profile
     print("[3/6] Cargando Volume Profile...")
     df_vol_profile = db.get_volume_profile(INTERVAL, START_DATE, END_DATE, resolution=10)
+    df_ohlc['poc'] = df_vol_profile[df_vol_profile['is_poc'] == True]['price_bin'].values
     print(f"      [OK] {len(df_vol_profile)} bins cargados")
 
     # Calcular columnas adicionales necesarias
@@ -792,21 +794,17 @@ def main():
     df_ohlc['delta_ma'] = df_ohlc['delta'].rolling(window=window).sum()
 
     # Obtener market context para filtro de eficiencia y Market Structure
-    interval_name = INTERVAL.replace(" ", "_")
     try:
-        df_context = db.con.execute(f"""
-            SELECT * FROM analytics.market_context_{interval_name}
-            WHERE open_time >= '{START_DATE}' AND open_time <= '{END_DATE}'
-            ORDER BY open_time
-        """).fetchdf()
-        df_ohlc = df_ohlc.merge(
-            df_context[['open_time', 'efficiency_normalized', 'efficiency_ma',
-                       'last_swing_high', 'last_swing_low', 'market_structure_event',
-                       'trend_direction', 'bars_since_structure']],
+        df_context = db.get_market_context(INTERVAL_CONTEXT, START_DATE, END_DATE)
+        df_ohlc = pd.merge_asof(
+            df_ohlc,
+            df_context[['open_time', 'trend', 'sh_type', 'sl_type',
+                        'last_sh_level', 'last_sh_type', 'last_sl_level', 'last_sl_type']],
             on='open_time',
-            how='left'
+            direction='backward'
         )
         print("      [OK] Market context mergeado (con Market Structure)")
+        print(df_ohlc.tail(40))
     except Exception as e:
         print(f"      [WARN] Market context no disponible: {e}")
         df_ohlc['efficiency_normalized'] = np.nan

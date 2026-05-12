@@ -31,20 +31,20 @@ def candle_proportions(row):
 def check_trend_filter(row, direction):
     """
     Filtro de market structure.
-    LONG:  UPTREND o RANGING
-    SHORT: DOWNTREND o RANGING
+    LONG:  CHOCH_BULL o BULL
+    SHORT: CHOCH_BEAR o BEAR
 
     En RANGING no se requiere proximidad a swing levels porque
     es el regime mas comun en mercados crypto intraday.
     """
-    trend = row.get('trend_direction')
+    trend = row.get('trend')
     if pd.isna(trend):
         return False
 
     if direction == 'LONG':
-        return trend in ('UPTREND', 'RANGING')
+        return trend in ('CHOCH_BULL', 'BULL')
     else:
-        return trend in ('DOWNTREND', 'RANGING')
+        return trend in ('CHOCH_BEAR', 'BEAR')
 
 
 # ============================================================
