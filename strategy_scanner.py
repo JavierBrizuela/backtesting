@@ -16,6 +16,7 @@ Genera:
 import pandas as pd
 import numpy as np
 from analytics_db import AnalyticsDB
+from strategies import calculate_candle_proportions, check_trend_filter
 import os
 
 # ==================== CONFIGURACIÓN ====================
@@ -263,18 +264,6 @@ def calculate_backtest_metrics(trades_df):
 
 # ==================== DETECCIÓN DE SEÑALES ====================
 
-def calculate_candle_proportions(row):
-    """Calcula proporciones de cuerpo y mechas."""
-    body = abs(row['close'] - row['open'])
-    total = row['high'] - row['low']
-    if total == 0:
-        return 0, 0, 0
-    body_ratio = body / total
-    upper_wick = (row['high'] - max(row['open'], row['close'])) / total
-    lower_wick = (min(row['open'], row['close']) - row['low']) / total
-    return body_ratio, upper_wick, lower_wick
-
-
 def detect_absorption_long(df):
     """
     Detecta absorción LONG:
@@ -318,19 +307,8 @@ def detect_absorption_long(df):
                 if row['efficiency_normalized'] >= row['efficiency_ma']:
                     continue
 
-        # FILTRO DE MARKET STRUCTURE: Solo operar Long en UPTREND
-        # O cuando estamos cerca del last_swing_low (zona de soporte)
-        trend_ok = False
-        if 'trend' in row and pd.notna(row['trend']):
-            if row['trend'] == 'CHOCH_BULL' or row['trend'] == 'BULL':
-                trend_ok = True
-            """ elif row['trend'] == 'RANGING' and 'last_swing_low' in row:
-                # En rango, aceptar si estamos cerca del soporte (last_swing_low)
-                if pd.notna(row['last_swing_low']):
-                    distance_to_sl = abs(row['close'] - row['last_swing_low']) / row['close']
-                    if distance_to_sl < 0.01:  # Dentro del 1% del swing low
-                        trend_ok = True """
-
+        direction = "LONG"
+        trend_ok = check_trend_filter(row, direction)
         if not trend_ok:
             continue
 

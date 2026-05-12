@@ -17,7 +17,7 @@ import numpy as np
 # Helpers compartidos
 # ============================================================
 
-def candle_proportions(row):
+def calculate_candle_proportions(row):
     body = abs(row['close'] - row['open'])
     total = row['high'] - row['low']
     if total == 0:
@@ -77,7 +77,7 @@ class AbsorcionLong(Strategy):
             if row['delta_normalized'] >= p['delta_thresh']:
                 continue
 
-            body_ratio, upper_wick, lower_wick = candle_proportions(row)
+            body_ratio, upper_wick, lower_wick = calculate_candle_proportions(row)
             if lower_wick < p['min_wick_ratio']:
                 continue
 
