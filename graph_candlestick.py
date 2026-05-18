@@ -17,7 +17,6 @@ end = '2026-05-08'
 simbol = 'BTCUSDT'
 raw_path = f'data/{simbol}/tradebook/raw_data.db'
 analytics_path = f'data/{simbol}/tradebook/analytics.db'
-table = 'agg_trades'
 window=20
 
 #parametros de análisis de contexto de mercado

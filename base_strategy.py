@@ -30,7 +30,7 @@ import numpy as np
 class Signal:
     """Representa una senal de trading generada por una estrategia."""
     timestamp: pd.Timestamp
-    strategy: str
+    type: str
     direction: str  # 'LONG' or 'SHORT'
     entry_trigger: float
     stop_loss: float
@@ -39,12 +39,13 @@ class Signal:
     price_high: float = 0.0
     price_low: float = 0.0
     price_close: float = 0.0
+    volume: float = 0.0
     metadata: Dict = field(default_factory=dict)
 
     def to_dict(self):
         d = {
             'timestamp': self.timestamp,
-            'strategy': self.strategy,
+            'type': self.type,
             'direction': self.direction,
             'entry_trigger': self.entry_trigger,
             'stop_loss': self.stop_loss,
@@ -104,13 +105,13 @@ def simulate_trade(signal: Signal, df_ohlc: pd.DataFrame, rr_ratio: float = 2.0,
     signal_idx = df_ohlc[df_ohlc['open_time'] == signal.timestamp]
 
     if signal_idx.empty:
-        return TradeResult(None, None, 'SIGNAL_NOT_FOUND', 0, 0, 0)
+        return TradeResult(None, None, 'SIGNAL_NOT_FOUND', 0, 0, 0, 0, 0)
 
     signal_idx = signal_idx.index[0]
     future = df_ohlc.iloc[signal_idx + 1:signal_idx + 1 + max_candles].copy()
 
     if future.empty:
-        return TradeResult(None, None, 'NO_DATA', 0, 0, 0)
+        return TradeResult(None, None, 'NO_DATA', 0, 0, 0, 0, 0)
 
     if signal.direction == 'LONG':
         entry = signal.entry_trigger

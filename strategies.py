@@ -63,6 +63,7 @@ class AbsorcionLong(Strategy):
         "volume_mult": 1.8,
         "delta_thresh": 0.46,
         "min_wick_ratio": 0.5,
+        "directions": 'LONG',
     }
 
     def scan(self, df: pd.DataFrame, **kwargs):
@@ -92,20 +93,22 @@ class AbsorcionLong(Strategy):
             risk = row['high'] - row['low']
             signals.append(Signal(
                 timestamp=row['open_time'],
-                strategy=self.name,
-                direction='LONG',
-                entry_trigger=row['high'],
-                stop_loss=row['low'],
-                target=row['high'] + risk * p['rr_ratio'],
+                type=self.name,
+                direction=p['directions'],
                 price_open=row['open'],
                 price_high=row['high'],
                 price_low=row['low'],
                 price_close=row['close'],
+                volume=row['volume'],
+                entry_trigger=row['high'],
+                stop_loss=row['low'],
+                target=row['high'] + risk * p['rr_ratio'],
                 metadata={
                     'poc': poc,
                     'delta': row.get('delta'),
                     'delta_normalized': row['delta_normalized'],
                     'lower_wick_ratio': lower_wick,
+                    'body_ratio': body_ratio,
                     'trend_direction': row.get('trend_direction'),
                 },
             ))
@@ -128,6 +131,7 @@ class AbsorcionShort(Strategy):
         "volume_mult": 1.8,
         "delta_thresh": 0.54,
         "min_wick_ratio": 0.5,
+        "directions": 'SHORT',
     }
 
     def scan(self, df: pd.DataFrame, **kwargs):
@@ -142,7 +146,7 @@ class AbsorcionShort(Strategy):
             if row['delta_normalized'] <= p['delta_thresh']:
                 continue
 
-            body_ratio, upper_wick, lower_wick = candle_proportions(row)
+            body_ratio, upper_wick, lower_wick = calculate_candle_proportions(row)
             if upper_wick < p['min_wick_ratio']:
                 continue
 
@@ -156,7 +160,7 @@ class AbsorcionShort(Strategy):
             risk = row['high'] - row['low']
             signals.append(Signal(
                 timestamp=row['open_time'],
-                strategy=self.name,
+                type=self.name,
                 direction='SHORT',
                 entry_trigger=row['low'],
                 stop_loss=row['high'],
@@ -231,7 +235,7 @@ class MeanReversionVA(Strategy):
             if any(pd.isna([val, vah, poc])):
                 continue
 
-            body_ratio, upper_wick, lower_wick = candle_proportions(row)
+            body_ratio, upper_wick, lower_wick = calculate_candle_proportions(row)
 
             # --- LONG: cerca de VAL con mecha inferior de rechazo ---
             near_val = abs(row['low'] - val) / row['close'] <= p['val_tolerance']
@@ -246,7 +250,7 @@ class MeanReversionVA(Strategy):
 
                 signals.append(Signal(
                     timestamp=row['open_time'],
-                    strategy=self.name,
+                    type=self.name,
                     direction='LONG',
                     entry_trigger=entry,
                     stop_loss=stop,
@@ -365,7 +369,7 @@ class DeltaDivergence(Strategy):
                             if risk > 0:
                                 signals.append(Signal(
                                     timestamp=row['open_time'],
-                                    strategy=self.name,
+                                    type=self.name,
                                     direction='SHORT',
                                     entry_trigger=entry,
                                     stop_loss=stop,
@@ -399,7 +403,7 @@ class DeltaDivergence(Strategy):
                             if risk > 0:
                                 signals.append(Signal(
                                     timestamp=row['open_time'],
-                                    strategy=self.name,
+                                    type=self.name,
                                     direction='LONG',
                                     entry_trigger=entry,
                                     stop_loss=stop,
