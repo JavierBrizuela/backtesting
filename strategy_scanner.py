@@ -14,6 +14,7 @@ import numpy as np
 from analytics_db import AnalyticsDB
 from base_strategy import backtest_signals, calculate_backtest_metrics
 from strategies import calculate_candle_proportions, check_trend_filter, AbsorcionLong, AbsorcionShort, DeltaDivergence
+from strategy_charts import StrategyChart
 import os
 
 # ==================== CONFIGURACIÓN ====================
@@ -347,6 +348,9 @@ def main():
     print("      [BACKTEST] Delta divergence...")
     delta_divergence = backtest_signals(delta_divergence_raw, df_ohlc, rr_ratio=RR_RATIO, max_candles=MAX_CANDLES_EXIT)
     
+    # Graficar strategia
+    
+    
     # Calcular métricas de backtest
     print("\n" + "=" * 60)
     print("METRICAS DE BACKTEST")
@@ -382,6 +386,8 @@ def main():
         print(f"  Avg MFE: {metrics['avg_mfe']:.2f} | Avg MAE: {metrics['avg_mae']:.2f}")
         print(f"  Exit Reasons: {metrics['exit_reasons']}")
     # Graficar estrategias
+    strategy_chart = StrategyChart("Absorcion_Long", absorption_long_raw, df_ohlc)
+    strategy_chart.create_chart()
     
     # Guardar resultados
     print("\n" + "=" * 60)
