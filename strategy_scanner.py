@@ -340,10 +340,10 @@ def main():
     print("[6/6] Ejecutando backtest en las señales...")
 
     print("      [BACKTEST] Absorcion LONG...")
-    absorption_long = backtest_signals(absorption_long_raw, df_ohlc, rr_ratio=RR_RATIO, max_candles=MAX_CANDLES_EXIT)
-
+    absorption_long_backtest = backtest_signals(absorption_long_raw, df_ohlc, rr_ratio=RR_RATIO, max_candles=MAX_CANDLES_EXIT)
+    
     print("      [BACKTEST] Absorcion SHORT...")
-    absorption_short = backtest_signals(absorption_short_raw, df_ohlc, rr_ratio=RR_RATIO, max_candles=MAX_CANDLES_EXIT)
+    absorption_short_backtest = backtest_signals(absorption_short_raw, df_ohlc, rr_ratio=RR_RATIO, max_candles=MAX_CANDLES_EXIT)
 
     print("      [BACKTEST] Delta divergence...")
     delta_divergence = backtest_signals(delta_divergence_raw, df_ohlc, rr_ratio=RR_RATIO, max_candles=MAX_CANDLES_EXIT)
@@ -356,8 +356,8 @@ def main():
     print("METRICAS DE BACKTEST")
     print("=" * 60)
 
-    if not absorption_long.empty:
-        metrics = calculate_backtest_metrics(absorption_long)
+    if not absorption_long_backtest.empty:
+        metrics = calculate_backtest_metrics(absorption_long_backtest)
         print(f"\n[ABSORCION LONG] ({metrics['total_trades']} trades)")
         print(f"  Win Rate: {metrics['win_rate']:.1%}")
         print(f"  Profit Factor: {metrics['profit_factor']:.2f}")
@@ -366,8 +366,8 @@ def main():
         print(f"  Avg MFE: {metrics['avg_mfe']:.2f} | Avg MAE: {metrics['avg_mae']:.2f}")
         print(f"  Exit Reasons: {metrics['exit_reasons']}")
 
-    if not absorption_short.empty:
-        metrics = calculate_backtest_metrics(absorption_short)
+    if not absorption_short_backtest.empty:
+        metrics = calculate_backtest_metrics(absorption_short_backtest)
         print(f"\n[ABSORCION SHORT] ({metrics['total_trades']} trades)")
         print(f"  Win Rate: {metrics['win_rate']:.1%}")
         print(f"  Profit Factor: {metrics['profit_factor']:.2f}")
@@ -385,8 +385,9 @@ def main():
         print(f"  Max Drawdown: {metrics['max_drawdown']:.2f}")
         print(f"  Avg MFE: {metrics['avg_mfe']:.2f} | Avg MAE: {metrics['avg_mae']:.2f}")
         print(f"  Exit Reasons: {metrics['exit_reasons']}")
+    
     # Graficar estrategias
-    strategy_chart = StrategyChart("Absorcion_Long", absorption_long_raw, df_ohlc)
+    strategy_chart = StrategyChart("Absorcion_Long", absorption_long_backtest, df_ohlc)
     strategy_chart.create_chart()
     
     # Guardar resultados
@@ -395,24 +396,24 @@ def main():
     print("=" * 60)
 
     # CSVs individuales
-    absorption_long.to_csv(f'{OUTPUT_DIR}/absorption_long.csv', index=False)
-    print(f"[OK] {OUTPUT_DIR}/absorption_long.csv ({len(absorption_long)} filas)")
+    absorption_long_backtest.to_csv(f'{OUTPUT_DIR}/absorption_long.csv', index=False)
+    print(f"[OK] {OUTPUT_DIR}/absorption_long.csv ({len(absorption_long_backtest)} filas)")
 
-    absorption_short.to_csv(f'{OUTPUT_DIR}/absorption_short.csv', index=False)
-    print(f"[OK] {OUTPUT_DIR}/absorption_short.csv ({len(absorption_short)} filas)")
+    absorption_short_backtest.to_csv(f'{OUTPUT_DIR}/absorption_short.csv', index=False)
+    print(f"[OK] {OUTPUT_DIR}/absorption_short.csv ({len(absorption_short_backtest)} filas)")
 
     delta_divergence.to_csv(f'{OUTPUT_DIR}/delta_divergence.csv', index=False)
     print(f"[OK] {OUTPUT_DIR}/delta_divergence.csv ({len(delta_divergence)} filas)")
 
     # Resumen combinado
-    all_signals = pd.concat([absorption_long, absorption_short, delta_divergence], ignore_index=True)
+    all_signals = pd.concat([absorption_long_backtest, absorption_short_backtest, delta_divergence], ignore_index=True)
     if not all_signals.empty:
         all_signals = all_signals.sort_values('timestamp')
         all_signals.to_csv(f'{OUTPUT_DIR}/all_signals.csv', index=False)
         print(f"[OK] {OUTPUT_DIR}/all_signals.csv ({len(all_signals)} señales totales)")
 
     # HTML resumen
-    html_content = generate_summary_html(absorption_long, absorption_short, delta_divergence)
+    html_content = generate_summary_html(absorption_long_backtest, absorption_short_backtest, delta_divergence)
     with open(f'{OUTPUT_DIR}/scanner_summary.html', 'w', encoding='utf-8') as f:
         f.write(html_content)
     print(f"[OK] {OUTPUT_DIR}/scanner_summary.html")

@@ -11,8 +11,10 @@ class StrategyChart:
     """
     def __init__(self, strategy_name: str, signals: pd.DataFrame, metrics: pd.DataFrame):
         self.strategy_name = strategy_name
-        self.signals = signals
-        #self.signals['open_time'] = self.signals['open_time'].dt.tz_localize(None)
+        self.signals = signals.copy()
+        self.signals['timestamp'] = self.signals['timestamp'].dt.tz_localize(None)
+        self.signals['exit_time'] = self.signals['exit_time'].dt.tz_localize(None)
+        print(self.signals.head())
         self.metrics = metrics
         self.metrics['open_time'] = self.metrics['open_time'].dt.tz_localize(None)
         path = 'bokeh_output'
@@ -60,16 +62,22 @@ class StrategyChart:
         # Grafica fondo con tendencia
         trend = self.metrics[["open_time", "trend"]].copy()
         trend['bg_color'] = trend['trend'].map(color_event).fillna('#888888')
-        trend['close_time'] = trend['open_time'].shift(-1)
-        print(trend.tail())
+        trend['close_time'] = trend['open_time'] + pd.to_timedelta(width_ms, unit='ms')
+        trend['sum'] = trend['trend'].ne(trend['trend'].shift(1)).cumsum()
+        trend = trend.groupby('sum').agg({
+            'open_time': 'first',
+            'close_time': 'last',
+            'bg_color': 'first'
+        }).reset_index(drop=True)
+        
         # Establecer límites dinámicos para el eje y
         y_min = self.metrics['low'].min() * 0.98
         y_max = self.metrics['high'].max() * 1.02
         
         source_trend = ColumnDataSource(trend)
-        bg_trend = plt_candlestick.vbar(
-            x='open_time',
-            width=width_ms,
+        bg_trend = plt_candlestick.quad(
+            left='open_time',
+            right='close_time',
             bottom=y_min,
             top=y_max,
             fill_color='bg_color',
