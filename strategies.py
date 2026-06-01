@@ -71,8 +71,8 @@ class AbsorcionLong(Strategy):
         signals = []
 
         for _, row in df.iterrows():
-            if row['color'] != 'red':
-                continue
+            #if row['color'] != 'red':
+            #    continue
             if not row.get('volume_high', False):
                 continue
             if row['delta_normalized'] >= p['delta_thresh']:

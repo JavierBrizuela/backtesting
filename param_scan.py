@@ -232,7 +232,7 @@ def main():
     db.close_connection()
 
     scan = ParamScan()
-    all_results = []
+    results = []
 
     # ---- SCAN 1: Absorcion Long ----
     print("\n[3/4] Scan: Absorcion Long")
@@ -253,53 +253,11 @@ def main():
             for k, v in best.items():
                 if k.startswith('param_'):
                     print(f"    {k}: {v}")
-        all_results.append(results_long)
-
-    # ---- SCAN 2: Absorcion Short ----
-    print("\n[4/4] Scan: Absorcion Short")
-    results_short = scan.run(
-        strategy_cls=AbsorcionShort,
-        df=df,
-        param_grid={
-            'rr_ratio': [1.5, 2.0, 2.5],
-            'delta_thresh': [0.50, 0.54, 0.60],
-            'volume_mult': [1.5, 1.8, 2.0],
-        },
-    )
-    if not results_short.empty:
-        scan.print_table(results_short, sort_by='profit_factor')
-        best = scan.best(results_short, by='profit_factor', min_trades=5)
-        if best is not None:
-            print(f"\n  MEJOR combinacion (PF={best['profit_factor']:.2f}, {best['total_trades']} trades):")
-            for k, v in best.items():
-                if k.startswith('param_'):
-                    print(f"    {k}: {v}")
-        all_results.append(results_short)
-
-    # ---- SCAN 3: Delta Divergence ----
-    print("\n[5/5] Scan: Delta Divergence")
-    results_div = scan.run(
-        strategy_cls=DeltaDivergence,
-        df=df,
-        param_grid={
-            'rr_ratio': [1.5, 2.0],
-            'lookback': [15, 20, 30],
-            'delta_min_change': [3.0, 5.0, 10.0],
-        },
-    )
-    if not results_div.empty:
-        scan.print_table(results_div, sort_by='profit_factor')
-        best = scan.best(results_div, by='profit_factor', min_trades=5)
-        if best is not None:
-            print(f"\n  MEJOR combinacion (PF={best['profit_factor']:.2f}, {best['total_trades']} trades):")
-            for k, v in best.items():
-                if k.startswith('param_'):
-                    print(f"    {k}: {v}")
-        all_results.append(results_div)
+        results.append(results_long)
 
     # Guardar resultados combinados
-    if all_results:
-        combined = pd.concat(all_results, ignore_index=True)
+    if results:
+        combined = pd.concat(results, ignore_index=True)
         scan.save_csv(combined, 'param_scan_combined.csv')
         print("\n[OK] Todos los resultados guardados en scanner_output/")
 

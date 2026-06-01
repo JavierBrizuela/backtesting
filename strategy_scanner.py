@@ -11,12 +11,12 @@ Genera:
 
 import pandas as pd
 import numpy as np
+import os
 from analytics_db import AnalyticsDB
 from base_strategy import backtest_signals, calculate_backtest_metrics
 from strategies import calculate_candle_proportions, check_trend_filter, AbsorcionLong, AbsorcionShort, DeltaDivergence
 from strategy_charts import StrategyChart
-import os
-
+from param_scan import ParamScan
 # ==================== CONFIGURACIÓN ====================
 
 SYMBOL = 'BTCUSDT'
@@ -223,11 +223,24 @@ def main():
     db.close_connection()
 
     # Detectar señales
-    print("[5/6] Escaneando patrones...")
-
-    print("      [SCAN] Buscando Absorcion LONG...")
     strategy = AbsorcionLong()
-    strategy_raw = strategy.scan(df_ohlc)
+    print("[5/6] Buscando mejores parametros...")
+    print(f"      [SCAN] Buscando {strategy.__class__.__name__}...")
+    scan = ParamScan()
+    results = scan.run(
+        strategy_cls=AbsorcionLong,
+        df=df_ohlc,
+        param_grid={
+            'rr_ratio': [1.5, 2.0, 2.5],
+            'delta_thresh': [0.40, 0.46, 0.50],
+            'volume_mult': [1.5, 1.8, 2.0],
+        },
+    )
+    scan.print_table(results)
+    best_params = scan.best(results, by='profit_factor')
+    scan.save_csv(results, 'param_scan_results.csv')
+    
+    strategy_raw = strategy.scan(df_ohlc, params=best_params)
     print(f"        Encontradas: {len(strategy_raw)} señales")
 
     # Ejecutar backtest en las señales
