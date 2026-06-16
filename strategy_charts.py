@@ -14,10 +14,10 @@ class StrategyChart:
         self.signals = signals.copy()
         self.signals['timestamp'] = self.signals['timestamp'].dt.tz_localize(None)
         self.signals['exit_time'] = self.signals['exit_time'].dt.tz_localize(None)
-        print(self.signals.columns)
+        #print(self.signals.columns)
         self.metrics = metrics.copy()
         self.metrics['open_time'] = self.metrics['open_time'].dt.tz_localize(None)
-        print(self.metrics.columns)
+        #print(self.metrics.columns)
         path = 'bokeh_output'
         os.makedirs(path, exist_ok=True)
         output_file(os.path.join(path, f'{self.strategy_name}_chart.html'))

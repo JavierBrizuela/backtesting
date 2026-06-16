@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 import os
 from analytics_db import AnalyticsDB
-from base_strategy import backtest_signals, calculate_backtest_metrics
+from base_strategy import backtest_signals, calculate_backtest_metrics, metrics_report
 from strategies import calculate_candle_proportions, check_trend_filter, AbsorcionLong, AbsorcionShort, DeltaDivergence
 from strategy_charts import StrategyChart
 from param_scan import ParamScan
@@ -50,7 +50,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ==================== GENERAR HTML ====================
 
-def generate_summary_html(strategy_backtest: pd.DataFrame) -> str:
+def generate_summary_html(strategy_backtest: pd.DataFrame, best_params=None) -> str:
     """Genera un resumen HTML con todas las señales y resultados de backtest."""
 
     html = """
@@ -81,7 +81,8 @@ def generate_summary_html(strategy_backtest: pd.DataFrame) -> str:
     <body>
         <h1>Strategy Scanner Summary</h1>
         <p>Periodo: """ + START_DATE + """ a """ + END_DATE + """ | Intervalo: """ + INTERVAL + """</p>
-        <p>RR Ratio: """ + str(RR_RATIO) + """:1 | Max Candiles: """ + str(MAX_CANDLES_EXIT) + """</p>
+        <p>Max Candiles: """ + str(MAX_CANDLES_EXIT) + """</p>
+        """ + (f'<p>Mejores params: delta_thresh={best_params["delta_thresh"]} | trend_filter={best_params["trend_filter"]} | rr_ratio={best_params["rr_ratio"]}:1</p>' if best_params is not None else '') + """
     """
 
     # Métricas generales
@@ -227,27 +228,30 @@ def main():
     print("[5/6] Buscando mejores parametros...")
     print(f"      [SCAN] Buscando {strategy.__class__.__name__}...")
     scan = ParamScan()
+    sort_by = 'profit_factor'
+    param_grid = {
+        'delta_thresh': [0.40, 0.46, 0.50],
+        'trend_filter': [['BOS_BULL',], ['CHOCH_BULL',], ['BOS_BEAR',],['CHOCH_BEAR',]],
+        'rr_ratio': [2.0, 2.5, 3.0],
+    }
     results = scan.run(
         strategy_cls=AbsorcionLong,
         df=df_ohlc,
-        param_grid={
-            'rr_ratio': [1.5, 2.0, 2.5],
-            'delta_thresh': [0.40, 0.46, 0.50],
-            'volume_mult': [1.5, 1.8, 2.0],
-        },
+        param_grid=param_grid,
     )
-    scan.print_table(results)
-    best_params = scan.best(results, by='profit_factor')
+    scan.print_table(results, sort_by=sort_by)
+    best_params = scan.best(results, sort_by=sort_by)
     scan.save_csv(results, 'param_scan_results.csv')
     
-    strategy_raw = strategy.scan(df_ohlc, params=best_params)
-    print(f"        Encontradas: {len(strategy_raw)} señales")
+    best_params_dict = {k: best_params[k] for k in param_grid.keys()}
+    signals = strategy.scan(df_ohlc, params=best_params_dict)
+    print(f"        Encontradas: {len(signals)} señales")
 
     # Ejecutar backtest en las señales
     print("[6/6] Ejecutando backtest en las señales...")
 
     print(f"      [BACKTEST] {strategy.__class__.__name__}...")
-    strategy_backtest = backtest_signals(strategy_raw, df_ohlc, rr_ratio=RR_RATIO, max_candles=MAX_CANDLES_EXIT)
+    strategy_backtest = backtest_signals(signals, df_ohlc, rr_ratio=best_params['rr_ratio'], max_candles=MAX_CANDLES_EXIT)
     
     # Calcular métricas de backtest
     print("\n" + "=" * 60)
@@ -256,13 +260,14 @@ def main():
 
     if not strategy_backtest.empty:
         metrics = calculate_backtest_metrics(strategy_backtest)
-        print(f"\n[{strategy.__class__.__name__}] ({metrics['total_trades']} trades)")
+        print(metrics_report(metrics, strategy.__class__.__name__ ))
+        """ print(f"\n[{strategy.__class__.__name__}] ({metrics['total_trades']} trades)")
         print(f"  Win Rate: {metrics['win_rate']:.1%}")
         print(f"  Profit Factor: {metrics['profit_factor']:.2f}")
         print(f"  Expectancy: {metrics['expectancy']:.2f}")
         print(f"  Max Drawdown: {metrics['max_drawdown']:.2f}")
         print(f"  Avg MFE: {metrics['avg_mfe']:.2f} | Avg MAE: {metrics['avg_mae']:.2f}")
-        print(f"  Exit Reasons: {metrics['exit_reasons']}")
+        print(f"  Exit Reasons: {metrics['exit_reasons']}") """
 
     # Graficar estrategias
     strategy_chart = StrategyChart(strategy.__class__.__name__, strategy_backtest, df_ohlc)
@@ -278,7 +283,7 @@ def main():
     print(f"[OK] {OUTPUT_DIR}/{strategy.__class__.__name__.lower()}.csv ({len(strategy_backtest)} filas)")
 
     # HTML resumen
-    html_content = generate_summary_html(strategy_backtest)
+    html_content = generate_summary_html(strategy_backtest, best_params)
     with open(f'{OUTPUT_DIR}/scanner_summary.html', 'w', encoding='utf-8') as f:
         f.write(html_content)
     print(f"[OK] {OUTPUT_DIR}/scanner_summary.html")

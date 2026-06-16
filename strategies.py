@@ -42,9 +42,9 @@ def check_trend_filter(row, direction):
         return False
 
     if direction == 'LONG':
-        return trend in ('CHOCH_BULL', 'BULL')
+        return trend in ('CHOCH_BULL', 'BOSS_BULL')
     else:
-        return trend in ('CHOCH_BEAR', 'BEAR')
+        return trend in ('CHOCH_BEAR', 'BOSS_BEAR')
 
 
 # ============================================================
@@ -64,10 +64,12 @@ class AbsorcionLong(Strategy):
         "delta_thresh": 0.46,
         "min_wick_ratio": 0.5,
         "directions": 'LONG',
+        "trend_filter": ['BOS_BULL', 'CHOCH_BULL'],
     }
 
     def scan(self, df: pd.DataFrame, **kwargs):
-        p = self.params
+        p = self.params.copy()
+        p.update(kwargs.get('params', {}))
         signals = []
 
         for _, row in df.iterrows():
@@ -75,6 +77,7 @@ class AbsorcionLong(Strategy):
             #    continue
             if not row.get('volume_high', False):
                 continue
+            
             if row['delta_normalized'] >= p['delta_thresh']:
                 continue
 
@@ -87,7 +90,7 @@ class AbsorcionLong(Strategy):
             if pd.isna(poc) or poc > row['close'] or poc < row['low']:
                 continue
 
-            if not check_trend_filter(row, 'LONG'):
+            if not row.get('trend') in p['trend_filter']:
                 continue
 
             risk = row['high'] - row['low']
