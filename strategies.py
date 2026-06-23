@@ -42,9 +42,9 @@ def check_trend_filter(row, direction):
         return False
 
     if direction == 'LONG':
-        return trend in ('CHOCH_BULL', 'BOSS_BULL')
+        return trend in ('CHOCH_BULL', 'BOS_BULL')
     else:
-        return trend in ('CHOCH_BEAR', 'BOSS_BEAR')
+        return trend in ('CHOCH_BEAR', 'BOS_BEAR')
 
 
 # ============================================================
@@ -421,5 +421,124 @@ class DeltaDivergence(Strategy):
                                         'delta_trough': delta_at_curr,
                                     },
                                 ))
+
+        return signals
+
+
+# ============================================================
+# 5. Delta Exhaustion
+# ============================================================
+
+class DeltaExhaustion(Strategy):
+    """
+    Detects selling/buying exhaustion over N consecutive candles.
+
+    LONG: N red candles with delta INCREASING (less negative each candle).
+          Sellers are losing conviction. Price fails to make new lows.
+          -> Limit order at close/open/POC of the last pattern candle.
+
+    SHORT: N green candles with delta DECREASING (less positive each candle).
+           Buyers are losing conviction. Price fails to make new highs.
+           -> Limit order at close/open/POC of the last pattern candle.
+
+    Entry via LIMIT order so the trade only activates if price retraces to
+    the chosen level (close/open/POC). Esto evita entrar en medio de la
+    vela de agotamiento y espera confirmacion.
+    """
+    name = "Delta Exhaustion"
+    params = {
+        "rr_ratio": 2.0,
+        "max_candles": 20,
+        "lookback": 3,
+        "entry_price_type": "close",  # 'close', 'open', 'poc'
+        "stop_buffer": 0.3,  # % del rango de la vela para buffer del stop
+        "directions": 'LONG',
+        "trend_filter": None,  # None = sin filtro, o lista como ['BOS_BULL', 'CHOCH_BULL']
+    }
+
+    def scan(self, df: pd.DataFrame, **kwargs):
+        p = self.params
+        lookback = p['lookback']
+        signals = []
+
+        for i in range(lookback, len(df)):
+            window = df.iloc[i - lookback:i]
+            row = df.iloc[i - 1]
+
+            # Filtro de tendencia (si esta configurado)
+            if p['trend_filter'] is not None:
+                trend = row.get('trend')
+                if pd.isna(trend) or trend not in p['trend_filter']:
+                    continue
+
+            if p['directions'] == 'LONG':
+                if not all(window['color'] == 'red'):
+                    continue
+                deltas = window['delta'].values
+                if not all(deltas[j] < deltas[j+1] for j in range(lookback - 1)):
+                    continue
+                if not all(d < 0 for d in deltas):
+                    continue
+                lows = window['low'].values
+                if lows[-1] <= min(lows[:-1]):
+                    continue
+
+            else:  # SHORT
+                if not all(window['color'] == 'green'):
+                    continue
+                deltas = window['delta'].values
+                if not all(deltas[j] > deltas[j+1] for j in range(lookback - 1)):
+                    continue
+                if not all(d > 0 for d in deltas):
+                    continue
+                highs = window['high'].values
+                if highs[-1] >= max(highs[:-1]):
+                    continue
+            if p['entry_price_type'] == 'close':
+                entry_price = row['close']
+            elif p['entry_price_type'] == 'open':
+                entry_price = row['open']
+            elif p['entry_price_type'] == 'poc':
+                entry_price = row['poc']
+            else:
+                entry_price = row['close']
+
+            candle_range = row['high'] - row['low']
+            min_low = min(window['low'].values)
+            max_high = max(window['high'].values)
+
+            if p['directions'] == 'LONG':
+                stop_price = min_low - candle_range * p['stop_buffer']
+                risk = entry_price - stop_price
+                target = entry_price + risk * p['rr_ratio']
+            else:
+                stop_price = max_high + candle_range * p['stop_buffer']
+                risk = stop_price - entry_price
+                target = entry_price - risk * p['rr_ratio']
+
+            if risk <= 0:
+                continue
+
+            signals.append(Signal(
+                timestamp=row['open_time'],
+                type=self.name,
+                direction=p['directions'],
+                entry_trigger=entry_price,
+                stop_loss=stop_price,
+                target=target,
+                entry_mode='LIMIT',
+                price_open=row['open'],
+                price_high=row['high'],
+                price_low=row['low'],
+                price_close=row['close'],
+                volume=row['volume'],
+                metadata={
+                    'deltas': deltas.tolist(),
+                    'pattern_low': min_low,
+                    'pattern_high': max_high,
+                    'entry_price_type': p['entry_price_type'],
+                    'stop_buffer': p['stop_buffer'],
+                },
+            ))
 
         return signals

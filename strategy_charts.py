@@ -51,7 +51,7 @@ class StrategyChart:
         # Establecer una como activa por defecto
         plt_candlestick.toolbar.active_scroll = wheel_zoom_x
         # Grafica Cuerpo y mecha de la vela
-        ohlc = self.metrics[["open_time", "open", "high", "low", "close", 'color', 'poc', 'delta_normalized', 'volume', 'volume_ma', 'trade_count']].copy()
+        ohlc = self.metrics[["open_time", "open", "high", "low", "close", 'color', 'poc', 'delta_normalized', 'delta', 'volume', 'volume_ma', 'trade_count']].copy()
         # Calcula las mechas basándote en el color
         ohlc['upper_wick_end'] = np.where(
             ohlc['color'] == 'red', 
@@ -81,6 +81,7 @@ class StrategyChart:
                 ("Volume", "@volume{0.00}"),
                 ("Volume MA", "@volume_ma{0.00}"),
                 ("Delta Normalized", "@delta_normalized{0.2f}"),
+                ("Delta", "@delta{0.2f}"),
                 ("Trade Count", "@trade_count"),
                 ("VWAP", "@vwap{0.2f}"),
                 ("POC", "@poc{0.2f}"),

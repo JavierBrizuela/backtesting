@@ -14,7 +14,7 @@ import numpy as np
 import os
 from analytics_db import AnalyticsDB
 from base_strategy import backtest_signals, calculate_backtest_metrics, metrics_report
-from strategies import calculate_candle_proportions, check_trend_filter, AbsorcionLong, AbsorcionShort, DeltaDivergence
+from strategies import calculate_candle_proportions, check_trend_filter, AbsorcionLong, AbsorcionShort, DeltaDivergence, DeltaExhaustion
 from strategy_charts import StrategyChart
 from param_scan import ParamScan
 # ==================== CONFIGURACIÓN ====================
@@ -41,7 +41,7 @@ IMBALANCE_RATIO = 3.0
 IMBALANCE_MIN_STREAK = 3
 
 # Gestión de riesgo
-RR_RATIO = 3.0  # Reward:Risk 2:1
+RR_RATIO = 2.0  # Reward:Risk 2:1
 MAX_CANDLES_EXIT = 20  # Salida forzosa después de N velas si no toca target/stop
 
 # Output
@@ -82,7 +82,7 @@ def generate_summary_html(strategy_backtest: pd.DataFrame, best_params=None) -> 
         <h1>Strategy Scanner Summary</h1>
         <p>Periodo: """ + START_DATE + """ a """ + END_DATE + """ | Intervalo: """ + INTERVAL + """</p>
         <p>Max Candiles: """ + str(MAX_CANDLES_EXIT) + """</p>
-        """ + (f'<p>Mejores params: delta_thresh={best_params["delta_thresh"]} | trend_filter={best_params["trend_filter"]} | rr_ratio={best_params["rr_ratio"]}:1</p>' if best_params is not None else '') + """
+        """ + (f'<p>Mejores params: delta_thresh={best_params["delta_thresh"] if "delta_thresh" in best_params else "N/A"} | trend_filter={best_params["trend_filter"] if "trend_filter" in best_params else "N/A"} | rr_ratio={best_params["rr_ratio"] if "rr_ratio" in best_params else "N/A"}:1</p>' if best_params is not None else '') + """
     """
 
     # Métricas generales
@@ -198,7 +198,7 @@ def main():
     df_ohlc['delta_normalized'] = df_ohlc['buy_volume'] / (df_ohlc['volume'] + 1e-9)
     df_ohlc['delta_ma'] = df_ohlc['delta'].rolling(window=window).sum()
 
-    # Obtener market context para filtro de eficiencia y Market Structure
+    # Obtener market context para filtro de eficiencia y merge con df_ohlc
     try:
         df_context = db.get_market_context(INTERVAL_CONTEXT, START_DATE, END_DATE)
         df_ohlc = pd.merge_asof(
@@ -223,19 +223,56 @@ def main():
     # Cerrar conexión DB antes del backtest
     db.close_connection()
 
+    # ============================================================
+    # SCAN: Delta Exhaustion
+    # ============================================================
+    """ strategy_de = DeltaExhaustion(trend_filter=['BOS_BULL', 'CHOCH_BULL'])
+    print("[5b/6] Escaneando Delta Exhaustion...")
+    scan = ParamScan()
+    sort_by = 'profit_factor'
+    param_grid = {
+        'lookback': [2, 3, 4],
+        'max_candles': [20, 30, 50],
+        'rr_ratio': [2.0, 3.0, 4.0, 5.0],
+    }
+    scan_results_de = scan.run(
+        strategy_cls=DeltaExhaustion,
+        df=df_ohlc,
+        param_grid=param_grid,
+    )
+    de_signals = strategy_de.scan(df_ohlc, params=scan.best(scan_results_de, sort_by='profit_factor'))
+    print(f"        Encontradas: {len(de_signals)} senales")
+
+    if de_signals:
+        de_backtest = backtest_signals(de_signals, df_ohlc, rr_ratio=strategy_de.params['rr_ratio'], max_candles=MAX_CANDLES_EXIT)
+        print("\n" + "=" * 60)
+        print("DELTA EXHAUSTION - BACKTEST METRICS")
+        print("=" * 60)
+        if not de_backtest.empty:
+            de_metrics = calculate_backtest_metrics(de_backtest)
+            print(metrics_report(de_metrics, "Delta Exhaustion"))
+            de_backtest.to_csv(f'{OUTPUT_DIR}/delta_exhaustion.csv', index=False)
+            print(f"[OK] {OUTPUT_DIR}/delta_exhaustion.csv ({len(de_backtest)} filas)")
+            not_filled = len(de_backtest[de_backtest['exit_reason'] == 'NOT_FILLED'])
+            if not_filled:
+                print(f"      [WARN] {not_filled}/{len(de_backtest)} senales no se llenaron (NOT_FILLED)")
+    else:
+        print("      [WARN] No se encontraron senales de Delta Exhaustion")
+    strategy_chart_de = StrategyChart("Delta Exhaustion", de_backtest if de_signals else pd.DataFrame(), df_ohlc)
+    strategy_chart_de.create_chart() """
     # Detectar señales
-    strategy = AbsorcionLong()
+    strategy = DeltaExhaustion()
     print("[5/6] Buscando mejores parametros...")
     print(f"      [SCAN] Buscando {strategy.__class__.__name__}...")
     scan = ParamScan()
     sort_by = 'profit_factor'
     param_grid = {
-        'delta_thresh': [0.40, 0.46, 0.50],
-        'trend_filter': [['BOS_BULL',], ['CHOCH_BULL',], ['BOS_BEAR',],['CHOCH_BEAR',]],
-        'rr_ratio': [2.0, 2.5, 3.0],
+        'trend_filter': [['BOS_BULL', 'CHOCH_BULL'], ['BOS_BULL'], ['CHOCH_BULL']],
+        'rr_ratio': [2.0, 3.0],
+        'entry_price_type': ['close', 'open', 'poc']
     }
     results = scan.run(
-        strategy_cls=AbsorcionLong,
+        strategy_cls=DeltaExhaustion,
         df=df_ohlc,
         param_grid=param_grid,
     )
@@ -244,14 +281,15 @@ def main():
     scan.save_csv(results, 'param_scan_results.csv')
     
     best_params_dict = {k: best_params[k] for k in param_grid.keys()}
-    signals = strategy.scan(df_ohlc, params=best_params_dict)
+    print(f"      [OK] Mejores parametros: {best_params_dict}")
+    signals = strategy.scan(df_ohlc, **best_params_dict)
     print(f"        Encontradas: {len(signals)} señales")
 
     # Ejecutar backtest en las señales
     print("[6/6] Ejecutando backtest en las señales...")
 
     print(f"      [BACKTEST] {strategy.__class__.__name__}...")
-    strategy_backtest = backtest_signals(signals, df_ohlc, rr_ratio=best_params['rr_ratio'], max_candles=MAX_CANDLES_EXIT)
+    strategy_backtest = backtest_signals(signals, df_ohlc, rr_ratio=best_params['rr_ratio'] if 'rr_ratio' in best_params else RR_RATIO, max_candles=best_params['max_candles'] if 'max_candles' in best_params else MAX_CANDLES_EXIT)
     
     # Calcular métricas de backtest
     print("\n" + "=" * 60)
@@ -261,13 +299,13 @@ def main():
     if not strategy_backtest.empty:
         metrics = calculate_backtest_metrics(strategy_backtest)
         print(metrics_report(metrics, strategy.__class__.__name__ ))
-        """ print(f"\n[{strategy.__class__.__name__}] ({metrics['total_trades']} trades)")
+        print(f"\n[{strategy.__class__.__name__}] ({metrics['total_trades']} trades)")
         print(f"  Win Rate: {metrics['win_rate']:.1%}")
         print(f"  Profit Factor: {metrics['profit_factor']:.2f}")
         print(f"  Expectancy: {metrics['expectancy']:.2f}")
         print(f"  Max Drawdown: {metrics['max_drawdown']:.2f}")
         print(f"  Avg MFE: {metrics['avg_mfe']:.2f} | Avg MAE: {metrics['avg_mae']:.2f}")
-        print(f"  Exit Reasons: {metrics['exit_reasons']}") """
+        print(f"  Exit Reasons: {metrics['exit_reasons']}")
 
     # Graficar estrategias
     strategy_chart = StrategyChart(strategy.__class__.__name__, strategy_backtest, df_ohlc)
@@ -278,7 +316,7 @@ def main():
     print("GUARDANDO RESULTADOS")
     print("=" * 60)
 
-    # CSVs individuales
+    # Guardar CSVs de estrategia
     strategy_backtest.to_csv(f'{OUTPUT_DIR}/{strategy.__class__.__name__.lower()}.csv', index=False)
     print(f"[OK] {OUTPUT_DIR}/{strategy.__class__.__name__.lower()}.csv ({len(strategy_backtest)} filas)")
 

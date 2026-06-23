@@ -40,6 +40,7 @@ class Signal:
     price_low: float = 0.0
     price_close: float = 0.0
     volume: float = 0.0
+    entry_mode: str = 'IMMEDIATE'  # 'IMMEDIATE' (entry at trigger on next candle) or 'LIMIT' (wait for price to be reached)
     metadata: Dict = field(default_factory=dict)
 
     def to_dict(self):
@@ -68,6 +69,8 @@ class TradeResult:
     pnl: float
     mae: float  # Maximum Adverse Excursion
     mfe: float  # Maximum Favorable Excursion
+    fill_time: Optional[pd.Timestamp] = None  # Cuando se lleno la orden (LIMIT)
+    fill_price: Optional[float] = None  # A qué precio se lleno (LIMIT)
 
 
 class Strategy(ABC):
@@ -103,22 +106,27 @@ class Strategy(ABC):
 def simulate_trade(signal: Signal, df_ohlc: pd.DataFrame, rr_ratio: float = 2.0, max_candles: int = 20) -> TradeResult:
     """Simula una operacion desde la senal hasta target/stop/expiracion."""
     signal_idx = df_ohlc[df_ohlc['open_time'] == signal.timestamp]
-
     if signal_idx.empty:
-        return TradeResult(None, None, 'SIGNAL_NOT_FOUND', 0, 0, 0, 0, 0)
-
+        return TradeResult(None, None, 'SIGNAL_NOT_FOUND', 0, 0, 0)
     signal_idx = signal_idx.index[0]
     future = df_ohlc.iloc[signal_idx + 1:signal_idx + 1 + max_candles].copy()
-
     if future.empty:
-        return TradeResult(None, None, 'NO_DATA', 0, 0, 0, 0, 0)
+        return TradeResult(None, None, 'NO_DATA', 0, 0, 0)
+
+    if signal.entry_mode == 'LIMIT':
+        return _simulate_limit(signal, future, rr_ratio)
+    else:
+        return _simulate_immediate(signal, future, rr_ratio)
+
+
+def _simulate_immediate(signal: Signal, future: pd.DataFrame, rr_ratio: float) -> TradeResult:
+    """Entrada inmediata: asume que entramos al entry_trigger al inicio."""
+    entry = signal.entry_trigger
+    stop = signal.stop_loss
 
     if signal.direction == 'LONG':
-        entry = signal.entry_trigger
-        stop = signal.stop_loss
-        target = entry + (entry - stop) * rr_ratio
         risk = entry - stop
-
+        target = entry + risk * rr_ratio
         max_high = future['high'].max()
         min_low = future['low'].min()
         mfe = max_high - entry
@@ -134,11 +142,8 @@ def simulate_trade(signal: Signal, df_ohlc: pd.DataFrame, rr_ratio: float = 2.0,
         return TradeResult(future.iloc[-1]['open_time'], exit_price, 'TIME_EXIT', exit_price - entry, mae, mfe)
 
     else:  # SHORT
-        entry = signal.entry_trigger
-        stop = signal.stop_loss
-        target = entry - (stop - entry) * rr_ratio
         risk = stop - entry
-
+        target = entry - risk * rr_ratio
         max_high = future['high'].max()
         min_low = future['low'].min()
         mfe = entry - min_low
@@ -154,6 +159,76 @@ def simulate_trade(signal: Signal, df_ohlc: pd.DataFrame, rr_ratio: float = 2.0,
         return TradeResult(future.iloc[-1]['open_time'], exit_price, 'TIME_EXIT', entry - exit_price, mae, mfe)
 
 
+def _simulate_limit(signal: Signal, future: pd.DataFrame, rr_ratio: float) -> TradeResult:
+    """
+    Entrada LIMIT: escanea velas futuras hasta que el mercado alcanza
+    el entry_trigger. Solo ahi se activa el trade y se monitorea stop/target.
+    Si no se llena en max_candles, retorna NOT_FILLED.
+    """
+    entry = signal.entry_trigger
+    stop = signal.stop_loss
+
+    if signal.direction == 'LONG':
+        for i, candle in future.iterrows():
+            if candle['low'] <= entry:
+                fill_time = candle['open_time']
+                fill_price = entry
+                remaining = future.loc[future.index > i]
+
+                if remaining.empty:
+                    return TradeResult(fill_time, fill_price, 'TIME_EXIT', 0, 0, 0, fill_time, fill_price)
+
+                risk = fill_price - stop
+                target = fill_price + risk * rr_ratio
+
+                max_high = remaining['high'].max()
+                min_low = remaining['low'].min()
+                mfe = max_high - fill_price
+                mae = fill_price - min_low
+
+                for _, c in remaining.iterrows():
+                    if c['low'] <= stop:
+                        return TradeResult(c['open_time'], stop, 'STOP_LOSS', -risk, mae, mfe, fill_time, fill_price)
+                    if c['high'] >= target:
+                        return TradeResult(c['open_time'], target, 'TARGET', risk * rr_ratio, mae, mfe, fill_time, fill_price)
+
+                exit_price = remaining.iloc[-1]['close']
+                pnl = exit_price - fill_price
+                return TradeResult(remaining.iloc[-1]['open_time'], exit_price, 'TIME_EXIT', pnl, mae, mfe, fill_time, fill_price)
+
+        return TradeResult(None, None, 'NOT_FILLED', 0, 0, 0)
+
+    else:  # SHORT
+        for i, candle in future.iterrows():
+            if candle['high'] >= entry:
+                fill_time = candle['open_time']
+                fill_price = entry
+                remaining = future.loc[future.index > i]
+
+                if remaining.empty:
+                    return TradeResult(fill_time, fill_price, 'TIME_EXIT', 0, 0, 0, fill_time, fill_price)
+
+                risk = stop - fill_price
+                target = fill_price - risk * rr_ratio
+
+                max_high = remaining['high'].max()
+                min_low = remaining['low'].min()
+                mfe = fill_price - min_low
+                mae = max_high - fill_price
+
+                for _, c in remaining.iterrows():
+                    if c['high'] >= stop:
+                        return TradeResult(c['open_time'], stop, 'STOP_LOSS', -risk, mae, mfe, fill_time, fill_price)
+                    if c['low'] <= target:
+                        return TradeResult(c['open_time'], target, 'TARGET', risk * rr_ratio, mae, mfe, fill_time, fill_price)
+
+                exit_price = remaining.iloc[-1]['close']
+                pnl = fill_price - exit_price
+                return TradeResult(remaining.iloc[-1]['open_time'], exit_price, 'TIME_EXIT', pnl, mae, mfe, fill_time, fill_price)
+
+        return TradeResult(None, None, 'NOT_FILLED', 0, 0, 0)
+
+
 def backtest_signals(signals: List[Signal], df_ohlc: pd.DataFrame, rr_ratio: float = 2.0, max_candles: int = 20) -> pd.DataFrame:
     """Ejecuta backtest sobre todas las senales y retorna DataFrame con resultados."""
     results = []
@@ -167,6 +242,8 @@ def backtest_signals(signals: List[Signal], df_ohlc: pd.DataFrame, rr_ratio: flo
             'pnl': trade.pnl,
             'mae': trade.mae,
             'mfe': trade.mfe,
+            'fill_time': trade.fill_time,
+            'fill_price': trade.fill_price,
         })
     return pd.DataFrame(results)
 
